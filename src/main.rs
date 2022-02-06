@@ -1,17 +1,27 @@
 use bracket_pathfinding::prelude::*;
-use bracket_random::prelude::*;
 use bracket_terminal::prelude::*;
+use specs::prelude::*;
+use specs_derive::Component;
+use std::cmp::{max, min};
+
+bracket_terminal::embedded_resource!(TILE_FONT, "../resources/settlement.png");
+
+const WIDTH: i32 = 25;
+const HEIGHT: i32 = 14;
+const TILE_WIDTH: u32 = 32;
+const TILE_HEIGHT: u32 = 32;
 
 #[derive(PartialEq, Copy, Clone)]
 enum TileType {
-    Wall,
+    Ground,
     Floor,
+    Wall,
 }
 
 #[derive(PartialEq, Copy, Clone)]
-enum Tiles {
+enum TileGraphic {
     Ground=0,
-    Inside,
+    InsideFloor,
     LRGroundInside=8,
     LRInsideGround,
     TBGroundInside,
@@ -39,206 +49,213 @@ enum Tiles {
     PlayerCharacterWithBackpack,
 }
 
-const WIDTH: i32 = 40;
-const HEIGHT: i32 = 25;
-const TILE_WIDTH: u32 = 32;
-const TILE_HEIGHT: u32 = 32;
+#[derive(PartialEq, Copy, Clone)]
+enum TileLayer {
+    Floor,
+    Walls,
+    Decorations,
+    NPCs,
+    PlayerCharacter,
+}
+
+#[derive(Component)]
+struct Position {
+    x: i32,
+    y: i32,
+}
+
+#[derive(Component)]
+struct Renderable {
+    graphic: TileGraphic,
+    layer: TileLayer,
+}
+
+#[derive(Component, Debug)]
+struct Player {}
 
 struct State {
-    map: Vec<TileType>,
-    player_position: usize,
-    visible: Vec<bool>,
+    ecs: World,
 }
 
 pub fn xy_idx(x: i32, y: i32) -> usize {
-    (y as usize * WIDTH as usize) + x as usize
+    ((y * WIDTH) + x) as usize
 }
 
-pub fn idx_xy(idx: usize) -> (i32, i32) {
-    (idx as i32 % WIDTH, idx as i32 / WIDTH)
+
+fn new_map() -> Vec<TileType> {
+    let mut map = vec![TileType::Ground; (WIDTH * HEIGHT) as usize];
+
+    const ROOM_P1: Point = Point{ x: 16, y: 2};
+    const ROOM_P2: Point = Point{ x: 22, y: 7};
+
+    for x in ROOM_P1.x..=ROOM_P2.x {
+        map[xy_idx(x, ROOM_P1.y)] = TileType::Wall;
+        map[xy_idx(x, ROOM_P2.y)] = TileType::Wall;
+    }
+
+    for y in ROOM_P1.y..=ROOM_P2.y {
+        map[xy_idx(ROOM_P1.x, y)] = TileType::Wall;
+        map[xy_idx(ROOM_P2.x, y)] = TileType::Wall;
+    }
+
+    map
 }
 
-impl State {
-    pub fn new() -> State {
-        let mut state = State {
-            map: vec![TileType::Floor; (WIDTH * HEIGHT) as usize],
-            player_position: xy_idx(WIDTH / 2, HEIGHT / 2),
-            visible: vec![false; (WIDTH * HEIGHT) as usize],
-        };
+fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
+    let mut positions = ecs.write_storage::<Position>();
+    let mut players = ecs.write_storage::<Player>();
+    let map = ecs.fetch::<Vec<TileType>>();
 
-        for x in 0..WIDTH {
-            state.map[xy_idx(x, 0)] = TileType::Wall;
-            state.map[xy_idx(x, HEIGHT - 1)] = TileType::Wall;
+    for (_player, pos) in (&mut players, &mut positions).join() {
+        let destination_idx = xy_idx(pos.x + delta_x, pos.y + delta_y);
+        if map[destination_idx] != TileType::Wall {
+            pos.x = min(WIDTH - 1, max(0, pos.x + delta_x));
+            pos.y = min(HEIGHT - 1, max(0, pos.y + delta_y));
         }
-        for y in 0..HEIGHT {
-            state.map[xy_idx(0, y)] = TileType::Wall;
-            state.map[xy_idx(WIDTH - 1, y)] = TileType::Wall;
-        }
+    }
+}
 
-        let mut rng = RandomNumberGenerator::new();
+fn player_input(gs: &mut State, ctx: &mut BTerm) {
+    // Player movement
+    match ctx.key {
+        None => {} // Nothing happened
+        Some(key) => match key {
+            // Laptop controls
 
-        for _ in 0..400 {
-            let x = rng.range(1, WIDTH - 1);
-            let y = rng.range(1, HEIGHT - 1);
-            let idx = xy_idx(x, y);
-            if state.player_position != idx {
-                state.map[idx] = TileType::Wall;
+            // vim-style HJKL
+            VirtualKeyCode::K => try_move_player(0, -1, &mut gs.ecs),
+            VirtualKeyCode::H => try_move_player(-1, 0, &mut gs.ecs),
+            VirtualKeyCode::L => try_move_player(1, 0, &mut gs.ecs),
+            VirtualKeyCode::J => try_move_player(0, 1, &mut gs.ecs),
+            // diagonals on YUBN
+            VirtualKeyCode::Y => try_move_player(-1, -1, &mut gs.ecs),
+            VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
+            VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
+            VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
+
+            // Arrow keys
+            VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
+            VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
+            VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
+            VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
+
+            _ => {}
+        },
+    }
+}
+
+
+fn draw_map(map: &[TileType]) {
+    let mut draw_batch = DrawBatch::new();
+    draw_batch.target(0);
+
+    let mut x = 0;
+    let mut y = 0;
+    for tile in map.iter() {
+        // Render a tile depending upon the tile type
+        match tile {
+            TileType::Ground => {
+                draw_batch.set(
+                    Point { x: x, y: y},
+                    ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
+                    TileGraphic::Ground as u16,
+                );
+            }
+            TileType::Floor => {
+                draw_batch.set(
+                    Point { x: x, y: y},
+                    ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
+                    TileGraphic::InsideFloor as u16,
+                );
+            }
+            TileType::Wall => {
+                draw_batch.set(
+                    Point { x: x, y: y},
+                    ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
+                    TileGraphic::WallHExternal as u16,
+                );
             }
         }
 
-        state
-    }
-
-    pub fn move_player(&mut self, delta_x: i32, delta_y: i32) {
-        let current_position = idx_xy(self.player_position);
-        let new_position = (current_position.0 + delta_x, current_position.1 + delta_y);
-        let new_idx = xy_idx(new_position.0, new_position.1);
-        if self.map[new_idx] == TileType::Floor {
-            self.player_position = new_idx;
+        // Move the coordinates
+        x += 1;
+        if x > (WIDTH - 1) {
+            x = 0;
+            y += 1;
         }
     }
 }
 
 // Implement the game loop
 impl GameState for State {
-    #[allow(non_snake_case)]
     fn tick(&mut self, ctx: &mut BTerm) {
+        player_input(self, ctx);
+        self.run_systems();
+    
+        let map = self.ecs.fetch::<Vec<TileType>>();
+        draw_map(&map);
+
         let mut draw_batch = DrawBatch::new();
-        match ctx.key {
-            None => {} // Nothing happened
-            Some(key) => {
-                // A key is pressed or held
-                match key {
-                    // Numpad
-                    VirtualKeyCode::K => self.move_player(0, -1),
-                    VirtualKeyCode::H => self.move_player(-1, 0),
-                    VirtualKeyCode::L => self.move_player(1, 0),
-                    VirtualKeyCode::J => self.move_player(0, 1),
+        let positions = self.ecs.read_storage::<Position>();
+        let renderables = self.ecs.read_storage::<Renderable>();
 
-                    // Numpad diagonals
-                    VirtualKeyCode::Y => self.move_player(-1, -1),
-                    VirtualKeyCode::U => self.move_player(1, -1),
-                    VirtualKeyCode::B => self.move_player(-1, 1),
-                    VirtualKeyCode::N => self.move_player(1, 1),
-
-                    // Cursors
-                    VirtualKeyCode::Up => self.move_player(0, -1),
-                    VirtualKeyCode::Down => self.move_player(0, 1),
-                    VirtualKeyCode::Left => self.move_player(-1, 0),
-                    VirtualKeyCode::Right => self.move_player(1, 0),
-
-                    _ => {} // Ignore all the other possibilities
-                }
-            }
-        }
-
-        // Set all tiles to not visible
-        for v in &mut self.visible {
-            *v = false;
-        }
-
-        // Obtain the player's visible tile set, and apply it
-        let player_position = self.index_to_point2d(self.player_position);
-        let fov = field_of_view_set(player_position, 8, self);
-
-        // Note that the steps above would generally not be run every frame!
-        for idx in &fov {
-            self.visible[xy_idx(idx.x, idx.y)] = true;
-        }
-
-        // Clear the screen
-        draw_batch.target(0);
-        draw_batch.cls();
-
-        // Iterate the map array, incrementing coordinates as we go.
-        let mut y = 0;
-        let mut x = 0;
-        for (i, tile) in self.map.iter().enumerate() {
-            // Render a tile depending upon the tile type; now we check visibility as well!
-            let mut fg = RGB::from_f32(1.0, 1.0, 1.0);
-            let glyph;
-
-            match tile {
-                TileType::Floor => {
-                    glyph = Tiles::Ground;
-                }
-                TileType::Wall => {
-                    glyph = Tiles::WallHExternal;
-                }
-            }
-            if !self.visible[i] {
-                fg = fg * 0.3;
-            } else {
-                let distance = 1.0
-                    - (DistanceAlg::Pythagoras.distance2d(Point::new(x, y), player_position)
-                        as f32
-                        / 10.0);
-                fg = RGB::from_f32(distance, distance, distance);
-            }
+        for (pos, render) in (&positions, &renderables).join() {
+            draw_batch.target(1);
+            draw_batch.cls();
             draw_batch.set(
-                Point::new(x, y),
-                ColorPair::new(fg, RGB::from_f32(0., 0., 0.)),
-                glyph as u16,
+                Point { x: pos.x, y: pos.y},
+                ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
+                render.graphic as u16,
             );
-
-            // Move the coordinates
-            x += 1;
-            if x > WIDTH - 1 {
-                x = 0;
-                y += 1;
-            }
+            draw_batch.submit(render.layer as usize).expect("Batch error");
         }
-
-        // Render the player @ symbol
-        let ppos = idx_xy(self.player_position);
-        draw_batch.target(1);
-        draw_batch.cls();
-        draw_batch.set(
-            Point::from_tuple(ppos),
-            ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
-            Tiles::PlayerCharacter as u16,
-        );
-
-        draw_batch.submit(0).expect("Batch error");
-
         render_draw_buffer(ctx).expect("Render error");
     }
 }
 
-impl BaseMap for State {
-    fn is_opaque(&self, idx: usize) -> bool {
-        self.map[idx as usize] == TileType::Wall
+impl State {
+    fn run_systems(&mut self) {
+        self.ecs.maintain();
     }
 }
-
-impl Algorithm2D for State {
-    fn dimensions(&self) -> Point {
-        Point::new(WIDTH, HEIGHT)
-    }
-}
-
-bracket_terminal::embedded_resource!(TILE_FONT, "../resources/settlement.png");
 
 fn main() -> BError {
     bracket_terminal::link_resource!(TILE_FONT, "resources/settlement.png");
 
-    // This initialization is a bit more complicated than the previous examples.
     let context = BTermBuilder::new()
         // We specify the CONSOLE dimensions
-        .with_dimensions(WIDTH as u32, HEIGHT as u32)
+        .with_dimensions(WIDTH, HEIGHT)
         // We specify the size of the tiles
-        .with_tile_dimensions(TILE_WIDTH, TILE_HEIGHT)
+        .with_tile_dimensions(TILE_WIDTH * 2, TILE_HEIGHT * 2)
         // We give it a window title
         .with_title("Reconnection - Settlement")
         // We register our embedded "settlement.png" as a font.
         .with_font("settlement.png", TILE_WIDTH, TILE_HEIGHT)
-        // We want a base simple console for the terrain background
+        // We want a base simple console for the floor layer
         .with_simple_console(WIDTH as u32, HEIGHT as u32, "settlement.png")
-        // We also want a sparse console atop it to handle moving the character
+        // We also want a sparse console for the layers above
         .with_sparse_console_no_bg(WIDTH as u32, HEIGHT as u32, "settlement.png")
         // And we call the builder function
         .build()?;
 
-    let gs = State::new();
+    let mut gs = State {
+        ecs: World::new(),
+    };
+    gs.ecs.register::<Position>();
+    gs.ecs.register::<Renderable>();
+    gs.ecs.register::<Player>();
+
+    gs.ecs.insert(new_map());
+
+    gs.ecs
+        .create_entity()
+        .with(Position { x: WIDTH / 2, y: HEIGHT / 2 })
+        .with(Renderable {
+            graphic: TileGraphic::PlayerCharacter,
+            layer: TileLayer::PlayerCharacter,
+        })
+        .with(Player{})
+        .build();
+
     main_loop(context, gs)
 }
