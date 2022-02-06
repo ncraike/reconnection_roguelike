@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../third-party/amethyst_rustrogueliketutorial"
+		},
+		{
+			"path": "../third-party/amethyst_bracket-lib"
+		}
+	],
+	"settings": {}
+}
