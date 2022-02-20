@@ -5,11 +5,11 @@ use super::*;
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
-    let map = ecs.fetch::<Vec<TileType>>();
+    let map = ecs.fetch::<Map>();
 
     for (_player, pos) in (&mut players, &mut positions).join() {
-        let destination_idx = xy_idx(pos.x + delta_x, pos.y + delta_y);
-        if map[destination_idx] != TileType::Wall {
+        let dest_idx = map.to_index(Point{x: (pos.x + delta_x), y: (pos.y + delta_y)});
+        if map.wall_tiles[dest_idx] == TileGraphic::EmptyWall {
             pos.x = min(WIDTH - 1, max(0, pos.x + delta_x));
             pos.y = min(HEIGHT - 1, max(0, pos.y + delta_y));
         }

@@ -21,16 +21,15 @@ impl GameState for State {
         player_input(self, ctx);
         self.run_systems();
     
-        let map = self.ecs.fetch::<Vec<TileType>>();
-        draw_map(&map);
+        draw_map(&self.ecs);
 
         let mut draw_batch = DrawBatch::new();
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
-
+        
+        draw_batch.cls();
+        draw_batch.target(1);
         for (pos, render) in (&positions, &renderables).join() {
-            draw_batch.target(1);
-            draw_batch.cls();
             draw_batch.set(
                 Point { x: pos.x, y: pos.y},
                 ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
@@ -74,7 +73,8 @@ fn main() -> BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
-    gs.ecs.insert(new_map());
+    let map: Map = Map::new_map();
+    gs.ecs.insert(map);
 
     gs.ecs
         .create_entity()
