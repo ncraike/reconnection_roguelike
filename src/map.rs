@@ -133,7 +133,7 @@ impl Map {
 
         let room = Rect::with_exact(16, 2, 22, 7);
         map.apply_room_to_map(&room);
-    
+
         map
     }
 }
@@ -145,10 +145,8 @@ pub fn draw_map(ecs: &World) {
     let map_area = Rect::with_size(0, 0, map.width, map.height);
     let mut floor_draws = DrawBatch::new();
     floor_draws.target(1);
-    floor_draws.cls();
     let mut wall_draws = DrawBatch::new();
     wall_draws.target(1);
-    wall_draws.cls();
 
     let solid_color: ColorPair = ColorPair::new(
         RGB::from_f32(1.0, 1.0, 1.0),

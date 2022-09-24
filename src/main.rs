@@ -20,14 +20,14 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         player_input(self, ctx);
         self.run_systems();
-    
+
         draw_map(&self.ecs);
+        render_draw_buffer(ctx).expect("Render error");
 
         let mut draw_batch = DrawBatch::new();
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
-        
-        draw_batch.cls();
+
         draw_batch.target(1);
         for (pos, render) in (&positions, &renderables).join() {
             draw_batch.set(
