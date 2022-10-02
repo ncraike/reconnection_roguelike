@@ -29,6 +29,7 @@ impl GameState for State {
         let renderables = self.ecs.read_storage::<Renderable>();
 
         draw_batch.target(1);
+        draw_batch.cls();
         for (pos, render) in (&positions, &renderables).join() {
             draw_batch.set(
                 Point { x: pos.x, y: pos.y},

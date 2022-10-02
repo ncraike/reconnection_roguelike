@@ -112,7 +112,8 @@ pub fn draw_map(ecs: &World) {
 
     let map_area = Rect::with_size(0, 0, map.width, map.height);
     let mut draws = DrawBatch::new();
-    draws.target(1);
+    draws.cls();
+    draws.target(0);
 
     let solid_color: ColorPair = ColorPair::new(
         RGB::from_f32(1.0, 1.0, 1.0),
