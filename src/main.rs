@@ -35,7 +35,7 @@ impl GameState for State {
                 ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
                 render.graphic as u16,
             );
-            draw_batch.submit(render.layer as usize).expect("Batch error");
+            draw_batch.submit(0).expect("Batch error");
         }
         render_draw_buffer(ctx).expect("Render error");
     }
@@ -54,15 +54,16 @@ fn main() -> BError {
         // We specify the CONSOLE dimensions
         .with_dimensions(WIDTH, HEIGHT)
         // We specify the size of the tiles
-        .with_tile_dimensions(TILE_WIDTH * 2, TILE_HEIGHT * 2)
+        .with_tile_dimensions(TILE_WIDTH, TILE_HEIGHT)
         // We give it a window title
         .with_title("Reconnection - Settlement")
         // We register our embedded "settlement.png" as a font.
-        .with_font("settlement.png", TILE_WIDTH, TILE_HEIGHT)
+        .with_font("reconnection_16x24.png", TILE_WIDTH, TILE_HEIGHT)
         // We want a base simple console for the floor layer
-        .with_simple_console(WIDTH as u32, HEIGHT as u32, "settlement.png")
-        // We also want a sparse console for the layers above
-        .with_sparse_console_no_bg(WIDTH as u32, HEIGHT as u32, "settlement.png")
+        .with_simple_console(WIDTH as u32, HEIGHT as u32, "reconnection_16x24.png")
+        // We want a sprite console for the player character, NPCs and monsters
+        // For now let's use a spare console
+        .with_sparse_console_no_bg(WIDTH as u32, HEIGHT as u32, "reconnection_16x24.png")
         // And we call the builder function
         .build()?;
 
@@ -81,7 +82,6 @@ fn main() -> BError {
         .with(Position { x: WIDTH / 2, y: HEIGHT / 2 })
         .with(Renderable {
             graphic: TileGraphic::PlayerCharacter,
-            layer: TileLayer::PlayerCharacter,
         })
         .with(Player{})
         .build();

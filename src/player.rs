@@ -9,7 +9,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
 
     for (_player, pos) in (&mut players, &mut positions).join() {
         let dest_idx = map.to_index(Point{x: (pos.x + delta_x), y: (pos.y + delta_y)});
-        if map.wall_tiles[dest_idx] == TileGraphic::EmptyWall {
+        if map.terrain[dest_idx] == TileGraphic::Ground1 {
             pos.x = min(WIDTH - 1, max(0, pos.x + delta_x));
             pos.y = min(HEIGHT - 1, max(0, pos.y + delta_y));
         }

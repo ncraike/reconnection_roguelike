@@ -8,63 +8,44 @@ use specs::prelude::*;
 pub const WIDTH: i32 = 25;
 pub const HEIGHT: i32 = 14;
 
-pub const TILE_WIDTH: u32 = 32;
-pub const TILE_HEIGHT: u32 = 32;
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum TileType {
-    Ground,
-    Floor,
-    Wall,
-}
+pub const TILE_WIDTH: u32 = 16*2;
+pub const TILE_HEIGHT: u32 = 24*2;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileGraphic {
-    EmptyFloor=0,
-    Ground,
-    InsideFloor,
-    EmptyFloorVariant=8,
-    LRGroundInside,
-    LRInsideGround,
-    TBGroundInside,
-    TBInsideGround,
-    TLGroundInside,
-    TRGroundInside,
-    BRGroundInside,
-    BLGroundInside,
-    TLInsideGround,
-    TRInsideGround,
-    BRInsideGround,
-    BLInsideGround,
-    EmptyWall=24,
-    WallV,
-    WallHExternal,
-    WallTLCornerExternal,
-    WallTRCornerExternal,
-    WallBRCornerExternal,
-    WallBLCornerExternal,
-    WallHInternal,
-    WallTLCornerInternal,
-    WallTRCornerInternal,
-    WallBRCornerInternal,
-    WallBLCornerInternal,
-    EmptyPlayerCharacter=56,
-    PlayerCharacter,
-    PlayerCharacterWithBackpack,
-}
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum TileLayer {
-    Floor,
-    Walls,
-    NPCs,
-    Decorations,
-    PlayerCharacter,
+    Void,
+    Ground1,
+    Ground2,
+    Ground3,
+    Ground4,
+    Floor1,
+    Floor2,
+    WallHExternal=8,
+    WallSECornerExternal,
+    WallSWCornerExternal,
+    WallSEndExternal,
+    WallEEndExternal,
+    WallWEndExternal,
+    WallNTeeExternal,
+    WallHInternal=16,
+    WallSECornerInternal,
+    WallSWCornerInternal,
+    WallSEndInternal,
+    WallEEndInternal,
+    WallWEndInternal,
+    WallNTeeInternal,
+    WallV=24,
+    WallNWCorner,
+    WallNECorner,
+    WallNEnd,
+    WallSTee,
+    WallETee,
+    WallWTee,
+    PlayerCharacter=32,
 }
 
 pub struct Map {
-    pub floor_tiles: Vec<TileGraphic>,
-    pub wall_tiles: Vec<TileGraphic>,
+    pub terrain: Vec<TileGraphic>,
     pub width: i32,
     pub height: i32
 }
@@ -79,54 +60,41 @@ impl Map {
         for y in (room.y1 + 1) .. room.y2 {
             for x in (room.x1 + 1) .. room.x2 {
                 let inside = self.to_index(Point{x, y});
-                self.floor_tiles[inside] = TileGraphic::InsideFloor;
-                self.wall_tiles[inside] = TileGraphic::EmptyWall;
+                self.terrain[inside] = TileGraphic::Floor1;
             }
         }
 
-        // Top-left corner
-        let top_left = self.to_index(Point{x: room.x1, y: room.y1});
-        self.floor_tiles[top_left] = TileGraphic::TLGroundInside;
-        self.wall_tiles[top_left] = TileGraphic::WallTLCornerInternal;
-        // Top-right corner
-        let top_right = self.to_index(Point{x: room.x2, y: room.y1});
-        self.floor_tiles[top_right] = TileGraphic::TRGroundInside;
-        self.wall_tiles[top_right] = TileGraphic::WallTRCornerInternal;
-        // Bottom-right corner
-        let bottom_right = self.to_index(Point{x: room.x2, y: room.y2});
-        self.floor_tiles[bottom_right] = TileGraphic::BRGroundInside;
-        self.wall_tiles[bottom_right] = TileGraphic::WallBRCornerExternal;
-        // Bottom-left corner
-        let bottom_left = self.to_index(Point{x: room.x1, y: room.y2});
-        self.floor_tiles[bottom_left] = TileGraphic::BLGroundInside;
-        self.wall_tiles[bottom_left] = TileGraphic::WallBLCornerExternal;
+        // Corners
+        let nw_corner = self.to_index(Point{x: room.x1, y: room.y1});
+        self.terrain[nw_corner] = TileGraphic::WallNWCorner;
+        let ne_corner = self.to_index(Point{x: room.x2, y: room.y1});
+        self.terrain[ne_corner] = TileGraphic::WallNECorner;
+        let se_corner = self.to_index(Point{x: room.x2, y: room.y2});
+        self.terrain[se_corner] = TileGraphic::WallSECornerExternal;
+        let sw_corner = self.to_index(Point{x: room.x1, y: room.y2});
+        self.terrain[sw_corner] = TileGraphic::WallSWCornerExternal;
 
         for x in (room.x1 + 1) .. room.x2 {
             // Top wall
             let top = self.to_index(Point{x, y: room.y1});
-            self.floor_tiles[top] = TileGraphic::TBGroundInside;
-            self.wall_tiles[top] = TileGraphic::WallHInternal;
+            self.terrain[top] = TileGraphic::WallHInternal;
             // Bottom wall
             let bottom = self.to_index(Point{x, y: room.y2});
-            self.floor_tiles[bottom] = TileGraphic::TBInsideGround;
-            self.wall_tiles[bottom] = TileGraphic::WallHExternal;
+            self.terrain[bottom] = TileGraphic::WallHExternal;
         }
         for y in (room.y1 + 1) .. room.y2 {
             // Left wall
             let left = self.to_index(Point{x: room.x1, y});
-            self.floor_tiles[left] = TileGraphic::LRGroundInside;
-            self.wall_tiles[left] = TileGraphic::WallV;
+            self.terrain[left] = TileGraphic::WallV;
             // Right wall
             let right = self.to_index(Point{x: room.x2, y});
-            self.floor_tiles[right] = TileGraphic::LRInsideGround;
-            self.wall_tiles[right] = TileGraphic::WallV;
+            self.terrain[right] = TileGraphic::WallV;
         }
     }
 
     pub fn new_map() -> Map {
         let mut map = Map{
-            floor_tiles: vec![TileGraphic::Ground; (WIDTH*HEIGHT) as usize],
-            wall_tiles: vec![TileGraphic::EmptyWall; (WIDTH*HEIGHT) as usize],
+            terrain: vec![TileGraphic::Ground1; (WIDTH*HEIGHT) as usize],
             width: WIDTH,
             height: HEIGHT
         };
@@ -143,22 +111,18 @@ pub fn draw_map(ecs: &World) {
     let map = ecs.fetch::<Map>();
 
     let map_area = Rect::with_size(0, 0, map.width, map.height);
-    let mut floor_draws = DrawBatch::new();
-    floor_draws.target(1);
-    let mut wall_draws = DrawBatch::new();
-    wall_draws.target(1);
+    let mut draws = DrawBatch::new();
+    draws.target(1);
 
     let solid_color: ColorPair = ColorPair::new(
         RGB::from_f32(1.0, 1.0, 1.0),
-        RGB::from_f32(0., 0., 0.),
+        RGB::from_f32(1.0, 1.0, 1.0),
     );
 
     for point in map_area.point_set().iter() {
         let point_index = map.to_index(*point);
-        floor_draws.set(*point, solid_color, map.floor_tiles[point_index] as u16);
-        wall_draws.set(*point, solid_color, map.wall_tiles[point_index] as u16);
+        draws.set(*point, solid_color, map.terrain[point_index] as u16);
     }
 
-    floor_draws.submit(TileLayer::Floor as usize).expect("Failed to draw floors");
-    wall_draws.submit(TileLayer::Walls as usize).expect("Failed to draw walls");
+    draws.submit(0).expect("Failed to draw walls");
 }

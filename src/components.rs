@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use specs_derive::Component;
 
-use super::{TileGraphic, TileLayer};
+use super::{TileGraphic};
 
 #[derive(Component)]
 pub struct Position {
@@ -12,7 +12,6 @@ pub struct Position {
 #[derive(Component)]
 pub struct Renderable {
     pub graphic: TileGraphic,
-    pub layer: TileLayer,
 }
 
 #[derive(Component, Debug)]
