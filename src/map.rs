@@ -136,3 +136,16 @@ pub fn draw_map(ecs: &World) {
 
     draws.submit(0).expect("Failed to draw walls");
 }
+
+pub fn is_passable(tile: TileGraphic) -> bool {
+    match tile {
+        TileGraphic::Void
+        | TileGraphic::Ground1
+        | TileGraphic::Ground2
+        | TileGraphic::Ground3
+        | TileGraphic::Ground4
+        | TileGraphic::Floor1
+        | TileGraphic::Floor2 => true,
+        _ => false,
+    }
+}

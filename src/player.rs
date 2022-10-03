@@ -12,7 +12,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             x: (pos.x + delta_x),
             y: (pos.y + delta_y),
         });
-        if map.terrain[dest_idx] == TileGraphic::Ground1 {
+        if is_passable(map.terrain[dest_idx]) {
             pos.x = min(WIDTH - 1, max(0, pos.x + delta_x));
             pos.y = min(HEIGHT - 1, max(0, pos.y + delta_y));
         }
