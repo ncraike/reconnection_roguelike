@@ -8,7 +8,10 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let map = ecs.fetch::<Map>();
 
     for (_player, pos) in (&mut players, &mut positions).join() {
-        let dest_idx = map.to_index(Point{x: (pos.x + delta_x), y: (pos.y + delta_y)});
+        let dest_idx = map.to_index(Point {
+            x: (pos.x + delta_x),
+            y: (pos.y + delta_y),
+        });
         if map.terrain[dest_idx] == TileGraphic::Ground1 {
             pos.x = min(WIDTH - 1, max(0, pos.x + delta_x));
             pos.y = min(HEIGHT - 1, max(0, pos.y + delta_y));
@@ -44,4 +47,3 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) {
         },
     }
 }
-

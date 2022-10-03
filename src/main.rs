@@ -32,7 +32,7 @@ impl GameState for State {
         draw_batch.cls();
         for (pos, render) in (&positions, &renderables).join() {
             draw_batch.set(
-                Point { x: pos.x, y: pos.y},
+                Point { x: pos.x, y: pos.y },
                 ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
                 render.graphic as u16,
             );
@@ -60,9 +60,7 @@ fn main() -> BError {
         .with_sparse_console_no_bg(WIDTH as u32, HEIGHT as u32, "reconnection_16x24.png")
         .build()?;
 
-    let mut gs = State {
-        ecs: World::new(),
-    };
+    let mut gs = State { ecs: World::new() };
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
@@ -72,11 +70,14 @@ fn main() -> BError {
 
     gs.ecs
         .create_entity()
-        .with(Position { x: WIDTH / 2, y: HEIGHT / 2 })
+        .with(Position {
+            x: WIDTH / 2,
+            y: HEIGHT / 2,
+        })
         .with(Renderable {
             graphic: TileGraphic::PlayerCharacter,
         })
-        .with(Player{})
+        .with(Player {})
         .build();
 
     main_loop(context, gs)

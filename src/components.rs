@@ -1,7 +1,7 @@
 use specs::prelude::*;
 use specs_derive::Component;
 
-use super::{TileGraphic};
+use super::TileGraphic;
 
 #[derive(Component)]
 pub struct Position {
