@@ -52,20 +52,12 @@ fn main() -> BError {
     bracket_terminal::link_resource!(TILE_FONT, "resources/settlement.png");
 
     let context = BTermBuilder::new()
-        // We specify the CONSOLE dimensions
         .with_dimensions(WIDTH, HEIGHT)
-        // We specify the size of the tiles
         .with_tile_dimensions(TILE_WIDTH, TILE_HEIGHT)
-        // We give it a window title
         .with_title("Reconnection - Settlement")
-        // We register our embedded "settlement.png" as a font.
         .with_font("reconnection_16x24.png", TILE_WIDTH, TILE_HEIGHT)
-        // We want a base simple console for the floor layer
         .with_simple_console(WIDTH as u32, HEIGHT as u32, "reconnection_16x24.png")
-        // We want a sprite console for the player character, NPCs and monsters
-        // For now let's use a spare console
         .with_sparse_console_no_bg(WIDTH as u32, HEIGHT as u32, "reconnection_16x24.png")
-        // And we call the builder function
         .build()?;
 
     let mut gs = State {
