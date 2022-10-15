@@ -1,8 +1,6 @@
-extern crate bracket_geometry;
-use bracket_geometry::prelude::*;
-extern crate bracket_terminal;
-use bracket_terminal::prelude::*;
-extern crate specs;
+use bracket_color::prelude::{ColorPair, RGB};
+use bracket_geometry::prelude::{Point, Rect};
+use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
 
 pub const WIDTH: i32 = 25;

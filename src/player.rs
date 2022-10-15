@@ -1,6 +1,12 @@
 use std::cmp::{max, min};
 
-use super::*;
+use bracket_geometry::prelude::Point;
+use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
+use specs::prelude::*;
+
+use super::components::{Player, Position};
+use super::map::{is_passable, Map, HEIGHT, WIDTH};
+use super::State;
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
