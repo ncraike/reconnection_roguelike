@@ -48,6 +48,7 @@ pub enum TileGraphic {
 pub struct Map {
     pub terrain: Vec<TileGraphic>,
     pub revealed_terrain: Vec<bool>,
+    pub visible_terrain: Vec<bool>,
     pub width: i32,
     pub height: i32,
 }
@@ -110,6 +111,7 @@ impl Map {
         let mut map = Map {
             terrain: vec![TileGraphic::Ground1; (WIDTH * HEIGHT) as usize],
             revealed_terrain: vec![false; (WIDTH * HEIGHT) as usize],
+            visible_terrain: vec![false; (WIDTH * HEIGHT) as usize],
             width: WIDTH,
             height: HEIGHT,
         };
@@ -139,7 +141,7 @@ pub fn draw_map(ecs: &World) {
     for (_player, viewshed) in (&mut players, &mut viewsheds).join() {
         for point in map_area.point_set().iter() {
             let point_index = map.to_index(*point);
-            if viewshed.visible_tiles.contains(&point) {
+            if map.visible_terrain[point_index] {
                 draws.set(*point, visible_color, map.terrain[point_index] as u16);
             } else if map.revealed_terrain[point_index] {
                 draws.set(*point, seen_color, map.terrain[point_index] as u16);
