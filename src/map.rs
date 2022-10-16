@@ -1,13 +1,16 @@
+use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap};
 use bracket_color::prelude::{ColorPair, RGB};
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
 
-pub const WIDTH: i32 = 25;
-pub const HEIGHT: i32 = 14;
+use super::{Player, Viewshed};
 
-pub const TILE_WIDTH: u32 = 16 * 2;
-pub const TILE_HEIGHT: u32 = 24 * 2;
+pub const WIDTH: i32 = 80;
+pub const HEIGHT: i32 = 25;
+
+pub const TILE_WIDTH: u32 = 16;
+pub const TILE_HEIGHT: u32 = 24;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileGraphic {
@@ -44,6 +47,7 @@ pub enum TileGraphic {
 
 pub struct Map {
     pub terrain: Vec<TileGraphic>,
+    pub revealed_terrain: Vec<bool>,
     pub width: i32,
     pub height: i32,
 }
@@ -105,6 +109,7 @@ impl Map {
     pub fn new_map() -> Map {
         let mut map = Map {
             terrain: vec![TileGraphic::Ground1; (WIDTH * HEIGHT) as usize],
+            revealed_terrain: vec![false; (WIDTH * HEIGHT) as usize],
             width: WIDTH,
             height: HEIGHT,
         };
@@ -117,6 +122,8 @@ impl Map {
 }
 
 pub fn draw_map(ecs: &World) {
+    let mut viewsheds = ecs.write_storage::<Viewshed>();
+    let mut players = ecs.write_storage::<Player>();
     let map = ecs.fetch::<Map>();
 
     let map_area = Rect::with_size(0, 0, map.width, map.height);
@@ -124,15 +131,25 @@ pub fn draw_map(ecs: &World) {
     draws.cls();
     draws.target(0);
 
-    let solid_color: ColorPair =
+    let visible_color: ColorPair =
         ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(1.0, 1.0, 1.0));
+    let seen_color: ColorPair =
+        ColorPair::new(RGB::from_f32(0.7, 0.7, 0.7), RGB::from_f32(0.7, 0.7, 0.7));
 
-    for point in map_area.point_set().iter() {
-        let point_index = map.to_index(*point);
-        draws.set(*point, solid_color, map.terrain[point_index] as u16);
+    for (_player, viewshed) in (&mut players, &mut viewsheds).join() {
+        for point in map_area.point_set().iter() {
+            let point_index = map.to_index(*point);
+            if viewshed.visible_tiles.contains(&point) {
+                draws.set(*point, visible_color, map.terrain[point_index] as u16);
+            } else if map.revealed_terrain[point_index] {
+                draws.set(*point, seen_color, map.terrain[point_index] as u16);
+            } else {
+                draws.set(*point, visible_color, TileGraphic::Void as u16);
+            }
+        }
     }
 
-    draws.submit(0).expect("Failed to draw walls");
+    draws.submit(0).expect("Failed to draw terrain");
 }
 
 pub fn is_passable(tile: TileGraphic) -> bool {
@@ -145,5 +162,17 @@ pub fn is_passable(tile: TileGraphic) -> bool {
         | TileGraphic::Floor1
         | TileGraphic::Floor2 => true,
         _ => false,
+    }
+}
+
+impl Algorithm2D for Map {
+    fn dimensions(&self) -> Point {
+        Point::new(self.width, self.height)
+    }
+}
+
+impl BaseMap for Map {
+    fn is_opaque(&self, _idx: usize) -> bool {
+        !is_passable(self.terrain[_idx])
     }
 }

@@ -9,11 +9,13 @@ use bracket_terminal::prelude::{
 use specs::prelude::*;
 
 pub mod components;
-use components::{Player, Position, Renderable};
 pub mod map;
+pub mod player;
+pub mod visibility_system;
+use components::{Player, Position, Renderable, Viewshed};
 use map::{draw_map, Map, TileGraphic, HEIGHT, TILE_HEIGHT, TILE_WIDTH, WIDTH};
-mod player;
 use player::player_input;
+use visibility_system::VisibilitySystem;
 
 bracket_terminal::embedded_resource!(TILE_FONT, "../resources/settlement.png");
 
@@ -50,6 +52,8 @@ impl GameState for State {
 
 impl State {
     fn run_systems(&mut self) {
+        let mut vis = VisibilitySystem {};
+        vis.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -70,6 +74,7 @@ fn main() -> BError {
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
+    gs.ecs.register::<Viewshed>();
 
     let map: Map = Map::new_map();
     gs.ecs.insert(map);
@@ -84,6 +89,10 @@ fn main() -> BError {
             graphic: TileGraphic::PlayerCharacter,
         })
         .with(Player {})
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+        })
         .build();
 
     main_loop(context, gs)
