@@ -1,19 +1,17 @@
-use bracket_color::prelude::{ColorPair, RGB};
-use bracket_geometry::prelude::Point;
 use bracket_lib::prelude::{main_loop, GameState};
 use bracket_terminal;
-use bracket_terminal::prelude::{
-    render_draw_buffer, BError, BTerm, BTermBuilder, DrawBatch, EMBED,
-};
+use bracket_terminal::prelude::{BError, BTerm, BTermBuilder, EMBED};
 
 use specs::prelude::*;
 
+pub mod camera;
 pub mod components;
 pub mod map;
 pub mod player;
 pub mod visibility_system;
+use camera::render_camera;
 use components::{Player, Position, Renderable, Viewshed};
-use map::{draw_map, Map, TileGraphic, HEIGHT, TILE_HEIGHT, TILE_WIDTH, WIDTH};
+use map::{Map, TileGraphic, HEIGHT, TILE_HEIGHT, TILE_WIDTH, WIDTH};
 use player::player_input;
 use visibility_system::VisibilitySystem;
 
@@ -29,24 +27,7 @@ impl GameState for State {
         player_input(self, ctx);
         self.run_systems();
 
-        draw_map(&self.ecs);
-        render_draw_buffer(ctx).expect("Render error");
-
-        let mut draw_batch = DrawBatch::new();
-        let positions = self.ecs.read_storage::<Position>();
-        let renderables = self.ecs.read_storage::<Renderable>();
-
-        draw_batch.target(1);
-        draw_batch.cls();
-        for (pos, render) in (&positions, &renderables).join() {
-            draw_batch.set(
-                Point { x: pos.x, y: pos.y },
-                ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
-                render.graphic as u16,
-            );
-            draw_batch.submit(0).expect("Batch error");
-        }
-        render_draw_buffer(ctx).expect("Render error");
+        render_camera(&self.ecs, ctx);
     }
 }
 

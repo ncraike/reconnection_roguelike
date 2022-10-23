@@ -1,10 +1,5 @@
 use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap};
-use bracket_color::prelude::{ColorPair, RGB};
 use bracket_geometry::prelude::{Point, Rect};
-use bracket_terminal::prelude::DrawBatch;
-use specs::prelude::*;
-
-use super::{Player, Viewshed};
 
 pub const WIDTH: i32 = 80;
 pub const HEIGHT: i32 = 25;
@@ -56,6 +51,10 @@ pub struct Map {
 impl Map {
     pub fn to_index(&self, point: Point) -> usize {
         point.to_index(self.width)
+    }
+
+    pub fn bounds(&self) -> Rect {
+        Rect::with_size(0, 0, self.width, self.height)
     }
 
     fn apply_room_to_map(&mut self, room: &Rect) {
@@ -121,37 +120,6 @@ impl Map {
 
         map
     }
-}
-
-pub fn draw_map(ecs: &World) {
-    let mut viewsheds = ecs.write_storage::<Viewshed>();
-    let mut players = ecs.write_storage::<Player>();
-    let map = ecs.fetch::<Map>();
-
-    let map_area = Rect::with_size(0, 0, map.width, map.height);
-    let mut draws = DrawBatch::new();
-    draws.cls();
-    draws.target(0);
-
-    let visible_color: ColorPair =
-        ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(1.0, 1.0, 1.0));
-    let seen_color: ColorPair =
-        ColorPair::new(RGB::from_f32(0.7, 0.7, 0.7), RGB::from_f32(0.7, 0.7, 0.7));
-
-    for (_player, viewshed) in (&mut players, &mut viewsheds).join() {
-        for point in map_area.point_set().iter() {
-            let point_index = map.to_index(*point);
-            if map.visible_terrain[point_index] {
-                draws.set(*point, visible_color, map.terrain[point_index] as u16);
-            } else if map.revealed_terrain[point_index] {
-                draws.set(*point, seen_color, map.terrain[point_index] as u16);
-            } else {
-                draws.set(*point, visible_color, TileGraphic::Void as u16);
-            }
-        }
-    }
-
-    draws.submit(0).expect("Failed to draw terrain");
 }
 
 pub fn is_passable(tile: TileGraphic) -> bool {
