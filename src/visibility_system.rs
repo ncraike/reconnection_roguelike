@@ -2,7 +2,7 @@ use bracket_geometry::prelude::Point;
 use bracket_pathfinding::prelude::field_of_view;
 use specs::prelude::*;
 
-use super::{Map, Player, Position, Viewshed};
+use super::{Map, Player, Viewshed};
 
 pub struct VisibilitySystem {}
 
@@ -11,7 +11,7 @@ impl<'a> System<'a> for VisibilitySystem {
         WriteExpect<'a, Map>,
         Entities<'a>,
         WriteStorage<'a, Viewshed>,
-        WriteStorage<'a, Position>,
+        WriteStorage<'a, Point>,
         ReadStorage<'a, Player>,
     );
 

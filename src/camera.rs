@@ -3,11 +3,11 @@ use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
 
-use super::components::{Player, Position, Renderable};
+use super::components::{Player, Renderable};
 use super::map::{Map, TileGraphic};
 
 pub fn get_view_bounds(ecs: &World, ctx: &mut BTerm) -> Option<Rect> {
-    let positions = ecs.read_storage::<Position>();
+    let positions = ecs.read_storage::<Point>();
     let players = ecs.read_storage::<Player>();
 
     for (player_pos, _player) in (&positions, &players).join() {
@@ -74,7 +74,7 @@ pub fn render_camera(ecs: &World, ctx: &mut BTerm) {
             };
             rect_for_each_enumed(&view_bounds, draw_tile);
 
-            let positions = ecs.read_storage::<Position>();
+            let positions = ecs.read_storage::<Point>();
             let renderables = ecs.read_storage::<Renderable>();
 
             draws.target(1);

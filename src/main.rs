@@ -10,7 +10,7 @@ pub mod map;
 pub mod player;
 pub mod visibility_system;
 use camera::render_camera;
-use components::{Player, Position, Renderable, Viewshed};
+use components::{Player, Point, Renderable, Viewshed};
 use map::{Map, TileGraphic, HEIGHT, TILE_HEIGHT, TILE_WIDTH, WIDTH};
 use player::player_input;
 use visibility_system::VisibilitySystem;
@@ -52,7 +52,7 @@ fn main() -> BError {
         .build()?;
 
     let mut gs = State { ecs: World::new() };
-    gs.ecs.register::<Position>();
+    gs.ecs.register::<Point>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
     gs.ecs.register::<Viewshed>();
@@ -62,7 +62,7 @@ fn main() -> BError {
 
     gs.ecs
         .create_entity()
-        .with(Position {
+        .with(Point {
             x: WIDTH / 2,
             y: HEIGHT / 2,
         })
