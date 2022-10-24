@@ -6,6 +6,9 @@ use specs::prelude::*;
 use super::components::{Player, Renderable};
 use super::map::{Map, TileGraphic};
 
+pub const DEFAULT_VIEW_WIDTH: u32 = 55;
+pub const DEFAULT_VIEW_HEIGHT: u32 = 20;
+
 pub fn get_view_bounds(ecs: &World, ctx: &mut BTerm) -> Option<Rect> {
     let positions = ecs.read_storage::<Point>();
     let players = ecs.read_storage::<Player>();

@@ -1,3 +1,4 @@
+use bracket_algorithm_traits::prelude::Algorithm2D;
 use bracket_geometry::prelude::Point;
 use bracket_pathfinding::prelude::field_of_view;
 use specs::prelude::*;
@@ -24,9 +25,7 @@ impl<'a> System<'a> for VisibilitySystem {
                 viewshed.visible_tiles.clear();
                 viewshed.visible_tiles =
                     field_of_view(Point::new(pos.x, pos.y), viewshed.range, &*map);
-                viewshed
-                    .visible_tiles
-                    .retain(|p| p.x >= 0 && p.x < map.width && p.y >= 0 && p.y < map.height);
+                viewshed.visible_tiles.retain(|p| map.in_bounds(*p));
 
                 // If this is the player, reveal what they can see
                 let _p: Option<&Player> = player.get(ent);

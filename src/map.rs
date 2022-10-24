@@ -1,11 +1,13 @@
 use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap};
 use bracket_geometry::prelude::{Point, Rect};
 
-pub const WIDTH: i32 = 80;
-pub const HEIGHT: i32 = 25;
+pub const MAP_WIDTH: u32 = 80;
+pub const MAP_HEIGHT: u32 = 25;
 
-pub const TILE_WIDTH: u32 = 16;
-pub const TILE_HEIGHT: u32 = 24;
+pub const TILE_1X_WIDTH: u32 = 16;
+pub const TILE_1X_HEIGHT: u32 = 24;
+pub const TILE_2X_WIDTH: u32 = 32;
+pub const TILE_2X_HEIGHT: u32 = 48;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileGraphic {
@@ -44,8 +46,8 @@ pub struct Map {
     pub terrain: Vec<TileGraphic>,
     pub revealed_terrain: Vec<bool>,
     pub visible_terrain: Vec<bool>,
-    pub width: i32,
-    pub height: i32,
+    pub width: u32,
+    pub height: u32,
 }
 
 impl Map {
@@ -108,11 +110,11 @@ impl Map {
 
     pub fn new_map() -> Map {
         let mut map = Map {
-            terrain: vec![TileGraphic::Ground1; (WIDTH * HEIGHT) as usize],
-            revealed_terrain: vec![false; (WIDTH * HEIGHT) as usize],
-            visible_terrain: vec![false; (WIDTH * HEIGHT) as usize],
-            width: WIDTH,
-            height: HEIGHT,
+            terrain: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            revealed_terrain: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            visible_terrain: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            width: MAP_WIDTH,
+            height: MAP_HEIGHT,
         };
 
         let room = Rect::with_exact(16, 2, 22, 7);

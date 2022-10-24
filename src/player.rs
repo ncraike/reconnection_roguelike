@@ -1,11 +1,9 @@
-use std::cmp::{max, min};
-
 use bracket_geometry::prelude::Point;
 use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
 use specs::prelude::*;
 
 use super::components::{Player, Viewshed};
-use super::map::{is_passable, Map, HEIGHT, WIDTH};
+use super::map::{is_passable, Map};
 use super::State;
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
@@ -21,9 +19,8 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
         }
         let dest_idx = map.to_index(dest);
         if is_passable(map.terrain[dest_idx]) {
-            player_pos.x = min(WIDTH - 1, max(0, player_pos.x + delta_x));
-            player_pos.y = min(HEIGHT - 1, max(0, player_pos.y + delta_y));
-
+            player_pos.x = dest.x;
+            player_pos.y = dest.y;
             viewshed.dirty = true;
         }
     }
