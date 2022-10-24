@@ -89,5 +89,36 @@ fn main() -> BError {
         })
         .build();
 
+    gs.ecs
+        .create_entity()
+        .with(Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 4) as i32,
+        })
+        .with(Renderable {
+            graphic: TileGraphic::EnemyHound,
+        })
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+            dirty: true,
+        })
+        .build();
+    gs.ecs
+        .create_entity()
+        .with(Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        })
+        .with(Renderable {
+            graphic: TileGraphic::EnemyBigStalker,
+        })
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+            dirty: true,
+        })
+        .build();
+
     main_loop(context, gs)
 }

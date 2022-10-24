@@ -82,14 +82,17 @@ pub fn render_camera(ecs: &World, ctx: &mut BTerm) {
 
             draws.target(1);
             for (pos, render) in (&positions, &renderables).join() {
-                draws.set(
-                    Point {
-                        x: pos.x - view_bounds.x1,
-                        y: pos.y - view_bounds.y1,
-                    },
-                    ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
-                    render.graphic as u16,
-                );
+                let tile_idx = map.to_index(*pos);
+                if map.visible_terrain[tile_idx] {
+                    draws.set(
+                        Point {
+                            x: pos.x - view_bounds.x1,
+                            y: pos.y - view_bounds.y1,
+                        },
+                        ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.)),
+                        render.graphic as u16,
+                    );
+                }
             }
 
             draws.submit(0).expect("Couldn't draw entities");

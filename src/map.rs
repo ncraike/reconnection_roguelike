@@ -11,6 +11,7 @@ pub const TILE_2X_HEIGHT: u32 = 48;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileGraphic {
+    // Ground
     Void,
     Ground1,
     Ground2,
@@ -18,6 +19,7 @@ pub enum TileGraphic {
     Ground4,
     Floor1,
     Floor2,
+    // Walls
     WallHExternal = 8,
     WallSECornerExternal,
     WallSWCornerExternal,
@@ -39,7 +41,14 @@ pub enum TileGraphic {
     WallSTee,
     WallETee,
     WallWTee,
+    // Player & NPCs
     PlayerCharacter = 32,
+    // Enemies
+    EnemyHound = 40,
+    EnemySmallStalker,
+    EnemyBigStalker,
+    // Debug
+    DebugOverlay = 48,
 }
 
 pub struct Map {
