@@ -58,15 +58,19 @@ impl<'a> System<'a> for MonsterAI {
                             console::log(&format!("{} beeps aggressively", monster_name.name));
                             return;
                         }
-                        let path = a_star_search(
-                            map.to_index(*monster_pos),
-                            map.to_index(player_pos),
-                            &mut *map,
-                        );
+                        let monster_pos_idx = map.to_index(*monster_pos);
+                        let player_pos_idx = map.to_index(player_pos);
+                        let path = a_star_search(monster_pos_idx, player_pos_idx, &mut *map);
                         if path.success && path.steps.len() > 1 {
-                            let next_step = map.to_point(path.steps[1]);
-                            monster_pos.x = next_step.x;
-                            monster_pos.y = next_step.y;
+                            let new_pos_idx = path.steps[1];
+                            let new_pos = map.to_point(new_pos_idx);
+                            monster_pos.x = new_pos.x;
+                            monster_pos.y = new_pos.y;
+                            // Mark new position as blocked, old position as unblocked
+                            // FIXME: it'd be kinda nice if map_index_system handled this
+                            map.blocked[new_pos_idx] = true;
+                            map.blocked[monster_pos_idx] = false;
+                            // Mark visibility for update
                             monster_viewshed.dirty = true;
                         }
                     }
