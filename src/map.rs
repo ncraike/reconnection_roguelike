@@ -55,6 +55,7 @@ pub struct Map {
     pub tiles: Vec<TileGraphic>,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
+    pub blocked: Vec<bool>,
     pub width: u32,
     pub height: u32,
 }
@@ -129,6 +130,7 @@ impl Map {
             tiles: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
             revealed_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
             visible_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            blocked: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
             width: MAP_WIDTH,
             height: MAP_HEIGHT,
         };
@@ -140,7 +142,13 @@ impl Map {
     }
 
     pub fn can_move_to(&self, point: Point) -> bool {
-        self.in_bounds(point) && is_passable(self.tiles[self.to_index(point)])
+        self.in_bounds(point) && !self.blocked[self.to_index(point)]
+    }
+
+    pub fn populate_blocked(&mut self) {
+        for (i, tile) in self.tiles.iter().enumerate() {
+            self.blocked[i] = !is_passable(*tile);
+        }
     }
 }
 

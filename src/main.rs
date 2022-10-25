@@ -7,12 +7,14 @@ use specs::prelude::*;
 pub mod camera;
 pub mod components;
 pub mod map;
+pub mod map_indexing_system;
 pub mod monster_ai_system;
 pub mod player;
 pub mod visibility_system;
 use camera::{render_camera, DEFAULT_VIEW_HEIGHT, DEFAULT_VIEW_WIDTH};
-use components::{Monster, Name, Player, Point, Renderable, Viewshed};
+use components::{BlocksTile, Monster, Name, Player, Point, Renderable, Viewshed};
 use map::{Map, TileGraphic, MAP_HEIGHT, MAP_WIDTH, TILE_2X_HEIGHT, TILE_2X_WIDTH};
+use map_indexing_system::MapIndexingSystem;
 use monster_ai_system::MonsterAI;
 use player::player_input;
 use visibility_system::VisibilitySystem;
@@ -47,6 +49,8 @@ impl State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem {};
         vis.run_now(&self.ecs);
+        let mut mapindex = MapIndexingSystem {};
+        mapindex.run_now(&self.ecs);
         let mut mob = MonsterAI {};
         mob.run_now(&self.ecs);
         self.ecs.maintain();
@@ -81,11 +85,12 @@ fn main() -> BError {
         ecs: World::new(),
         runstate: RunState::Running,
     };
-    gs.ecs.register::<Point>();
-    gs.ecs.register::<Renderable>();
+    gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
+    gs.ecs.register::<Point>();
+    gs.ecs.register::<Renderable>();
     gs.ecs.register::<Viewshed>();
 
     let map: Map = Map::new_map();
@@ -117,6 +122,7 @@ fn main() -> BError {
         .with(Name {
             name: String::from("H-32"),
         })
+        .with(BlocksTile {})
         .with(Point {
             x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 4) as i32,
@@ -136,6 +142,7 @@ fn main() -> BError {
         .with(Name {
             name: String::from("S-07"),
         })
+        .with(BlocksTile {})
         .with(Point {
             x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,

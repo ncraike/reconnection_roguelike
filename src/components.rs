@@ -20,6 +20,9 @@ pub struct Player {}
 #[derive(Component, Debug)]
 pub struct Monster {}
 
+#[derive(Component, Debug)]
+pub struct BlocksTile {}
+
 #[derive(Component)]
 pub struct Viewshed {
     pub visible_tiles: Vec<Point>,
