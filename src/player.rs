@@ -18,7 +18,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             return;
         }
         let dest_idx = map.to_index(dest);
-        if is_passable(map.tiles[dest_idx]) {
+        if !map.blocked[dest_idx] {
             player_pos.x = dest.x;
             player_pos.y = dest.y;
             viewshed.dirty = true;

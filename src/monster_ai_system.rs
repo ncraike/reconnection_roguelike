@@ -1,3 +1,4 @@
+use bracket_geometry::prelude::DistanceAlg;
 use bracket_pathfinding::prelude::a_star_search;
 use bracket_terminal::prelude::console;
 use specs::prelude::*;
@@ -51,7 +52,12 @@ impl<'a> System<'a> for MonsterAI {
                     .join()
                 {
                     if monster_viewshed.visible_tiles.contains(&player_pos) {
-                        console::log(&format!("{} beeps aggressively", monster_name.name));
+                        let distance = DistanceAlg::Pythagoras.distance2d(player_pos, *monster_pos);
+                        if distance < 1.5 {
+                            // Attack goes here
+                            console::log(&format!("{} beeps aggressively", monster_name.name));
+                            return;
+                        }
                         let path = a_star_search(
                             map.to_index(*monster_pos),
                             map.to_index(player_pos),
