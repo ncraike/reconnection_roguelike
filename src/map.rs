@@ -1,5 +1,5 @@
-use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap};
-use bracket_geometry::prelude::{Point, Rect};
+use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap, SmallVec};
+use bracket_geometry::prelude::{DistanceAlg, Point, Rect};
 
 pub const MAP_WIDTH: u32 = 80;
 pub const MAP_HEIGHT: u32 = 25;
@@ -62,6 +62,13 @@ pub struct Map {
 impl Map {
     pub fn to_index(&self, point: Point) -> usize {
         point.to_index(self.width)
+    }
+
+    pub fn to_point(&self, index: usize) -> Point {
+        Point {
+            x: (index as i32) % (self.width as i32),
+            y: (index as i32) / (self.width as i32),
+        }
     }
 
     pub fn bounds(&self) -> Rect {
@@ -131,6 +138,10 @@ impl Map {
 
         map
     }
+
+    pub fn can_move_to(&self, point: Point) -> bool {
+        self.in_bounds(point) && is_passable(self.terrain[self.to_index(point)])
+    }
 }
 
 pub fn is_passable(tile: TileGraphic) -> bool {
@@ -155,5 +166,35 @@ impl Algorithm2D for Map {
 impl BaseMap for Map {
     fn is_opaque(&self, _idx: usize) -> bool {
         !is_passable(self.terrain[_idx])
+    }
+
+    fn get_available_exits(&self, _idx: usize) -> SmallVec<[(usize, f32); 10]> {
+        let mut exits = SmallVec::new();
+        let point = self.to_point(_idx);
+
+        let north = point + Point { x: 0, y: -1 };
+        if self.can_move_to(north) {
+            exits.push((self.to_index(north), 1.0));
+        }
+        let south = point + Point { x: 0, y: 1 };
+        if self.can_move_to(south) {
+            exits.push((self.to_index(south), 1.0));
+        }
+        let east = point + Point { x: 1, y: 0 };
+        if self.can_move_to(east) {
+            exits.push((self.to_index(east), 1.0));
+        }
+        let west = point + Point { x: -1, y: 0 };
+        if self.can_move_to(west) {
+            exits.push((self.to_index(west), 1.0));
+        }
+
+        exits
+    }
+
+    fn get_pathing_distance(&self, _idx1: usize, _idx2: usize) -> f32 {
+        let point1 = self.to_point(_idx1);
+        let point2 = self.to_point(_idx2);
+        DistanceAlg::Pythagoras.distance2d(point1, point2)
     }
 }
