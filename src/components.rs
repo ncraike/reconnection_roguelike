@@ -4,6 +4,11 @@ use specs_derive::Component;
 
 use super::TileGraphic;
 
+#[derive(Component, Debug)]
+pub struct Name {
+    pub name: String,
+}
+
 #[derive(Component)]
 pub struct Renderable {
     pub graphic: TileGraphic,
@@ -11,6 +16,9 @@ pub struct Renderable {
 
 #[derive(Component, Debug)]
 pub struct Player {}
+
+#[derive(Component, Debug)]
+pub struct Monster {}
 
 #[derive(Component)]
 pub struct Viewshed {
