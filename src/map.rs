@@ -180,21 +180,22 @@ impl BaseMap for Map {
         let mut exits = SmallVec::new();
         let point = self.to_point(_idx);
 
-        let north = point + Point { x: 0, y: -1 };
-        if self.can_move_to(north) {
-            exits.push((self.to_index(north), 1.0));
-        }
-        let south = point + Point { x: 0, y: 1 };
-        if self.can_move_to(south) {
-            exits.push((self.to_index(south), 1.0));
-        }
-        let east = point + Point { x: 1, y: 0 };
-        if self.can_move_to(east) {
-            exits.push((self.to_index(east), 1.0));
-        }
-        let west = point + Point { x: -1, y: 0 };
-        if self.can_move_to(west) {
-            exits.push((self.to_index(west), 1.0));
+        let directions = vec![
+            (0, -1, 1.0),   // north
+            (0, 1, 1.0),    // south
+            (1, 0, 1.0),    // east
+            (-1, 0, 1.0),   // west
+            (-1, -1, 1.45), // north-west
+            (1, -1, 1.45),  // north-east
+            (-1, 1, 1.45),  // south-west
+            (1, 1, 1.45),   // south-east
+        ];
+        for direction in directions {
+            let (dir_x, dir_y, distance) = direction;
+            let candidate_exit = point + Point { x: dir_x, y: dir_y };
+            if self.can_move_to(candidate_exit) {
+                exits.push((self.to_index(candidate_exit), distance))
+            }
         }
 
         exits
