@@ -64,10 +64,10 @@ pub fn render_camera(ecs: &World, ctx: &mut BTerm) {
             let draw_tile = |screen_xy: Point, map_xy: Point| {
                 if map_bounds.point_in_rect(map_xy) {
                     let tile_idx = map.to_index(map_xy);
-                    if map.visible_terrain[tile_idx] {
-                        draws.set(screen_xy, visible_color, map.terrain[tile_idx] as u16);
-                    } else if map.revealed_terrain[tile_idx] {
-                        draws.set(screen_xy, seen_color, map.terrain[tile_idx] as u16);
+                    if map.visible_tiles[tile_idx] {
+                        draws.set(screen_xy, visible_color, map.tiles[tile_idx] as u16);
+                    } else if map.revealed_tiles[tile_idx] {
+                        draws.set(screen_xy, seen_color, map.tiles[tile_idx] as u16);
                     } else {
                         draws.set(screen_xy, visible_color, TileGraphic::Void as u16);
                     }
@@ -83,7 +83,7 @@ pub fn render_camera(ecs: &World, ctx: &mut BTerm) {
             draws.target(1);
             for (pos, render) in (&positions, &renderables).join() {
                 let tile_idx = map.to_index(*pos);
-                if map.visible_terrain[tile_idx] {
+                if map.visible_tiles[tile_idx] {
                     draws.set(
                         Point {
                             x: pos.x - view_bounds.x1,

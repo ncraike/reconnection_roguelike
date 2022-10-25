@@ -52,9 +52,9 @@ pub enum TileGraphic {
 }
 
 pub struct Map {
-    pub terrain: Vec<TileGraphic>,
-    pub revealed_terrain: Vec<bool>,
-    pub visible_terrain: Vec<bool>,
+    pub tiles: Vec<TileGraphic>,
+    pub revealed_tiles: Vec<bool>,
+    pub visible_tiles: Vec<bool>,
     pub width: u32,
     pub height: u32,
 }
@@ -80,7 +80,7 @@ impl Map {
         for y in (room.y1 + 1)..room.y2 {
             for x in (room.x1 + 1)..room.x2 {
                 let inside = self.to_index(Point { x, y });
-                self.terrain[inside] = TileGraphic::Floor1;
+                self.tiles[inside] = TileGraphic::Floor1;
             }
         }
 
@@ -89,46 +89,46 @@ impl Map {
             x: room.x1,
             y: room.y1,
         });
-        self.terrain[nw_corner] = TileGraphic::WallNWCorner;
+        self.tiles[nw_corner] = TileGraphic::WallNWCorner;
         let ne_corner = self.to_index(Point {
             x: room.x2,
             y: room.y1,
         });
-        self.terrain[ne_corner] = TileGraphic::WallNECorner;
+        self.tiles[ne_corner] = TileGraphic::WallNECorner;
         let se_corner = self.to_index(Point {
             x: room.x2,
             y: room.y2,
         });
-        self.terrain[se_corner] = TileGraphic::WallSECornerExternal;
+        self.tiles[se_corner] = TileGraphic::WallSECornerExternal;
         let sw_corner = self.to_index(Point {
             x: room.x1,
             y: room.y2,
         });
-        self.terrain[sw_corner] = TileGraphic::WallSWCornerExternal;
+        self.tiles[sw_corner] = TileGraphic::WallSWCornerExternal;
 
         for x in (room.x1 + 1)..room.x2 {
             // Top wall
             let top = self.to_index(Point { x, y: room.y1 });
-            self.terrain[top] = TileGraphic::WallHInternal;
+            self.tiles[top] = TileGraphic::WallHInternal;
             // Bottom wall
             let bottom = self.to_index(Point { x, y: room.y2 });
-            self.terrain[bottom] = TileGraphic::WallHExternal;
+            self.tiles[bottom] = TileGraphic::WallHExternal;
         }
         for y in (room.y1 + 1)..room.y2 {
             // Left wall
             let left = self.to_index(Point { x: room.x1, y });
-            self.terrain[left] = TileGraphic::WallV;
+            self.tiles[left] = TileGraphic::WallV;
             // Right wall
             let right = self.to_index(Point { x: room.x2, y });
-            self.terrain[right] = TileGraphic::WallV;
+            self.tiles[right] = TileGraphic::WallV;
         }
     }
 
     pub fn new_map() -> Map {
         let mut map = Map {
-            terrain: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
-            revealed_terrain: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
-            visible_terrain: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            tiles: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            revealed_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            visible_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
             width: MAP_WIDTH,
             height: MAP_HEIGHT,
         };
@@ -140,7 +140,7 @@ impl Map {
     }
 
     pub fn can_move_to(&self, point: Point) -> bool {
-        self.in_bounds(point) && is_passable(self.terrain[self.to_index(point)])
+        self.in_bounds(point) && is_passable(self.tiles[self.to_index(point)])
     }
 }
 
@@ -165,7 +165,7 @@ impl Algorithm2D for Map {
 
 impl BaseMap for Map {
     fn is_opaque(&self, _idx: usize) -> bool {
-        !is_passable(self.terrain[_idx])
+        !is_passable(self.tiles[_idx])
     }
 
     fn get_available_exits(&self, _idx: usize) -> SmallVec<[(usize, f32); 10]> {
