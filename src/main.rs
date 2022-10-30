@@ -12,7 +12,7 @@ pub mod monster_ai_system;
 pub mod player;
 pub mod visibility_system;
 use camera::{render_camera, DEFAULT_VIEW_HEIGHT, DEFAULT_VIEW_WIDTH};
-use components::{BlocksTile, Monster, Name, Player, Point, Renderable, Viewshed};
+use components::{BlocksTile, CombatStats, Monster, Name, Player, Point, Renderable, Viewshed};
 use map::{Map, TileGraphic, MAP_HEIGHT, MAP_WIDTH, TILE_2X_HEIGHT, TILE_2X_WIDTH};
 use map_indexing_system::MapIndexingSystem;
 use monster_ai_system::MonsterAI;
@@ -86,6 +86,7 @@ fn main() -> BError {
         runstate: RunState::Running,
     };
     gs.ecs.register::<BlocksTile>();
+    gs.ecs.register::<CombatStats>();
     gs.ecs.register::<Monster>();
     gs.ecs.register::<Name>();
     gs.ecs.register::<Player>();
@@ -101,6 +102,12 @@ fn main() -> BError {
         .with(Player {})
         .with(Name {
             name: String::from("Player"),
+        })
+        .with(CombatStats {
+            max_hp: 30,
+            hp: 30,
+            defense: 2,
+            power: 5,
         })
         .with(Point {
             x: (MAP_WIDTH / 2) as i32,
@@ -122,6 +129,12 @@ fn main() -> BError {
         .with(Name {
             name: String::from("H-32"),
         })
+        .with(CombatStats {
+            max_hp: 16,
+            hp: 16,
+            defense: 1,
+            power: 4,
+        })
         .with(BlocksTile {})
         .with(Point {
             x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
@@ -141,6 +154,12 @@ fn main() -> BError {
         .with(Monster {})
         .with(Name {
             name: String::from("S-07"),
+        })
+        .with(CombatStats {
+            max_hp: 16,
+            hp: 16,
+            defense: 1,
+            power: 4,
         })
         .with(BlocksTile {})
         .with(Point {

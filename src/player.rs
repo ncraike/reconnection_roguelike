@@ -1,8 +1,8 @@
 use bracket_geometry::prelude::Point;
-use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
+use bracket_terminal::prelude::{console, BTerm, VirtualKeyCode};
 use specs::prelude::*;
 
-use super::components::{Player, Viewshed};
+use super::components::{CombatStats, Player, Viewshed};
 use super::map::Map;
 use super::{RunState, State};
 
@@ -10,6 +10,7 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Point>();
     let mut players = ecs.write_storage::<Player>();
     let mut viewsheds = ecs.write_storage::<Viewshed>();
+    let combat_stats = ecs.read_storage::<CombatStats>();
     let map = ecs.fetch::<Map>();
 
     for (_player, player_pos, viewshed) in (&mut players, &mut positions, &mut viewsheds).join() {
@@ -18,6 +19,18 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             return;
         }
         let dest_idx = map.to_index(dest);
+        for potential_target in map.tile_content[dest_idx].iter() {
+            let maybe_target = combat_stats.get(*potential_target);
+            match maybe_target {
+                None => {}
+                Some(_target) => {
+                    // Attack
+                    console::log(&format!("Player attacks enemy"));
+                    return;
+                }
+            }
+        }
+
         if !map.blocked[dest_idx] {
             player_pos.x = dest.x;
             player_pos.y = dest.y;

@@ -1,5 +1,6 @@
 use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap, SmallVec};
 use bracket_geometry::prelude::{DistanceAlg, Point, Rect};
+use specs::prelude::*;
 
 pub const MAP_WIDTH: u32 = 80;
 pub const MAP_HEIGHT: u32 = 25;
@@ -52,15 +53,33 @@ pub enum TileGraphic {
 }
 
 pub struct Map {
+    pub width: u32,
+    pub height: u32,
     pub tiles: Vec<TileGraphic>,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
     pub blocked: Vec<bool>,
-    pub width: u32,
-    pub height: u32,
+    pub tile_content: Vec<Vec<Entity>>,
 }
 
 impl Map {
+    pub fn new_map() -> Map {
+        let mut map = Map {
+            width: MAP_WIDTH,
+            height: MAP_HEIGHT,
+            tiles: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            revealed_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            visible_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            blocked: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
+            tile_content: vec![Vec::new(); (MAP_WIDTH * MAP_HEIGHT) as usize],
+        };
+
+        let room = Rect::with_exact(16, 2, 22, 7);
+        map.apply_room_to_map(&room);
+
+        map
+    }
+
     pub fn to_index(&self, point: Point) -> usize {
         point.to_index(self.width)
     }
@@ -125,22 +144,6 @@ impl Map {
         }
     }
 
-    pub fn new_map() -> Map {
-        let mut map = Map {
-            tiles: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
-            revealed_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
-            visible_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
-            blocked: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
-            width: MAP_WIDTH,
-            height: MAP_HEIGHT,
-        };
-
-        let room = Rect::with_exact(16, 2, 22, 7);
-        map.apply_room_to_map(&room);
-
-        map
-    }
-
     pub fn can_move_to(&self, point: Point) -> bool {
         self.in_bounds(point) && !self.blocked[self.to_index(point)]
     }
@@ -148,6 +151,12 @@ impl Map {
     pub fn populate_blocked(&mut self) {
         for (i, tile) in self.tiles.iter().enumerate() {
             self.blocked[i] = !is_passable(*tile);
+        }
+    }
+
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
         }
     }
 }
