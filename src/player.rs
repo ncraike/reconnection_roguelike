@@ -1,6 +1,8 @@
 use bracket_geometry::prelude::Point;
-use bracket_terminal::prelude::{console, BTerm, VirtualKeyCode};
+use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
 use specs::prelude::*;
+
+use crate::components::WantsToMelee;
 
 use super::components::{CombatStats, Player, Viewshed};
 use super::map::Map;
@@ -10,10 +12,14 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Point>();
     let mut players = ecs.write_storage::<Player>();
     let mut viewsheds = ecs.write_storage::<Viewshed>();
+    let mut wants_to_melee_store = ecs.write_storage::<WantsToMelee>();
     let combat_stats = ecs.read_storage::<CombatStats>();
+    let entities = ecs.entities();
     let map = ecs.fetch::<Map>();
 
-    for (_player, player_pos, viewshed) in (&mut players, &mut positions, &mut viewsheds).join() {
+    for (entity, _player, player_pos, viewshed) in
+        (&entities, &mut players, &mut positions, &mut viewsheds).join()
+    {
         let dest = *player_pos + Point::new(delta_x, delta_y);
         if !map.bounds().point_in_rect(dest) {
             return;
@@ -21,13 +27,15 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
         let dest_idx = map.to_index(dest);
         for potential_target in map.tile_content[dest_idx].iter() {
             let maybe_target = combat_stats.get(*potential_target);
-            match maybe_target {
-                None => {}
-                Some(_target) => {
-                    // Attack
-                    console::log(&format!("Player attacks enemy"));
-                    return;
-                }
+            if let Some(_target) = maybe_target {
+                wants_to_melee_store
+                    .insert(
+                        entity,
+                        WantsToMelee {
+                            target: *potential_target,
+                        },
+                    )
+                    .expect("Add melee target failed");
             }
         }
 

@@ -6,15 +6,22 @@ use specs::prelude::*;
 
 pub mod camera;
 pub mod components;
+pub mod damage_system;
 pub mod map;
 pub mod map_indexing_system;
+pub mod melee_combat_system;
 pub mod monster_ai_system;
 pub mod player;
 pub mod visibility_system;
 use camera::{render_camera, DEFAULT_VIEW_HEIGHT, DEFAULT_VIEW_WIDTH};
-use components::{BlocksTile, CombatStats, Monster, Name, Player, Point, Renderable, Viewshed};
+use components::{
+    BlocksTile, CombatStats, Monster, Name, Player, Point, Renderable, SufferDamage, Viewshed,
+    WantsToMelee,
+};
+use damage_system::DamageSystem;
 use map::{Map, TileGraphic, MAP_HEIGHT, MAP_WIDTH, TILE_2X_HEIGHT, TILE_2X_WIDTH};
 use map_indexing_system::MapIndexingSystem;
+use melee_combat_system::MeleeCombatSystem;
 use monster_ai_system::MonsterAI;
 use player::player_input;
 use visibility_system::VisibilitySystem;
@@ -37,6 +44,7 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         if self.runstate == RunState::Running {
             self.run_systems();
+            damage_system::delete_the_dead(&mut self.ecs);
             self.runstate = RunState::Paused;
             render_camera(&self.ecs, ctx);
         } else {
@@ -53,6 +61,10 @@ impl State {
         mapindex.run_now(&self.ecs);
         let mut mob = MonsterAI {};
         mob.run_now(&self.ecs);
+        let mut melee = MeleeCombatSystem {};
+        melee.run_now(&self.ecs);
+        let mut damage = DamageSystem {};
+        damage.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -92,7 +104,9 @@ fn main() -> BError {
     gs.ecs.register::<Player>();
     gs.ecs.register::<Point>();
     gs.ecs.register::<Renderable>();
+    gs.ecs.register::<SufferDamage>();
     gs.ecs.register::<Viewshed>();
+    gs.ecs.register::<WantsToMelee>();
 
     let map: Map = Map::new_map();
     gs.ecs.insert(map);
