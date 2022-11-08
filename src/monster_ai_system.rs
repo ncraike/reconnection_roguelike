@@ -3,7 +3,8 @@ use bracket_pathfinding::prelude::a_star_search;
 use bracket_terminal::prelude::console;
 use specs::prelude::*;
 
-use super::{Map, Monster, Name, Player, Point, Viewshed};
+use super::components::{Monster, Name, Player, Point, Viewshed, WantsToMelee};
+use super::map::Map;
 
 pub struct MonsterAI {}
 
@@ -26,23 +27,36 @@ impl<'a> MonsterAI {
 
 impl<'a> System<'a> for MonsterAI {
     type SystemData = (
+        Entities<'a>,
         WriteExpect<'a, Map>,
+        ReadExpect<'a, Entity>,
         WriteStorage<'a, Viewshed>,
         WriteStorage<'a, Point>,
+        WriteStorage<'a, WantsToMelee>,
         ReadStorage<'a, Monster>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, Player>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut map, mut viewshed_store, mut point_store, monster_store, name_store, player_store) =
-            data;
+        let (
+            entities,
+            mut map,
+            player_entity,
+            mut viewshed_store,
+            mut point_store,
+            mut wants_to_melee_store,
+            monster_store,
+            name_store,
+            player_store,
+        ) = data;
 
         let maybe_player_pos = self.get_player_pos(&player_store, &monster_store, &point_store);
         match maybe_player_pos {
             None => return,
             Some(player_pos) => {
-                for (mut monster_viewshed, mut monster_pos, _monster, monster_name, _) in (
+                for (entity, mut monster_viewshed, mut monster_pos, _monster, monster_name, _) in (
+                    &entities,
                     &mut viewshed_store,
                     &mut point_store,
                     &monster_store,
@@ -54,6 +68,14 @@ impl<'a> System<'a> for MonsterAI {
                     if monster_viewshed.visible_tiles.contains(&player_pos) {
                         let distance = DistanceAlg::Pythagoras.distance2d(player_pos, *monster_pos);
                         if distance < 1.5 {
+                            wants_to_melee_store
+                                .insert(
+                                    entity,
+                                    WantsToMelee {
+                                        target: *player_entity,
+                                    },
+                                )
+                                .expect("Unable to insert attack against player");
                             // Attack goes here
                             console::log(&format!("{} beeps aggressively", monster_name.name));
                             return;

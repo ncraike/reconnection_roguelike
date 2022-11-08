@@ -111,7 +111,8 @@ fn main() -> BError {
     let map: Map = Map::new_map();
     gs.ecs.insert(map);
 
-    gs.ecs
+    let player_entity = gs
+        .ecs
         .create_entity()
         .with(Player {})
         .with(Name {
@@ -136,6 +137,7 @@ fn main() -> BError {
             dirty: true,
         })
         .build();
+    gs.ecs.insert(player_entity);
 
     gs.ecs
         .create_entity()
