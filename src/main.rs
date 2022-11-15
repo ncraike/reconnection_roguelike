@@ -30,26 +30,55 @@ bracket_terminal::embedded_resource!(TILE_FONT, "../resources/reconnection_16x24
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
-    Paused,
-    Running,
+    AwaitingInput,
+    PreRun,
+    PlayerTurn,
+    MonsterTurn,
 }
 
 pub struct State {
     ecs: World,
-    runstate: RunState,
 }
 
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
-        if self.runstate == RunState::Running {
-            self.run_systems();
-            damage_system::delete_the_dead(&mut self.ecs);
-            self.runstate = RunState::Paused;
-            render_camera(&self.ecs, ctx);
-        } else {
-            self.runstate = player_input(self, ctx);
+        ctx.cls();
+        let mut new_run_state;
+        {
+            let run_state = self.ecs.fetch::<RunState>();
+            new_run_state = *run_state;
         }
+
+        match new_run_state {
+            RunState::PreRun => {
+                self.run_systems();
+                new_run_state = RunState::AwaitingInput;
+            }
+            RunState::AwaitingInput => {
+                new_run_state = player_input(self, ctx);
+                // FIXME: this is needed to avoid "jitter" in vision rendering
+                let mut vis = VisibilitySystem {};
+                vis.run_now(&self.ecs);
+                self.ecs.maintain();
+            }
+            RunState::PlayerTurn => {
+                self.run_systems();
+                new_run_state = RunState::MonsterTurn;
+            }
+            RunState::MonsterTurn => {
+                self.run_systems();
+                new_run_state = RunState::AwaitingInput;
+            }
+        }
+
+        {
+            let mut run_state_writer = self.ecs.write_resource::<RunState>();
+            *run_state_writer = new_run_state;
+        }
+
+        damage_system::delete_the_dead(&mut self.ecs);
+        render_camera(&self.ecs, ctx);
     }
 }
 
@@ -93,10 +122,7 @@ fn main() -> BError {
         )
         .build()?;
 
-    let mut gs = State {
-        ecs: World::new(),
-        runstate: RunState::Running,
-    };
+    let mut gs = State { ecs: World::new() };
     gs.ecs.register::<BlocksTile>();
     gs.ecs.register::<CombatStats>();
     gs.ecs.register::<Monster>();
@@ -110,6 +136,8 @@ fn main() -> BError {
 
     let map: Map = Map::new_map();
     gs.ecs.insert(map);
+
+    gs.ecs.insert(RunState::PreRun);
 
     let player_entity = gs
         .ecs

@@ -5,6 +5,7 @@ use specs::prelude::*;
 
 use super::components::{Monster, Name, Player, Point, Viewshed, WantsToMelee};
 use super::map::Map;
+use super::RunState;
 
 pub struct MonsterAI {}
 
@@ -30,6 +31,7 @@ impl<'a> System<'a> for MonsterAI {
         Entities<'a>,
         WriteExpect<'a, Map>,
         ReadExpect<'a, Entity>,
+        ReadExpect<'a, RunState>,
         WriteStorage<'a, Viewshed>,
         WriteStorage<'a, Point>,
         WriteStorage<'a, WantsToMelee>,
@@ -43,6 +45,7 @@ impl<'a> System<'a> for MonsterAI {
             entities,
             mut map,
             player_entity,
+            run_state,
             mut viewshed_store,
             mut point_store,
             mut wants_to_melee_store,
@@ -50,6 +53,10 @@ impl<'a> System<'a> for MonsterAI {
             name_store,
             player_store,
         ) = data;
+
+        if *run_state != RunState::MonsterTurn {
+            return;
+        }
 
         let maybe_player_pos = self.get_player_pos(&player_store, &monster_store, &point_store);
         match maybe_player_pos {
