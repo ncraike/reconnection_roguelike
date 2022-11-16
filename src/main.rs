@@ -110,6 +110,7 @@ fn main() -> BError {
             TILE_2X_WIDTH,
             TILE_2X_HEIGHT,
         )
+        .with_font("vga8x16.png", 8, 16)
         .with_simple_console(
             DEFAULT_VIEW_WIDTH,
             DEFAULT_VIEW_HEIGHT,
@@ -119,6 +120,11 @@ fn main() -> BError {
             DEFAULT_VIEW_WIDTH,
             DEFAULT_VIEW_HEIGHT,
             "reconnection_16x24_tiles_at_2x.png",
+        )
+        .with_sparse_console_no_bg(
+            DEFAULT_VIEW_WIDTH * (TILE_2X_WIDTH / 8),
+            DEFAULT_VIEW_HEIGHT * (TILE_2X_HEIGHT / 16),
+            "vga8x16.png",
         )
         .build()?;
 
