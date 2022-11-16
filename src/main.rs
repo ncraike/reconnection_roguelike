@@ -102,9 +102,8 @@ fn main() -> BError {
     bracket_terminal::link_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
 
     let context = BTermBuilder::new()
-        .with_dimensions(DEFAULT_VIEW_WIDTH, DEFAULT_VIEW_HEIGHT)
-        .with_tile_dimensions(TILE_2X_WIDTH, TILE_2X_HEIGHT)
-        .with_title("Reconnection")
+        .with_automatic_console_resize(true)
+        .with_fitscreen(true)
         .with_font(
             "reconnection_16x24_tiles_at_2x.png",
             TILE_2X_WIDTH,
@@ -126,6 +125,7 @@ fn main() -> BError {
             DEFAULT_VIEW_HEIGHT * (TILE_2X_HEIGHT / 16),
             "vga8x16.png",
         )
+        .with_title("Reconnection")
         .build()?;
 
     let mut gs = State { ecs: World::new() };
