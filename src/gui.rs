@@ -1,13 +1,14 @@
-use bracket_color::prelude::{ColorPair, RGB};
+use bracket_color::prelude::{ColorPair, RGBA};
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BResult, BTerm, BTermBuilder, DrawBatch};
 use specs::prelude::*;
 
 use super::camera::render_camera;
+use super::message_log::MessageLog;
 use super::GAME_TITLE;
 
-pub const DEFAULT_WINDOW_WIDTH_IN_TILES: u32 = 50;
-pub const DEFAULT_WINDOW_HEIGHT_IN_TILES: u32 = 20;
+pub const DEFAULT_WINDOW_WIDTH_IN_TILES: u32 = 48;
+pub const DEFAULT_WINDOW_HEIGHT_IN_TILES: u32 = 18;
 
 pub const TILE_1X_WIDTH: u32 = 16;
 pub const TILE_1X_HEIGHT: u32 = 24;
@@ -28,6 +29,19 @@ pub const TILE_1X_FONT: &str = "reconnection_16x24_tiles_at_1x.png";
 pub const TILE_2X_FONT: &str = "reconnection_16x24_tiles_at_2x.png";
 pub const TEXT_FONT: &str = "vga8x16.png";
 
+pub const WHITE: RGBA = RGBA {
+    r: 1.0,
+    g: 1.0,
+    b: 1.0,
+    a: 1.0,
+};
+pub const TRANSPARENT: RGBA = RGBA {
+    r: 0.0,
+    g: 0.0,
+    b: 0.0,
+    a: 0.0,
+};
+
 pub enum Consoles {
     TilesTerrain,
     TilesEntities,
@@ -37,6 +51,11 @@ pub enum Consoles {
 pub fn build_terminal() -> BResult<BTerm> {
     BTermBuilder::new()
         .with_title(GAME_TITLE)
+        .with_tile_dimensions(TILE_2X_WIDTH, TILE_2X_HEIGHT)
+        .with_dimensions(
+            DEFAULT_WINDOW_WIDTH_IN_TILES,
+            DEFAULT_WINDOW_HEIGHT_IN_TILES,
+        )
         .with_automatic_console_resize(true)
         .with_fitscreen(true)
         .with_font(TILE_2X_FONT, TILE_2X_WIDTH, TILE_2X_HEIGHT)
@@ -107,6 +126,7 @@ pub fn render_main_view(ecs: &World, ctx: &mut BTerm) {
         main_view.window_in_tiles,
     );
     render_messages(
+        ecs,
         &mut batch,
         main_view.message_log_view,
         main_view.window_in_text,
@@ -115,18 +135,27 @@ pub fn render_main_view(ecs: &World, ctx: &mut BTerm) {
     render_draw_buffer(ctx).expect("Couldn't render camera");
 }
 
-pub fn render_messages(batch: &mut DrawBatch, bounds: Rect, _window_bounds: Rect) {
-    let color_pair = ColorPair::new(RGB::from_f32(1.0, 1.0, 1.0), RGB::from_f32(0., 0., 0.));
+pub fn render_messages(ecs: &World, batch: &mut DrawBatch, bounds: Rect, _window_bounds: Rect) {
+    let message_log = ecs.fetch::<MessageLog>();
+    let tail = message_log
+        .entries
+        .iter()
+        .rev()
+        .take(bounds.height() as usize);
+
     batch.target(Consoles::Text as usize);
     batch.cls();
-    for line_no in 1..(bounds.height() + 1) {
+    for (line_no, entry) in tail.enumerate() {
         batch.print_color(
             Point {
                 x: bounds.x1,
-                y: bounds.y1 + line_no - 1,
+                y: bounds.y1 + (line_no as i32),
             },
-            format!("Line {}", line_no),
-            color_pair,
+            entry,
+            ColorPair {
+                fg: WHITE,
+                bg: TRANSPARENT,
+            },
         );
     }
     batch

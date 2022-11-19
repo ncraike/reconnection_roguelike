@@ -1,12 +1,15 @@
-use super::components::{CombatStats, Name, SufferDamage, WantsToMelee};
 use bracket_terminal::console;
 use specs::prelude::*;
+
+use super::components::{CombatStats, Name, SufferDamage, WantsToMelee};
+use super::message_log::MessageLog;
 
 pub struct MeleeCombatSystem {}
 
 impl<'a> System<'a> for MeleeCombatSystem {
     type SystemData = (
         Entities<'a>,
+        WriteExpect<'a, MessageLog>,
         WriteStorage<'a, WantsToMelee>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, CombatStats>,
@@ -14,7 +17,7 @@ impl<'a> System<'a> for MeleeCombatSystem {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut wants_melee, names, combat_stats, mut inflict_damage) = data;
+        let (entities, mut log, mut wants_melee, names, combat_stats, mut inflict_damage) = data;
 
         for (_entity, wants_melee, name, stats) in
             (&entities, &wants_melee, &names, &combat_stats).join()
@@ -26,12 +29,12 @@ impl<'a> System<'a> for MeleeCombatSystem {
                     let damage = i32::max(0, stats.power - target_stats.defense);
 
                     if damage == 0 {
-                        console::log(&format!(
+                        log.entries.push(format!(
                             "{} is unable to hurt {}",
                             &name.name, &target_name.name
                         ));
                     } else {
-                        console::log(&format!(
+                        log.entries.push(format!(
                             "{} hits {}, for {} hp.",
                             &name.name, &target_name.name, damage
                         ));

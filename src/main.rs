@@ -11,6 +11,7 @@ pub mod gui;
 pub mod map;
 pub mod map_indexing_system;
 pub mod melee_combat_system;
+pub mod message_log;
 pub mod monster_ai_system;
 pub mod player;
 pub mod visibility_system;
@@ -23,6 +24,7 @@ use gui::{build_terminal, render_main_view};
 use map::Map;
 use map_indexing_system::MapIndexingSystem;
 use melee_combat_system::MeleeCombatSystem;
+use message_log::MessageLog;
 use monster_ai_system::MonsterAI;
 use player::player_input;
 use visibility_system::VisibilitySystem;
@@ -109,13 +111,17 @@ fn main() -> BError {
     let mut gs = State { ecs: World::new() };
     register_components(&mut gs.ecs);
 
+    gs.ecs.insert(RunState::PreRun);
+
     let map: Map = Map::new_map();
     gs.ecs.insert(map);
 
+    gs.ecs.insert(MessageLog {
+        entries: vec!["First message".to_string(), "Second message".to_string()],
+    });
+
     insert_player_entity(&mut gs.ecs);
     build_monster_entities(&mut gs.ecs);
-
-    gs.ecs.insert(RunState::PreRun);
 
     main_loop(terminal, gs)
 }
