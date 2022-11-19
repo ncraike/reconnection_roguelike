@@ -1,6 +1,8 @@
-use super::components::{CombatStats, Player, SufferDamage};
 use bracket_terminal::prelude::console;
 use specs::prelude::*;
+
+use super::components::{CombatStats, Name, Player, SufferDamage};
+use super::message_log::MessageLog;
 
 pub struct DamageSystem {}
 
@@ -26,12 +28,22 @@ pub fn delete_the_dead(ecs: &mut World) {
     {
         let combat_stats_store = ecs.read_storage::<CombatStats>();
         let players_store = ecs.read_storage::<Player>();
+        let name_store = ecs.read_storage::<Name>();
         let entities = ecs.entities();
+        let mut message_log = ecs.write_resource::<MessageLog>();
         for (entity, stats) in (&entities, &combat_stats_store).join() {
             if stats.hp < 1 {
                 let maybe_player = players_store.get(entity);
                 match maybe_player {
-                    None => dead.push(entity),
+                    None => {
+                        let victim_name = name_store.get(entity);
+                        if let Some(victim_name) = victim_name {
+                            message_log
+                                .entries
+                                .push(format!("{} dies", &victim_name.name));
+                        }
+                        dead.push(entity);
+                    }
                     Some(_) => console::log("You are dead"),
                 }
             }
