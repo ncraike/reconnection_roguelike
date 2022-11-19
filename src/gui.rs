@@ -3,8 +3,9 @@ use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BResult, BTerm, BTermBuilder, DrawBatch};
 use specs::prelude::*;
 
-use super::camera::render_camera;
-use super::components::{CombatStats, Player};
+use super::camera::{get_camera_bounds_in_world, render_camera};
+use super::components::{CombatStats, Name, Player};
+use super::map::Map;
 use super::message_log::MessageLog;
 use super::GAME_TITLE;
 
@@ -105,16 +106,20 @@ pub struct MainView {
     pub stats_view: Rect,
     pub window_in_tiles: Rect,
     pub window_in_text: Rect,
+    pub mouse_pt_in_tiles: Point,
+    pub mouse_pt_in_text: Point,
 }
 
 impl MainView {
     pub fn from_context(ctx: &mut BTerm) -> MainView {
         ctx.set_active_console(Consoles::TilesTerrain as usize);
         let (width_in_tiles, height_in_tiles) = ctx.get_char_size();
+        let mouse_pt_in_tiles = ctx.mouse_point();
         ctx.set_active_console(Consoles::Text as usize);
         let (width_in_text, height_in_text) = ctx.get_char_size();
         let message_log_width = width_in_text / 2;
         let stats_width = width_in_text - message_log_width;
+        let mouse_pt_in_text = ctx.mouse_point();
 
         MainView {
             camera_view_2x: Rect::with_size(
@@ -141,23 +146,41 @@ impl MainView {
             ),
             window_in_tiles: Rect::with_size(0, 0, width_in_tiles, height_in_tiles),
             window_in_text: Rect::with_size(0, 0, width_in_text, height_in_text),
+            mouse_pt_in_tiles: mouse_pt_in_tiles,
+            mouse_pt_in_text: mouse_pt_in_text,
         }
     }
 }
 
 pub fn render_main_view(ecs: &World, ctx: &mut BTerm) {
     let main_view = MainView::from_context(ctx);
+    let maybe_camera_in_world = get_camera_bounds_in_world(ecs, main_view.camera_view_2x);
+    if maybe_camera_in_world.is_none() {
+        // No player yet?
+        return;
+    }
+    let camera_in_world = maybe_camera_in_world.unwrap();
+
     let mut batch = DrawBatch::new();
     render_camera(
         ecs,
         &mut batch,
         main_view.camera_view_2x,
+        camera_in_world,
         main_view.window_in_tiles,
     );
     batch.target(Consoles::Text as usize);
     batch.cls();
     render_messages(ecs, &mut batch, main_view.message_log_view);
     render_stats(ecs, &mut batch, main_view.stats_view);
+    render_tooltips(
+        &mut batch,
+        ecs,
+        main_view.camera_view_2x,
+        camera_in_world,
+        main_view.mouse_pt_in_tiles,
+        main_view.mouse_pt_in_text,
+    );
 
     render_draw_buffer(ctx).expect("Couldn't render camera");
 }
@@ -240,4 +263,68 @@ pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Rect) {
     batch
         .submit(Consoles::Text as usize)
         .expect("Couldn't render player stats");
+}
+
+pub fn render_tooltips(
+    batch: &mut DrawBatch,
+    ecs: &World,
+    camera_view: Rect,
+    camera_in_world: Rect,
+    mouse_pt_in_tiles: Point,
+    mouse_pt_in_text: Point,
+) {
+    let names = ecs.read_storage::<Name>();
+    let map = ecs.fetch::<Map>();
+
+    if !camera_view.point_in_rect(mouse_pt_in_tiles) {
+        // Pointing out of camera
+        return;
+    }
+
+    let mouse_pt_in_world: Point = mouse_pt_in_tiles
+        + Point {
+            x: camera_in_world.x1,
+            y: camera_in_world.y1,
+        };
+    if !map.bounds().point_in_rect(mouse_pt_in_world) {
+        // Pointing out of map
+        return;
+    }
+
+    // FIXME: check visibility
+    let entities_at_tile = map.tile_content[map.to_index(mouse_pt_in_world)].clone();
+    if entities_at_tile.is_empty() {
+        // Not pointing at an entity
+        return;
+    }
+
+    let mut tooltips: Vec<String> = Vec::new();
+
+    batch.target(Consoles::Text as usize);
+
+    for entity in entities_at_tile.iter() {
+        let maybe_name = names.get(*entity);
+        if let Some(name) = maybe_name {
+            tooltips.push(name.name.to_string());
+        }
+    }
+    for tooltip in tooltips.iter() {
+        batch.print_color(
+            mouse_pt_in_text + Point { x: 4, y: 0 },
+            tooltip,
+            ColorPair {
+                fg: FIRST_MESSAGE_COLOR.to_rgba(1.0),
+                bg: RGBA {
+                    r: 0.0,
+                    g: 0.0,
+                    b: 0.0,
+                    a: 1.0,
+                },
+            },
+        );
+    }
+
+    batch
+        .submit(Consoles::Text as usize)
+        .expect("Couldn't render text");
 }

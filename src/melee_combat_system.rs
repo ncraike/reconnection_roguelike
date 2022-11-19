@@ -1,4 +1,3 @@
-use bracket_terminal::console;
 use specs::prelude::*;
 
 use super::components::{CombatStats, Name, SufferDamage, WantsToMelee};

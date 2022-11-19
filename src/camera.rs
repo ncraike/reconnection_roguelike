@@ -46,12 +46,13 @@ pub fn get_camera_bounds_in_world(ecs: &World, camera_view: Rect) -> Option<Rect
     None
 }
 
-pub fn render_camera(ecs: &World, batch: &mut DrawBatch, camera_view: Rect, window_bounds: Rect) {
-    let maybe_camera_in_world = get_camera_bounds_in_world(ecs, camera_view);
-    if maybe_camera_in_world.is_none() {
-        return;
-    }
-    let camera_in_world = maybe_camera_in_world.unwrap();
+pub fn render_camera(
+    ecs: &World,
+    batch: &mut DrawBatch,
+    camera_view: Rect,
+    camera_in_world: Rect,
+    window_bounds: Rect,
+) {
     render_terrain_in_camera(batch, ecs, camera_view, camera_in_world, window_bounds);
     render_entities_in_camera(batch, ecs, camera_view, camera_in_world);
 }
