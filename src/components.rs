@@ -5,7 +5,7 @@ use specs::prelude::*;
 use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::{Component, ConvertSaveload};
 
-use super::TileGraphic;
+use super::map::{TileGraphic, MAP_HEIGHT, MAP_WIDTH};
 
 #[derive(Component, Debug)]
 pub struct Name {
@@ -62,4 +62,99 @@ impl SufferDamage {
             store.insert(victim, dmg).expect("Unable to insert damage");
         }
     }
+}
+
+pub fn register_components(ecs: &mut World) {
+    ecs.register::<BlocksTile>();
+    ecs.register::<CombatStats>();
+    ecs.register::<Monster>();
+    ecs.register::<Name>();
+    ecs.register::<Player>();
+    ecs.register::<Point>();
+    ecs.register::<Renderable>();
+    ecs.register::<SufferDamage>();
+    ecs.register::<Viewshed>();
+    ecs.register::<WantsToMelee>();
+}
+
+pub fn insert_player_entity(ecs: &mut World) {
+    let player_entity = ecs
+        .create_entity()
+        .with(Player {})
+        .with(Name {
+            name: String::from("Player"),
+        })
+        .with(CombatStats {
+            max_hp: 30,
+            hp: 30,
+            defense: 2,
+            power: 5,
+        })
+        .with(Point {
+            x: (MAP_WIDTH / 2) as i32,
+            y: (MAP_HEIGHT / 2) as i32,
+        })
+        .with(Renderable {
+            graphic: TileGraphic::PlayerCharacter,
+        })
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+            dirty: true,
+        })
+        .build();
+    ecs.insert(player_entity);
+}
+
+pub fn build_monster_entities(ecs: &mut World) {
+    ecs.create_entity()
+        .with(Monster {})
+        .with(Name {
+            name: String::from("H-32"),
+        })
+        .with(CombatStats {
+            max_hp: 16,
+            hp: 16,
+            defense: 1,
+            power: 4,
+        })
+        .with(BlocksTile {})
+        .with(Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 4) as i32,
+        })
+        .with(Renderable {
+            graphic: TileGraphic::EnemyHound,
+        })
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+            dirty: true,
+        })
+        .build();
+    ecs.create_entity()
+        .with(Monster {})
+        .with(Name {
+            name: String::from("S-07"),
+        })
+        .with(CombatStats {
+            max_hp: 16,
+            hp: 16,
+            defense: 1,
+            power: 4,
+        })
+        .with(BlocksTile {})
+        .with(Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        })
+        .with(Renderable {
+            graphic: TileGraphic::EnemyBigStalker,
+        })
+        .with(Viewshed {
+            visible_tiles: Vec::new(),
+            range: 8,
+            dirty: true,
+        })
+        .build();
 }
