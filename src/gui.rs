@@ -1,4 +1,4 @@
-use bracket_color::prelude::{ColorPair, RGBA};
+use bracket_color::prelude::{ColorPair, RgbLerp, RGB, RGBA};
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BResult, BTerm, BTermBuilder, DrawBatch};
 use specs::prelude::*;
@@ -29,11 +29,15 @@ pub const TILE_1X_FONT: &str = "reconnection_16x24_tiles_at_1x.png";
 pub const TILE_2X_FONT: &str = "reconnection_16x24_tiles_at_2x.png";
 pub const TEXT_FONT: &str = "vga8x16.png";
 
-pub const WHITE: RGBA = RGBA {
+pub const MESSAGE_LOG_FIRST_COLOR: RGB = RGB {
     r: 1.0,
     g: 1.0,
     b: 1.0,
-    a: 1.0,
+};
+pub const MESSAGE_LOG_LAST_COLOR: RGB = RGB {
+    r: 0.4,
+    g: 0.4,
+    b: 0.4,
 };
 pub const TRANSPARENT: RGBA = RGBA {
     r: 0.0,
@@ -142,6 +146,11 @@ pub fn render_messages(ecs: &World, batch: &mut DrawBatch, bounds: Rect, _window
         .iter()
         .rev()
         .take(bounds.height() as usize);
+    let mut color_lerp = RgbLerp::new(
+        MESSAGE_LOG_FIRST_COLOR,
+        MESSAGE_LOG_LAST_COLOR,
+        bounds.height() as usize,
+    );
 
     batch.target(Consoles::Text as usize);
     batch.cls();
@@ -153,7 +162,10 @@ pub fn render_messages(ecs: &World, batch: &mut DrawBatch, bounds: Rect, _window
             },
             entry,
             ColorPair {
-                fg: WHITE,
+                fg: color_lerp
+                    .next()
+                    .unwrap_or(MESSAGE_LOG_LAST_COLOR)
+                    .to_rgba(1.0),
                 bg: TRANSPARENT,
             },
         );

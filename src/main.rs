@@ -116,9 +116,7 @@ fn main() -> BError {
     let map: Map = Map::new_map();
     gs.ecs.insert(map);
 
-    gs.ecs.insert(MessageLog {
-        entries: vec!["First message".to_string(), "Second message".to_string()],
-    });
+    gs.ecs.insert(MessageLog { entries: vec![] });
 
     insert_player_entity(&mut gs.ecs);
     build_monster_entities(&mut gs.ecs);
