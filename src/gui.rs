@@ -291,8 +291,13 @@ pub fn render_tooltips(
         return;
     }
 
-    // FIXME: check visibility
-    let entities_at_tile = map.tile_content[map.to_index(mouse_pt_in_world)].clone();
+    let mouse_pt_as_index = map.to_index(mouse_pt_in_world);
+    if !map.visible_tiles[mouse_pt_as_index] {
+        // Point out of player vision
+        return;
+    }
+
+    let entities_at_tile = map.tile_content[mouse_pt_as_index].clone();
     if entities_at_tile.is_empty() {
         // Not pointing at an entity
         return;

@@ -62,9 +62,12 @@ impl GameState for State {
             }
             RunState::AwaitingInput => {
                 new_run_state = player_input(self, ctx);
-                // FIXME: this is needed to avoid "jitter" in vision rendering
+                // FIXME: fix "jitter" in vision rendering
                 let mut vis = VisibilitySystem {};
                 vis.run_now(&self.ecs);
+                // FIXME: fix out-of-date monster positions for tooltips
+                let mut map_index = MapIndexingSystem {};
+                map_index.run_now(&self.ecs);
                 self.ecs.maintain();
             }
             RunState::PlayerTurn => {
