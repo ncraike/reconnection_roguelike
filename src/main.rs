@@ -1,3 +1,4 @@
+use bracket_geometry::prelude::Point;
 use bracket_lib::prelude::{main_loop, GameState};
 use bracket_terminal;
 use bracket_terminal::prelude::{BError, BTerm, EMBED};
@@ -14,19 +15,18 @@ pub mod melee_combat_system;
 pub mod message_log;
 pub mod monster_ai_system;
 pub mod player;
+pub mod spawner;
 pub mod visibility_system;
-use components::{
-    build_monster_entities, insert_player_entity, register_components, BlocksTile, Player, Point,
-    Viewshed,
-};
+use components::{register_components, BlocksTile, Player, Viewshed};
 use damage_system::DamageSystem;
 use gui::{build_terminal, render_main_view};
-use map::Map;
+use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use map_indexing_system::MapIndexingSystem;
 use melee_combat_system::MeleeCombatSystem;
 use message_log::MessageLog;
 use monster_ai_system::MonsterAI;
 use player::player_input;
+use spawner::{create_enemy_big_stalker, create_enemy_hound, create_player};
 use visibility_system::VisibilitySystem;
 
 pub const GAME_TITLE: &str = "Reconnection";
@@ -121,8 +121,28 @@ fn main() -> BError {
 
     gs.ecs.insert(MessageLog { entries: vec![] });
 
-    insert_player_entity(&mut gs.ecs);
-    build_monster_entities(&mut gs.ecs);
+    let player = create_player(
+        &mut gs.ecs,
+        Point {
+            x: (MAP_WIDTH / 2) as i32,
+            y: (MAP_HEIGHT / 2) as i32,
+        },
+    );
+    gs.ecs.insert(player);
+    create_enemy_hound(
+        &mut gs.ecs,
+        Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_enemy_big_stalker(
+        &mut gs.ecs,
+        Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
 
     main_loop(terminal, gs)
 }
