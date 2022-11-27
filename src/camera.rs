@@ -3,7 +3,7 @@ use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
 
-use super::components::{Player, Renderable};
+use super::components::{Item, Player, Renderable};
 use super::gui::Consoles;
 use super::map::{Map, TileGraphic};
 
@@ -46,19 +46,12 @@ pub fn get_camera_bounds_in_world(ecs: &World, camera_view: Rect) -> Option<Rect
     None
 }
 
-pub fn render_camera(
-    ecs: &World,
-    batch: &mut DrawBatch,
-    camera_view: Rect,
-    camera_in_world: Rect,
-    window_bounds: Rect,
-) {
-    render_terrain_in_camera(batch, ecs, camera_view, camera_in_world, window_bounds);
-    render_entities_in_camera(batch, ecs, camera_view, camera_in_world);
+pub fn render_camera(ecs: &World, camera_view: Rect, camera_in_world: Rect, window_bounds: Rect) {
+    render_terrain_in_camera(ecs, camera_view, camera_in_world, window_bounds);
+    render_entities_in_camera(ecs, camera_view, camera_in_world);
 }
 
 pub fn render_terrain_in_camera(
-    batch: &mut DrawBatch,
     ecs: &World,
     camera_view: Rect,
     camera_in_world: Rect,
@@ -67,6 +60,7 @@ pub fn render_terrain_in_camera(
     let map = ecs.fetch::<Map>();
     let map_bounds = map.bounds();
 
+    let mut batch = DrawBatch::new();
     batch.target(Consoles::TilesTerrain as usize);
     batch.cls();
 
@@ -96,19 +90,22 @@ pub fn render_terrain_in_camera(
         .expect("Couldn't render tiles");
 }
 
-pub fn render_entities_in_camera(
-    batch: &mut DrawBatch,
-    ecs: &World,
-    camera_view: Rect,
-    camera_in_world: Rect,
-) {
+pub fn render_entities_in_camera(ecs: &World, camera_view: Rect, camera_in_world: Rect) {
     let map = ecs.fetch::<Map>();
+    let entities = ecs.entities();
     let positions = ecs.read_storage::<Point>();
     let renderables = ecs.read_storage::<Renderable>();
+    let items = ecs.read_storage::<Item>();
 
-    batch.target(Consoles::TilesEntities as usize);
-    batch.cls();
-    for (pos, render) in (&positions, &renderables).join() {
+    let mut draw_items = DrawBatch::new();
+    draw_items.target(Consoles::TilesEntitiesItems as usize);
+    draw_items.cls();
+
+    let mut draw_characters = DrawBatch::new();
+    draw_characters.target(Consoles::TilesEntitiesCharacters as usize);
+    draw_characters.cls();
+
+    for (entity, pos, render) in (&entities, &positions, &renderables).join() {
         let tile_idx = map.to_index(*pos);
         if map.visible_tiles[tile_idx] {
             let camera_pt = Point {
@@ -116,11 +113,22 @@ pub fn render_entities_in_camera(
                 y: pos.y - camera_in_world.y1,
             };
             if camera_view.point_in_rect(camera_pt) {
-                batch.set(camera_pt, VISIBLE_COLOR, render.graphic as u16);
+                match items.get(entity) {
+                    None => {
+                        draw_characters.set(camera_pt, VISIBLE_COLOR, render.graphic as u16);
+                    }
+                    Some(_item) => {
+                        draw_items.set(camera_pt, VISIBLE_COLOR, render.graphic as u16);
+                    }
+                }
             }
         }
     }
-    batch
-        .submit(Consoles::TilesEntities as usize)
+
+    draw_items
+        .submit(Consoles::TilesEntitiesItems as usize)
+        .expect("Couldn't render items");
+    draw_characters
+        .submit(Consoles::TilesEntitiesCharacters as usize)
         .expect("Couldn't render entities");
 }

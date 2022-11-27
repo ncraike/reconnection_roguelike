@@ -65,7 +65,8 @@ pub const TRANSPARENT: RGBA = RGBA {
 
 pub enum Consoles {
     TilesTerrain,
-    TilesEntities,
+    TilesEntitiesItems,
+    TilesEntitiesCharacters,
     Text,
 }
 
@@ -81,16 +82,25 @@ pub fn build_terminal() -> BResult<BTerm> {
         .with_fitscreen(true)
         .with_font(TILE_2X_FONT, TILE_2X_WIDTH, TILE_2X_HEIGHT)
         .with_font(TEXT_FONT, TEXT_FONT_WIDTH, TEXT_FONT_HEIGHT)
+        // Terrain
         .with_simple_console(
             DEFAULT_WINDOW_WIDTH_IN_TILES,
             DEFAULT_WINDOW_HEIGHT_IN_TILES,
             TILE_2X_FONT,
         )
+        // Entities (items)
         .with_sparse_console_no_bg(
             DEFAULT_WINDOW_WIDTH_IN_TILES,
             DEFAULT_WINDOW_HEIGHT_IN_TILES,
             TILE_2X_FONT,
         )
+        // Entities (player, NPCs, enemies)
+        .with_sparse_console_no_bg(
+            DEFAULT_WINDOW_WIDTH_IN_TILES,
+            DEFAULT_WINDOW_HEIGHT_IN_TILES,
+            TILE_2X_FONT,
+        )
+        // Text
         .with_sparse_console_no_bg(
             DEFAULT_WINDOW_WIDTH_IN_TEXT,
             DEFAULT_WINDOW_HEIGHT_IN_TEXT,
@@ -161,14 +171,13 @@ pub fn render_main_view(ecs: &World, ctx: &mut BTerm) {
     }
     let camera_in_world = maybe_camera_in_world.unwrap();
 
-    let mut batch = DrawBatch::new();
     render_camera(
         ecs,
-        &mut batch,
         main_view.camera_view_2x,
         camera_in_world,
         main_view.window_in_tiles,
     );
+    let mut batch = DrawBatch::new();
     batch.target(Consoles::Text as usize);
     batch.cls();
     render_messages(ecs, &mut batch, main_view.message_log_view);
