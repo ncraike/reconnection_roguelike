@@ -9,6 +9,7 @@ pub mod camera;
 pub mod components;
 pub mod damage_system;
 pub mod gui;
+pub mod inventory_system;
 pub mod map;
 pub mod map_indexing_system;
 pub mod melee_combat_system;
@@ -20,13 +21,14 @@ pub mod visibility_system;
 use components::{register_components, BlocksTile, Player, Viewshed};
 use damage_system::DamageSystem;
 use gui::{build_terminal, render_main_view};
+use inventory_system::InventorySystem;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use map_indexing_system::MapIndexingSystem;
 use melee_combat_system::MeleeCombatSystem;
 use message_log::MessageLog;
 use monster_ai_system::MonsterAI;
 use player::player_input;
-use spawner::{create_enemy_big_stalker, create_enemy_hound, create_player};
+use spawner::{create_bandage, create_enemy_big_stalker, create_enemy_hound, create_player};
 use visibility_system::VisibilitySystem;
 
 pub const GAME_TITLE: &str = "Reconnection";
@@ -102,6 +104,8 @@ impl State {
         melee.run_now(&self.ecs);
         let mut damage = DamageSystem {};
         damage.run_now(&self.ecs);
+        let mut inventory_system = InventorySystem {};
+        inventory_system.run_now(&self.ecs);
         self.ecs.maintain();
     }
 }
@@ -140,6 +144,13 @@ fn main() -> BError {
         &mut gs.ecs,
         Point {
             x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_bandage(
+        &mut gs.ecs,
+        Point {
+            x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
         },
     );

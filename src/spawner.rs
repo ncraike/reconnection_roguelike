@@ -1,7 +1,9 @@
 pub use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
-use super::components::{BlocksTile, CombatStats, Monster, Name, Player, Renderable, Viewshed};
+use super::components::{
+    BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player, Renderable, Viewshed,
+};
 use super::map::TileGraphic;
 
 pub fn create_player(ecs: &mut World, at: Point) -> Entity {
@@ -75,5 +77,33 @@ pub fn create_enemy_big_stalker(ecs: &mut World, at: Point) -> Entity {
             range: 8,
             dirty: true,
         })
+        .build()
+}
+
+pub fn create_bandage(ecs: &mut World, at: Point) -> Entity {
+    ecs.create_entity()
+        .with(Item {})
+        .with(Name {
+            name: String::from("bandage"),
+        })
+        .with(Renderable {
+            graphic: TileGraphic::ItemBandage,
+        })
+        .with(HealthRestore { heal_amount: 8 })
+        .with(at.clone())
+        .build()
+}
+
+pub fn create_first_aid_kit(ecs: &mut World, at: Point) -> Entity {
+    ecs.create_entity()
+        .with(Item {})
+        .with(Name {
+            name: String::from("first aid kit"),
+        })
+        .with(Renderable {
+            graphic: TileGraphic::ItemBandage,
+        })
+        .with(HealthRestore { heal_amount: 20 })
+        .with(at.clone())
         .build()
 }

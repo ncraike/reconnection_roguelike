@@ -2,10 +2,11 @@ use bracket_geometry::prelude::Point;
 use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
 use specs::prelude::*;
 
-use crate::components::WantsToMelee;
+use crate::components::{WantsToMelee, WantsToPickupItem};
 
-use super::components::{CombatStats, Player, Viewshed};
+use super::components::{CombatStats, Item, Player, Viewshed};
 use super::map::Map;
+use super::message_log::MessageLog;
 use super::{RunState, State};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
@@ -64,6 +65,8 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
             VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
             VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
             VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
+            // Actions
+            VirtualKeyCode::G => get_item(&mut gs.ecs),
 
             // Arrow keys
             VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
@@ -75,4 +78,41 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
         },
     }
     RunState::PlayerTurn
+}
+
+fn get_item(ecs: &mut World) {
+    let entities = ecs.entities();
+    let player_entity = ecs.fetch::<Entity>();
+    let mut messages = ecs.fetch_mut::<MessageLog>();
+
+    let item_store = ecs.read_storage::<Item>();
+    let point_store = ecs.read_storage::<Point>();
+    let player_pos = point_store
+        .get(*player_entity)
+        .expect("Could not get player position");
+
+    let mut target_item: Option<Entity> = None;
+    for (item_entity, _item, pos) in (&entities, &item_store, &point_store).join() {
+        if pos == player_pos {
+            target_item = Some(item_entity);
+        }
+    }
+
+    match target_item {
+        None => messages
+            .entries
+            .push("There is nothing here to pick up.".to_string()),
+        Some(item) => {
+            let mut wants_to_pickup_store = ecs.write_storage::<WantsToPickupItem>();
+            wants_to_pickup_store
+                .insert(
+                    *player_entity,
+                    WantsToPickupItem {
+                        collected_by: *player_entity,
+                        item: item,
+                    },
+                )
+                .expect("Unable to add want-to-pickup");
+        }
+    }
 }

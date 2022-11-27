@@ -24,6 +24,9 @@ pub struct Player {}
 pub struct Monster {}
 
 #[derive(Component, Debug)]
+pub struct Item {}
+
+#[derive(Component, Debug)]
 pub struct BlocksTile {}
 
 #[derive(Component)]
@@ -64,9 +67,28 @@ impl SufferDamage {
     }
 }
 
+#[derive(Component, Debug, Clone)]
+pub struct InInventory {
+    pub owner: Entity,
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct WantsToPickupItem {
+    pub collected_by: Entity,
+    pub item: Entity,
+}
+
+#[derive(Component, Debug)]
+pub struct HealthRestore {
+    pub heal_amount: i32,
+}
+
 pub fn register_components(ecs: &mut World) {
     ecs.register::<BlocksTile>();
     ecs.register::<CombatStats>();
+    ecs.register::<InInventory>();
+    ecs.register::<Item>();
+    ecs.register::<HealthRestore>();
     ecs.register::<Monster>();
     ecs.register::<Name>();
     ecs.register::<Player>();
@@ -75,4 +97,5 @@ pub fn register_components(ecs: &mut World) {
     ecs.register::<SufferDamage>();
     ecs.register::<Viewshed>();
     ecs.register::<WantsToMelee>();
+    ecs.register::<WantsToPickupItem>();
 }
