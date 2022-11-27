@@ -48,8 +48,11 @@ pub enum TileGraphic {
     EnemyHound = 40,
     EnemySmallStalker,
     EnemyBigStalker,
+    // Items
+    ItemBandage = 48,
+    ItemFirstAidKit,
     // Debug
-    DebugOverlay = 48,
+    DebugOverlay = 56,
 }
 
 pub struct Map {
