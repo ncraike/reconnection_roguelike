@@ -37,8 +37,8 @@ pub const FIRST_MESSAGE_COLOR: RGB = RGB {
     b: 181.0 / 255.0,
 };
 pub const LAST_MESSAGE_COLOR: RGB = RGB {
-    r: 107.0 / 255.0,
-    g: 148.0 / 255.0,
+    r: 74.0 / 255.0,
+    g: 115.0 / 255.0,
     b: 148.0 / 255.0,
 };
 pub const HEALTH_CRITICAL_COLOR: RGB = RGB {
