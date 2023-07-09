@@ -1,5 +1,6 @@
 use bracket_color::prelude::{ColorPair, RgbLerp, RGB, RGBA};
 use bracket_geometry::prelude::{Point, Rect};
+use bracket_lib::color;
 use bracket_terminal::prelude::{
     render_draw_buffer, to_cp437, BResult, BTerm, BTermBuilder, DrawBatch,
 };
@@ -120,6 +121,36 @@ pub fn build_terminal() -> BResult<BTerm> {
             TEXT_FONT,
         )
         .build()
+}
+
+pub fn draw_box_with_filled_bg(batch: &mut DrawBatch, bounds: Rect, colorpair: ColorPair) {
+    batch.fill_region(
+        Rect::with_exact(bounds.x1, bounds.y1, bounds.x2 + 1, bounds.y2 + 1),
+        ColorPair::new(colorpair.bg, colorpair.bg),
+        to_cp437('█'),
+    );
+    batch.draw_box(bounds, colorpair);
+}
+
+pub fn print_color_with_filled_bg<S: ToString>(
+    batch: &mut DrawBatch,
+    pos: Point,
+    text: S,
+    colorpair: ColorPair,
+    left_padding: i32,
+    right_padding: i32,
+) {
+    let as_string = text.to_string();
+    // FIXME: this will be wrong for multi-byte characters
+    let width = as_string.len() as i32;
+    let fill_bounds = Rect::with_size(pos.x - left_padding, pos.y, width + right_padding + 1, 1);
+    // FIXME: assert this is still in the screen space
+    batch.fill_region(
+        fill_bounds,
+        ColorPair::new(colorpair.bg, colorpair.bg),
+        to_cp437('█'),
+    );
+    batch.print_color(pos, text, colorpair);
 }
 
 #[derive(Debug)]
@@ -403,10 +434,9 @@ pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm, _menu_state: Inventor
 
     let mut batch = DrawBatch::new();
     batch.target(Consoles::Text as usize);
-    batch.cls();
 
     let text_colorpair = ColorPair::new(MENU_TEXT_COLOR.to_rgba(1.0), MENU_BG_COLOR);
-    // let highlight_colorpair = ColorPair::new(MENU_HIGHLIGHT_COLOR.to_rgba(1.0), MENU_BG_COLOR);
+    let highlight_colorpair = ColorPair::new(MENU_HIGHLIGHT_COLOR.to_rgba(1.0), MENU_BG_COLOR);
     let line_colorpair = ColorPair::new(MENU_LINE_COLOR.to_rgba(1.0), MENU_BG_COLOR);
 
     let inventory = (&held_items, &names)
@@ -414,7 +444,7 @@ pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm, _menu_state: Inventor
         .filter(|item| item.0.owner == *player);
     let count = inventory.clone().count() as i32;
 
-    let menu_bounds_abstract = Rect::with_exact(0, 0, 40, cmp::max(count, 1) + 1);
+    let menu_bounds_abstract = Rect::with_exact(0, 0, 40, cmp::max(count, 1) + 3);
 
     let menu_x = (view.menu_view.width() - menu_bounds_abstract.width()) / 2;
     let menu_y = (view.menu_view.height() - menu_bounds_abstract.height()) / 2;
@@ -424,26 +454,31 @@ pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm, _menu_state: Inventor
         menu_x + menu_bounds_abstract.width(),
         menu_y + menu_bounds_abstract.height(),
     );
-    let fill_bounds = Rect::with_exact(
-        menu_bounds.x1,
-        menu_bounds.y1,
-        menu_bounds.x2 + 1,
-        menu_bounds.y2 + 1,
-    );
     let listing_bounds = Rect::with_exact(
-        menu_bounds.x1 + 1,
-        menu_bounds.y1 + 1,
-        menu_bounds.x2 - 1,
-        menu_bounds.y2 - 1,
+        menu_bounds.x1 + 2,
+        menu_bounds.y1 + 2,
+        menu_bounds.x2 - 2,
+        menu_bounds.y2 - 2,
     );
     // FIXME: assert all these rects are in screenspace
 
-    batch.fill_region(
-        fill_bounds,
-        ColorPair::new(MENU_BG_COLOR, MENU_BG_COLOR),
-        to_cp437('█'),
+    draw_box_with_filled_bg(&mut batch, menu_bounds, line_colorpair);
+    print_color_with_filled_bg(
+        &mut batch,
+        Point::new(menu_bounds.x1 + 3, menu_bounds.y1),
+        "Inventory",
+        highlight_colorpair,
+        1,
+        1,
     );
-    batch.draw_box(menu_bounds, line_colorpair);
+    print_color_with_filled_bg(
+        &mut batch,
+        Point::new(menu_bounds.x1 + 3, menu_bounds.y2),
+        "<escape> to cancel",
+        highlight_colorpair,
+        1,
+        1,
+    );
 
     if count == 0 {
         batch.print_color(

@@ -66,7 +66,6 @@ pub struct State {
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
-        ctx.cls();
         let mut new_run_state;
         {
             let run_state = self.ecs.fetch::<RunState>();
