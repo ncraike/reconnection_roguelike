@@ -20,16 +20,18 @@ pub mod spawner;
 pub mod visibility_system;
 use components::{register_components, BlocksTile, Player, Viewshed};
 use damage_system::DamageSystem;
-use gui::{build_terminal, render_main_view};
+use gui::{build_terminal, render_inventory_menu, render_main_view};
 use inventory_system::InventorySystem;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use map_indexing_system::MapIndexingSystem;
 use melee_combat_system::MeleeCombatSystem;
 use message_log::MessageLog;
 use monster_ai_system::MonsterAI;
-use player::player_input;
+use player::{player_input, player_input_inventory_menu};
 use spawner::{create_bandage, create_enemy_big_stalker, create_enemy_hound, create_player};
 use visibility_system::VisibilitySystem;
+
+use crate::spawner::create_first_aid_kit;
 
 pub const GAME_TITLE: &str = "Reconnection";
 
@@ -41,6 +43,20 @@ pub enum RunState {
     PreRun,
     PlayerTurn,
     MonsterTurn,
+    ActiveMenu(Menu),
+}
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum Menu {
+    Inventory(InventoryMenuState),
+    Stats,
+    Skills,
+}
+
+#[derive(PartialEq, Copy, Clone)]
+pub enum InventoryMenuState {
+    AwaitingInput,
+    UseItem,
 }
 
 pub struct State {
@@ -80,6 +96,18 @@ impl GameState for State {
                 self.run_systems();
                 new_run_state = RunState::AwaitingInput;
             }
+            RunState::ActiveMenu(menu) => match menu {
+                Menu::Inventory(state) => match state {
+                    InventoryMenuState::AwaitingInput => {
+                        new_run_state = player_input_inventory_menu(ctx);
+                    }
+                    InventoryMenuState::UseItem => {
+                        // FIXME: implement using items
+                    }
+                },
+                // FIXME: implement other options
+                _ => {}
+            },
         }
 
         {
@@ -87,8 +115,18 @@ impl GameState for State {
             *run_state_writer = new_run_state;
         }
 
-        damage_system::delete_the_dead(&mut self.ecs);
-        render_main_view(&self.ecs, ctx);
+        match new_run_state {
+            RunState::ActiveMenu(menu) => match menu {
+                Menu::Inventory(menu_state) => {
+                    render_inventory_menu(&self.ecs, ctx, menu_state);
+                }
+                _ => {}
+            },
+            _ => {
+                damage_system::delete_the_dead(&mut self.ecs);
+                render_main_view(&self.ecs, ctx);
+            }
+        }
     }
 }
 
@@ -152,6 +190,20 @@ fn main() -> BError {
         Point {
             x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_bandage(
+        &mut gs.ecs,
+        Point {
+            x: ((MAP_WIDTH / 2 - MAP_WIDTH / 4) + 1) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_first_aid_kit(
+        &mut gs.ecs,
+        Point {
+            x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
+            y: ((MAP_HEIGHT / 2 + MAP_HEIGHT / 4) + 1) as i32,
         },
     );
 

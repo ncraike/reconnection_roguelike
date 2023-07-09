@@ -7,7 +7,7 @@ use crate::components::{WantsToMelee, WantsToPickupItem};
 use super::components::{CombatStats, Item, Player, Viewshed};
 use super::map::Map;
 use super::message_log::MessageLog;
-use super::{RunState, State};
+use super::{InventoryMenuState, Menu, RunState, State};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Point>();
@@ -65,8 +65,14 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
             VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
             VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
             VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
+
             // Actions
             VirtualKeyCode::G => get_item(&mut gs.ecs),
+
+            // Menus
+            VirtualKeyCode::I => {
+                return RunState::ActiveMenu(Menu::Inventory(InventoryMenuState::AwaitingInput))
+            }
 
             // Arrow keys
             VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
@@ -78,6 +84,17 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
         },
     }
     RunState::PlayerTurn
+}
+
+pub fn player_input_inventory_menu(ctx: &mut BTerm) -> RunState {
+    match ctx.key {
+        None => {}
+        Some(key) => match key {
+            VirtualKeyCode::Escape => return RunState::AwaitingInput,
+            _ => {}
+        },
+    }
+    RunState::ActiveMenu(Menu::Inventory(InventoryMenuState::AwaitingInput))
 }
 
 fn get_item(ecs: &mut World) {

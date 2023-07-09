@@ -1,13 +1,16 @@
 use bracket_color::prelude::{ColorPair, RgbLerp, RGB, RGBA};
 use bracket_geometry::prelude::{Point, Rect};
-use bracket_terminal::prelude::{render_draw_buffer, BResult, BTerm, BTermBuilder, DrawBatch};
+use bracket_terminal::prelude::{
+    render_draw_buffer, to_cp437, BResult, BTerm, BTermBuilder, DrawBatch,
+};
 use specs::prelude::*;
+use std::cmp;
 
 use super::camera::{get_camera_bounds_in_world, render_camera};
-use super::components::{CombatStats, Name, Player};
+use super::components::{CombatStats, InInventory, Name, Player};
 use super::map::Map;
 use super::message_log::MessageLog;
-use super::GAME_TITLE;
+use super::{InventoryMenuState, GAME_TITLE};
 
 pub const DEFAULT_WINDOW_WIDTH_IN_TILES: u32 = 48;
 pub const DEFAULT_WINDOW_HEIGHT_IN_TILES: u32 = 18;
@@ -61,6 +64,16 @@ pub const TRANSPARENT: RGBA = RGBA {
     g: 0.0,
     b: 0.0,
     a: 0.0,
+};
+
+pub const MENU_TEXT_COLOR: RGB = FIRST_MESSAGE_COLOR;
+pub const MENU_LINE_COLOR: RGB = LAST_MESSAGE_COLOR;
+pub const MENU_HIGHLIGHT_COLOR: RGB = HEALTH_OKAY_COLOR;
+pub const MENU_BG_COLOR: RGBA = RGBA {
+    r: 27.0 / 255.0,
+    g: 24.0 / 255.0,
+    b: 25.0 / 255.0,
+    a: 1.0,
 };
 
 pub enum Consoles {
@@ -341,4 +354,118 @@ pub fn render_tooltips(
     batch
         .submit(Consoles::Text as usize)
         .expect("Couldn't render text");
+}
+
+#[derive(Debug)]
+pub struct MenuInventoryView {
+    pub camera_view_2x: Rect,
+    pub menu_view: Rect,
+    pub window_in_tiles: Rect,
+    pub window_in_text: Rect,
+    pub mouse_pt_in_tiles: Point,
+    pub mouse_pt_in_text: Point,
+}
+
+impl MenuInventoryView {
+    pub fn from_context(ctx: &mut BTerm) -> MenuInventoryView {
+        ctx.set_active_console(Consoles::TilesTerrain as usize);
+        let (width_in_tiles, height_in_tiles) = ctx.get_char_size();
+        let mouse_pt_in_tiles = ctx.mouse_point();
+        ctx.set_active_console(Consoles::Text as usize);
+        let (width_in_text, height_in_text) = ctx.get_char_size();
+        let mouse_pt_in_text = ctx.mouse_point();
+
+        MenuInventoryView {
+            camera_view_2x: Rect::with_size(
+                0,
+                0,
+                width_in_tiles,
+                if height_in_tiles > TEXT_BOX_HEIGHT_IN_TILES {
+                    height_in_tiles - TEXT_BOX_HEIGHT_IN_TILES
+                } else {
+                    height_in_tiles
+                },
+            ),
+            menu_view: Rect::with_size(0, 0, width_in_text, height_in_text - TEXT_BOX_HEIGHT),
+            window_in_tiles: Rect::with_size(0, 0, width_in_tiles, height_in_tiles),
+            window_in_text: Rect::with_size(0, 0, width_in_text, height_in_text),
+            mouse_pt_in_tiles: mouse_pt_in_tiles,
+            mouse_pt_in_text: mouse_pt_in_text,
+        }
+    }
+}
+
+pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm, _menu_state: InventoryMenuState) {
+    let view = MenuInventoryView::from_context(ctx);
+    let player = ecs.fetch::<Entity>();
+    let names = ecs.read_storage::<Name>();
+    let held_items = ecs.read_storage::<InInventory>();
+
+    let mut batch = DrawBatch::new();
+    batch.target(Consoles::Text as usize);
+    batch.cls();
+
+    let text_colorpair = ColorPair::new(MENU_TEXT_COLOR.to_rgba(1.0), MENU_BG_COLOR);
+    // let highlight_colorpair = ColorPair::new(MENU_HIGHLIGHT_COLOR.to_rgba(1.0), MENU_BG_COLOR);
+    let line_colorpair = ColorPair::new(MENU_LINE_COLOR.to_rgba(1.0), MENU_BG_COLOR);
+
+    let inventory = (&held_items, &names)
+        .join()
+        .filter(|item| item.0.owner == *player);
+    let count = inventory.clone().count() as i32;
+
+    let menu_bounds_abstract = Rect::with_exact(0, 0, 40, cmp::max(count, 1) + 1);
+
+    let menu_x = (view.menu_view.width() - menu_bounds_abstract.width()) / 2;
+    let menu_y = (view.menu_view.height() - menu_bounds_abstract.height()) / 2;
+    let menu_bounds = Rect::with_exact(
+        menu_x,
+        menu_y,
+        menu_x + menu_bounds_abstract.width(),
+        menu_y + menu_bounds_abstract.height(),
+    );
+    let fill_bounds = Rect::with_exact(
+        menu_bounds.x1,
+        menu_bounds.y1,
+        menu_bounds.x2 + 1,
+        menu_bounds.y2 + 1,
+    );
+    let listing_bounds = Rect::with_exact(
+        menu_bounds.x1 + 1,
+        menu_bounds.y1 + 1,
+        menu_bounds.x2 - 1,
+        menu_bounds.y2 - 1,
+    );
+    // FIXME: assert all these rects are in screenspace
+
+    batch.fill_region(
+        fill_bounds,
+        ColorPair::new(MENU_BG_COLOR, MENU_BG_COLOR),
+        to_cp437('█'),
+    );
+    batch.draw_box(menu_bounds, line_colorpair);
+
+    if count == 0 {
+        batch.print_color(
+            Point::new(listing_bounds.x1, listing_bounds.y1),
+            "No items",
+            text_colorpair,
+        );
+    } else {
+        let mut y = listing_bounds.y1;
+        for (_item, item_name) in inventory {
+            batch.print_color(
+                Point::new(listing_bounds.x1, y),
+                &item_name.name.to_string(),
+                text_colorpair,
+            );
+            y += 1;
+        }
+    }
+
+    batch
+        .submit(Consoles::Text as usize)
+        .expect("Couldn't draw inventory listing");
+
+    render_draw_buffer(ctx).expect("Couldn't render inventory listing");
 }

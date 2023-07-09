@@ -101,7 +101,7 @@ pub fn create_first_aid_kit(ecs: &mut World, at: Point) -> Entity {
             name: String::from("first aid kit"),
         })
         .with(Renderable {
-            graphic: TileGraphic::ItemBandage,
+            graphic: TileGraphic::ItemFirstAidKit,
         })
         .with(HealthRestore { heal_amount: 20 })
         .with(at.clone())
