@@ -5,10 +5,8 @@ use bracket_terminal::prelude::{BError, BTerm, EMBED};
 
 use specs::prelude::*;
 
-pub mod camera;
 pub mod components;
 pub mod damage_system;
-pub mod gui;
 pub mod inventory_system;
 pub mod map;
 pub mod map_indexing_system;
@@ -17,10 +15,11 @@ pub mod message_log;
 pub mod monster_ai_system;
 pub mod player;
 pub mod spawner;
+pub mod ui;
 pub mod visibility_system;
+
 use components::{register_components, BlocksTile, Player, Viewshed};
 use damage_system::DamageSystem;
-use gui::{build_terminal, render_inventory_menu, render_main_view};
 use inventory_system::InventorySystem;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use map_indexing_system::MapIndexingSystem;
@@ -29,6 +28,9 @@ use message_log::MessageLog;
 use monster_ai_system::MonsterAI;
 use player::{player_input, player_input_inventory_menu};
 use spawner::{create_bandage, create_enemy_big_stalker, create_enemy_hound, create_player};
+use ui::common::build_terminal;
+use ui::main_view::render_main_view;
+use ui::menus::render_inventory_menu;
 use visibility_system::VisibilitySystem;
 
 use crate::spawner::create_first_aid_kit;

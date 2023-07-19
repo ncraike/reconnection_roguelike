@@ -1,31 +1,21 @@
-use bracket_color::prelude::{ColorPair, RGBA};
+use bracket_color::prelude::ColorPair;
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
 
-use super::components::{Item, Player, Renderable};
-use super::gui::Consoles;
-use super::map::{Map, TileGraphic};
+use super::super::components::{Item, Player, Renderable};
+use super::super::map::{Map, TileGraphic};
 
-pub const WHITE: RGBA = RGBA {
-    r: 1.0,
-    g: 1.0,
-    b: 1.0,
-    a: 1.0,
+use super::colors;
+use super::common::Consoles;
+
+const VISIBLE: ColorPair = ColorPair {
+    fg: colors::OPAQUE_WHITE,
+    bg: colors::OPAQUE_WHITE,
 };
-pub const LIGHT_GRAY: RGBA = RGBA {
-    r: 0.7,
-    g: 0.7,
-    b: 0.7,
-    a: 1.0,
-};
-pub const VISIBLE_COLOR: ColorPair = ColorPair {
-    fg: WHITE,
-    bg: WHITE,
-};
-pub const SEEN_COLOR: ColorPair = ColorPair {
-    fg: LIGHT_GRAY,
-    bg: LIGHT_GRAY,
+const SEEN: ColorPair = ColorPair {
+    fg: colors::OPAQUE_GRAY,
+    bg: colors::OPAQUE_GRAY,
 };
 
 pub fn get_camera_bounds_in_world(ecs: &World, camera_view: Rect) -> Option<Rect> {
@@ -73,16 +63,16 @@ pub fn render_terrain_in_camera(
             if map_bounds.point_in_rect(map_pt) {
                 let tile_idx = map.to_index(map_pt);
                 if map.visible_tiles[tile_idx] {
-                    batch.set(screen_pt, VISIBLE_COLOR, map.tiles[tile_idx] as u16);
+                    batch.set(screen_pt, VISIBLE, map.tiles[tile_idx] as u16);
                 } else if map.revealed_tiles[tile_idx] {
-                    batch.set(screen_pt, SEEN_COLOR, map.tiles[tile_idx] as u16);
+                    batch.set(screen_pt, SEEN, map.tiles[tile_idx] as u16);
                 } else {
-                    batch.set(screen_pt, VISIBLE_COLOR, TileGraphic::Void as u16);
+                    batch.set(screen_pt, VISIBLE, TileGraphic::Void as u16);
                 }
                 return;
             }
         }
-        batch.set(screen_pt, SEEN_COLOR, TileGraphic::Void as u16);
+        batch.set(screen_pt, SEEN, TileGraphic::Void as u16);
     });
 
     batch
@@ -115,10 +105,10 @@ pub fn render_entities_in_camera(ecs: &World, camera_view: Rect, camera_in_world
             if camera_view.point_in_rect(camera_pt) {
                 match items.get(entity) {
                     None => {
-                        draw_characters.set(camera_pt, VISIBLE_COLOR, render.graphic as u16);
+                        draw_characters.set(camera_pt, VISIBLE, render.graphic as u16);
                     }
                     Some(_item) => {
-                        draw_items.set(camera_pt, VISIBLE_COLOR, render.graphic as u16);
+                        draw_items.set(camera_pt, VISIBLE, render.graphic as u16);
                     }
                 }
             }
