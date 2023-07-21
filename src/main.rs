@@ -14,9 +14,9 @@ pub mod melee_combat_system;
 pub mod message_log;
 pub mod monster_ai_system;
 pub mod player;
-pub mod spawner;
 pub mod ui;
 pub mod visibility_system;
+pub mod world;
 
 use components::{register_components, BlocksTile, Player, Viewshed};
 use damage_system::DamageSystem;
@@ -27,13 +27,14 @@ use melee_combat_system::MeleeCombatSystem;
 use message_log::MessageLog;
 use monster_ai_system::MonsterAI;
 use player::{player_input, player_input_inventory_menu};
-use spawner::{create_bandage, create_enemy_big_stalker, create_enemy_hound, create_player};
 use ui::common::build_terminal;
 use ui::main_view::render_main_view;
 use ui::menus::render_inventory_menu;
 use visibility_system::VisibilitySystem;
-
-use crate::spawner::create_first_aid_kit;
+use world::spawner::{
+    create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
+    create_player,
+};
 
 pub const GAME_TITLE: &str = "Reconnection";
 

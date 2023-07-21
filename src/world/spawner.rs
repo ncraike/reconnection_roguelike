@@ -1,10 +1,10 @@
 pub use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
-use super::components::{
+use super::super::components::{
     BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player, Renderable, Viewshed,
 };
-use super::map::TileGraphic;
+use super::super::map::TileGraphic;
 
 pub fn create_player(ecs: &mut World, at: Point) -> Entity {
     ecs.create_entity()
