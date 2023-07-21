@@ -12,7 +12,7 @@ pub mod player;
 pub mod ui;
 pub mod world;
 
-use components::{register_components, BlocksTile, Player, Viewshed};
+use components::register_components;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use message_log::MessageLog;
 use player::{player_input, player_input_inventory_menu};
