@@ -3,7 +3,8 @@ use bracket_geometry::prelude::Point;
 use bracket_pathfinding::prelude::field_of_view;
 use specs::prelude::*;
 
-use super::{Map, Player, Viewshed};
+use super::super::super::components::{Player, Viewshed};
+use super::super::super::map::Map;
 
 pub struct VisibilitySystem {}
 

@@ -1,8 +1,8 @@
 use bracket_terminal::prelude::console;
 use specs::prelude::*;
 
-use super::components::{CombatStats, Name, Player, SufferDamage};
-use super::message_log::MessageLog;
+use super::super::super::components::{CombatStats, Name, Player, SufferDamage};
+use super::super::super::message_log::MessageLog;
 
 pub struct DamageSystem {}
 

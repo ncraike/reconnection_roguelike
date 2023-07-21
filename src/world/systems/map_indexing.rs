@@ -1,5 +1,7 @@
-use super::{BlocksTile, Map, Point};
 use specs::prelude::*;
+
+use super::super::super::components::{BlocksTile, Point};
+use super::super::super::map::Map;
 
 pub struct MapIndexingSystem {}
 

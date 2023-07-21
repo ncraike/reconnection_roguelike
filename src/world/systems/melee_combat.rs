@@ -1,7 +1,7 @@
 use specs::prelude::*;
 
-use super::components::{CombatStats, Name, SufferDamage, WantsToMelee};
-use super::message_log::MessageLog;
+use super::super::super::components::{CombatStats, Name, SufferDamage, WantsToMelee};
+use super::super::super::message_log::MessageLog;
 
 pub struct MeleeCombatSystem {}
 

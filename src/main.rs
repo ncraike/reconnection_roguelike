@@ -6,35 +6,27 @@ use bracket_terminal::prelude::{BError, BTerm, EMBED};
 use specs::prelude::*;
 
 pub mod components;
-pub mod damage_system;
-pub mod inventory_system;
 pub mod map;
-pub mod map_indexing_system;
-pub mod melee_combat_system;
 pub mod message_log;
-pub mod monster_ai_system;
 pub mod player;
 pub mod ui;
-pub mod visibility_system;
 pub mod world;
 
 use components::{register_components, BlocksTile, Player, Viewshed};
-use damage_system::DamageSystem;
-use inventory_system::InventorySystem;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
-use map_indexing_system::MapIndexingSystem;
-use melee_combat_system::MeleeCombatSystem;
 use message_log::MessageLog;
-use monster_ai_system::MonsterAI;
 use player::{player_input, player_input_inventory_menu};
 use ui::common::build_terminal;
 use ui::main_view::render_main_view;
 use ui::menus::render_inventory_menu;
-use visibility_system::VisibilitySystem;
 use world::spawner::{
     create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
     create_player,
 };
+use world::systems;
+use world::systems::damage::delete_the_dead;
+use world::systems::map_indexing::MapIndexingSystem;
+use world::systems::visibility::VisibilitySystem;
 
 pub const GAME_TITLE: &str = "Reconnection";
 
@@ -125,7 +117,7 @@ impl GameState for State {
                 _ => {}
             },
             _ => {
-                damage_system::delete_the_dead(&mut self.ecs);
+                delete_the_dead(&mut self.ecs);
                 render_main_view(&self.ecs, ctx);
             }
         }
@@ -134,18 +126,7 @@ impl GameState for State {
 
 impl State {
     fn run_systems(&mut self) {
-        let mut vis = VisibilitySystem {};
-        vis.run_now(&self.ecs);
-        let mut mapindex = MapIndexingSystem {};
-        mapindex.run_now(&self.ecs);
-        let mut mob = MonsterAI {};
-        mob.run_now(&self.ecs);
-        let mut melee = MeleeCombatSystem {};
-        melee.run_now(&self.ecs);
-        let mut damage = DamageSystem {};
-        damage.run_now(&self.ecs);
-        let mut inventory_system = InventorySystem {};
-        inventory_system.run_now(&self.ecs);
+        systems::run(&self.ecs);
         self.ecs.maintain();
     }
 }

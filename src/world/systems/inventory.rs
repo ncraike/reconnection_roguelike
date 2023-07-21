@@ -1,8 +1,8 @@
 use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
-use super::components::{InInventory, Name, WantsToPickupItem};
-use super::message_log::MessageLog;
+use super::super::super::components::{InInventory, Name, WantsToPickupItem};
+use super::super::super::message_log::MessageLog;
 
 pub struct InventorySystem {}
 
