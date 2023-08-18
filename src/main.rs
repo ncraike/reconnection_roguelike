@@ -2,8 +2,8 @@ use bracket_geometry::prelude::Point;
 use bracket_lib::prelude::{main_loop, GameState};
 use bracket_terminal;
 use bracket_terminal::prelude::{BError, BTerm, EMBED};
-
 use specs::prelude::*;
+use statig::prelude::*;
 
 pub mod components;
 pub mod map;
@@ -54,13 +54,26 @@ pub enum InventoryMenuState {
     UseItem,
 }
 
-pub struct State {
+pub struct ReconnectionState {
     ecs: World,
 }
 
+#[derive(Debug)]
+pub enum GameEvent {
+    Start,
+    PlayerInput,
+    Tick,
+}
+
+pub struct Context {
+    bterm: &BTerm,
+}
+
 // Implement the game loop
-impl GameState for State {
+impl GameState for ReconnectionState {
     fn tick(&mut self, ctx: &mut BTerm) {
+        self.handle_with_context(&GameEvent::Tick, &mut ctx);
+
         let mut new_run_state;
         {
             let run_state = self.ecs.fetch::<RunState>();
@@ -124,7 +137,43 @@ impl GameState for State {
     }
 }
 
-impl State {
+#[state_machine(initial = "State::pre_run()")]
+impl ReconnectionState {
+    #[state]
+    fn pre_run(&mut self, context: &mut BTerm, event: &GameEvent) -> Response<State> {
+        self.run_systems();
+        Transition(State::awaiting_input())
+    }
+
+    #[state]
+    fn awaiting_input(&mut self, context: &mut BTerm, event: &GameEvent) -> Response<State> {
+        let new_state = player_input(self, context);
+
+        // FIXME: fix "jitter" in vision rendering
+        let mut vis = VisibilitySystem {};
+        vis.run_now(&self.ecs);
+        // FIXME: fix out-of-date monster positions for tooltips
+        let mut map_index = MapIndexingSystem {};
+        map_index.run_now(&self.ecs);
+        self.ecs.maintain();
+
+        Transition(new_state)
+    }
+
+    #[state]
+    fn player_turn(&mut self, context: &mut BTerm, event: &GameEvent) -> Response<State> {
+        self.run_systems();
+
+        Transition(State::monster_turn())
+    }
+
+    #[state]
+    fn monster_turn(&mut self, context: &mut BTerm, event: &GameEvent) -> Response<State> {
+        self.run_systems();
+
+        Transition(State::player_turn())
+    }
+
     fn run_systems(&mut self) {
         systems::run(&self.ecs);
         self.ecs.maintain();
@@ -136,7 +185,7 @@ fn main() -> BError {
 
     let terminal: BTerm = build_terminal()?;
 
-    let mut gs = State { ecs: World::new() };
+    let mut gs = ReconnectionState { ecs: World::new() };
     register_components(&mut gs.ecs);
 
     gs.ecs.insert(RunState::PreRun);

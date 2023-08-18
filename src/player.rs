@@ -7,7 +7,7 @@ use crate::components::{WantsToMelee, WantsToPickupItem};
 use super::components::{CombatStats, Item, Player, Viewshed};
 use super::map::Map;
 use super::message_log::MessageLog;
-use super::{InventoryMenuState, Menu, RunState, State};
+use super::{InventoryMenuState, Menu, ReconnectionState, State};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Point>();
@@ -48,10 +48,10 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     }
 }
 
-pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
+pub fn player_input(gs: &mut ReconnectionState, ctx: &mut BTerm) -> State {
     // Player movement
     match ctx.key {
-        None => return RunState::AwaitingInput,
+        None => return State::awaiting_input(),
         Some(key) => match key {
             // Laptop controls
 
@@ -71,7 +71,7 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
 
             // Menus
             VirtualKeyCode::I => {
-                return RunState::ActiveMenu(Menu::Inventory(InventoryMenuState::AwaitingInput))
+                return State::active_menu(Menu::Inventory(InventoryMenuState::AwaitingInput))
             }
 
             // Arrow keys
@@ -80,7 +80,7 @@ pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
             VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
             VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
 
-            _ => return RunState::AwaitingInput,
+            _ => return State::awaiting_input(),
         },
     }
     RunState::PlayerTurn
