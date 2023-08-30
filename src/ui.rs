@@ -3,6 +3,7 @@ pub mod main_view;
 pub mod menus;
 
 mod camera;
+mod input;
 mod messages;
 mod stats;
 mod tooltips;
