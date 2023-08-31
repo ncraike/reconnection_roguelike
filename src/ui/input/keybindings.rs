@@ -19,6 +19,7 @@ pub enum Menu {
     Inventory,
     Character,
     Quests,
+    System,
 }
 
 #[derive(PartialEq, Eq, Hash)]
@@ -27,7 +28,6 @@ pub enum CoreAction {
     OpenMenu(Menu),
     Pickup,
     Wait,
-    QuitGame,
 }
 
 #[derive(PartialEq, Eq, Hash)]
@@ -88,14 +88,31 @@ pub fn classic_laptop() -> Keybindings {
                 CoreAction::MovePlayer(PlayerMoveDirection::SouthEast),
             ),
             (VirtualKeyCode::I, CoreAction::OpenMenu(Menu::Inventory)),
+            (VirtualKeyCode::Escape, CoreAction::OpenMenu(Menu::System)),
             (VirtualKeyCode::G, CoreAction::Pickup),
             (VirtualKeyCode::Period, CoreAction::Wait),
-            (VirtualKeyCode::Q, CoreAction::QuitGame),
         ]),
         menu: HashMap::from([
+            // Standard confirm/cancel and cardinals
             (VirtualKeyCode::Return, MenuAction::Confirm),
             (VirtualKeyCode::Space, MenuAction::Confirm),
             (VirtualKeyCode::Escape, MenuAction::Cancel),
+            (
+                VirtualKeyCode::Up,
+                MenuAction::MoveSelection(MenuDirection::Up),
+            ),
+            (
+                VirtualKeyCode::Left,
+                MenuAction::MoveSelection(MenuDirection::Left),
+            ),
+            (
+                VirtualKeyCode::Down,
+                MenuAction::MoveSelection(MenuDirection::Down),
+            ),
+            (
+                VirtualKeyCode::Right,
+                MenuAction::MoveSelection(MenuDirection::Right),
+            ),
             // vim-style HJKL cardinal movement
             (
                 VirtualKeyCode::H,
