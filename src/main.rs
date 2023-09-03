@@ -15,8 +15,9 @@ pub mod world;
 use components::register_components;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use message_log::MessageLog;
-use player::{player_input, player_input_inventory_menu};
+use player::{do_player_action, player_input_inventory_menu};
 use ui::common::build_terminal;
+use ui::input::keybindings::{classic_laptop, Keybindings};
 use ui::main_view::render_main_view;
 use ui::menus::render_inventory_menu;
 use world::spawner::{
@@ -38,11 +39,11 @@ pub enum RunState {
     PreRun,
     PlayerTurn,
     MonsterTurn,
-    ActiveMenu(Menu),
+    ActiveMenu(MenuState),
 }
 
 #[derive(PartialEq, Copy, Clone)]
-pub enum Menu {
+pub enum MenuState {
     Inventory(InventoryMenuState),
     Stats,
     Skills,
@@ -61,10 +62,13 @@ pub struct State {
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
+        let mut keybindings;
+
         let mut new_run_state;
         {
             let run_state = self.ecs.fetch::<RunState>();
             new_run_state = *run_state;
+            keybindings = self.ecs.fetch::<Keybindings>();
         }
 
         match new_run_state {
@@ -73,14 +77,19 @@ impl GameState for State {
                 new_run_state = RunState::AwaitingInput;
             }
             RunState::AwaitingInput => {
-                new_run_state = player_input(self, ctx);
-                // FIXME: fix "jitter" in vision rendering
-                let mut vis = VisibilitySystem {};
-                vis.run_now(&self.ecs);
-                // FIXME: fix out-of-date monster positions for tooltips
-                let mut map_index = MapIndexingSystem {};
-                map_index.run_now(&self.ecs);
-                self.ecs.maintain();
+                match keybindings.get_core_action(ctx) {
+                    Some(player_action) => {
+                        new_run_state = do_player_action(player_action, self);
+                        // FIXME: fix "jitter" in vision rendering
+                        let mut vis = VisibilitySystem {};
+                        vis.run_now(&self.ecs);
+                        // FIXME: fix out-of-date monster positions for tooltips
+                        let mut map_index = MapIndexingSystem {};
+                        map_index.run_now(&self.ecs);
+                        self.ecs.maintain();
+                    }
+                    None => (),
+                }
             }
             RunState::PlayerTurn => {
                 self.run_systems();
@@ -91,7 +100,7 @@ impl GameState for State {
                 new_run_state = RunState::AwaitingInput;
             }
             RunState::ActiveMenu(menu) => match menu {
-                Menu::Inventory(state) => match state {
+                MenuState::Inventory(state) => match state {
                     InventoryMenuState::AwaitingInput => {
                         new_run_state = player_input_inventory_menu(ctx);
                     }
@@ -111,7 +120,7 @@ impl GameState for State {
 
         match new_run_state {
             RunState::ActiveMenu(menu) => match menu {
-                Menu::Inventory(menu_state) => {
+                MenuState::Inventory(menu_state) => {
                     render_inventory_menu(&self.ecs, ctx, menu_state);
                 }
                 _ => {}
@@ -145,6 +154,9 @@ fn main() -> BError {
     gs.ecs.insert(map);
 
     gs.ecs.insert(MessageLog { entries: vec![] });
+
+    let keybindings: Keybindings = classic_laptop();
+    gs.ecs.insert(keybindings);
 
     let player = create_player(
         &mut gs.ecs,

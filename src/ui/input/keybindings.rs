@@ -1,36 +1,10 @@
 use std::collections::HashMap;
 
-use bracket_terminal::prelude::VirtualKeyCode;
+use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
 
-#[derive(PartialEq, Eq, Hash)]
-pub enum PlayerMoveDirection {
-    North,
-    NorthEast,
-    East,
-    SouthEast,
-    South,
-    SouthWest,
-    West,
-    NorthWest,
-}
+use super::super::super::player::{Menu, PlayerAction, PlayerMoveDirection};
 
-#[derive(PartialEq, Eq, Hash)]
-pub enum Menu {
-    Inventory,
-    Character,
-    Quests,
-    System,
-}
-
-#[derive(PartialEq, Eq, Hash)]
-pub enum CoreAction {
-    MovePlayer(PlayerMoveDirection),
-    OpenMenu(Menu),
-    Pickup,
-    Wait,
-}
-
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MenuDirection {
     Up,
     Right,
@@ -38,7 +12,7 @@ pub enum MenuDirection {
     Left,
 }
 
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MenuAction {
     Confirm,
     Cancel,
@@ -46,8 +20,31 @@ pub enum MenuAction {
 }
 
 pub struct Keybindings {
-    core: HashMap<VirtualKeyCode, CoreAction>,
+    core: HashMap<VirtualKeyCode, PlayerAction>,
     menu: HashMap<VirtualKeyCode, MenuAction>,
+}
+
+impl Keybindings {
+    fn match_key<Action: Copy>(
+        map: &HashMap<VirtualKeyCode, Action>,
+        bterm: &BTerm,
+    ) -> Option<Action> {
+        match bterm.key {
+            None => None,
+            Some(key) => match map.get(&key) {
+                None => None,
+                Some(action) => Some(*action),
+            },
+        }
+    }
+
+    pub fn get_core_action(&self, bterm: &BTerm) -> Option<PlayerAction> {
+        Keybindings::match_key(&self.core, bterm)
+    }
+
+    pub fn get_menu_action(&self, bterm: &BTerm) -> Option<MenuAction> {
+        Keybindings::match_key(&self.menu, bterm)
+    }
 }
 
 pub fn classic_laptop() -> Keybindings {
@@ -56,41 +53,41 @@ pub fn classic_laptop() -> Keybindings {
             // vim-style HJKL cardinal movement
             (
                 VirtualKeyCode::H,
-                CoreAction::MovePlayer(PlayerMoveDirection::West),
+                PlayerAction::MovePlayer(PlayerMoveDirection::West),
             ),
             (
                 VirtualKeyCode::J,
-                CoreAction::MovePlayer(PlayerMoveDirection::South),
+                PlayerAction::MovePlayer(PlayerMoveDirection::South),
             ),
             (
                 VirtualKeyCode::K,
-                CoreAction::MovePlayer(PlayerMoveDirection::North),
+                PlayerAction::MovePlayer(PlayerMoveDirection::North),
             ),
             (
                 VirtualKeyCode::L,
-                CoreAction::MovePlayer(PlayerMoveDirection::East),
+                PlayerAction::MovePlayer(PlayerMoveDirection::East),
             ),
             // YUBN diagonal movement
             (
                 VirtualKeyCode::Y,
-                CoreAction::MovePlayer(PlayerMoveDirection::NorthWest),
+                PlayerAction::MovePlayer(PlayerMoveDirection::NorthWest),
             ),
             (
                 VirtualKeyCode::U,
-                CoreAction::MovePlayer(PlayerMoveDirection::NorthEast),
+                PlayerAction::MovePlayer(PlayerMoveDirection::NorthEast),
             ),
             (
                 VirtualKeyCode::B,
-                CoreAction::MovePlayer(PlayerMoveDirection::SouthWest),
+                PlayerAction::MovePlayer(PlayerMoveDirection::SouthWest),
             ),
             (
                 VirtualKeyCode::N,
-                CoreAction::MovePlayer(PlayerMoveDirection::SouthEast),
+                PlayerAction::MovePlayer(PlayerMoveDirection::SouthEast),
             ),
-            (VirtualKeyCode::I, CoreAction::OpenMenu(Menu::Inventory)),
-            (VirtualKeyCode::Escape, CoreAction::OpenMenu(Menu::System)),
-            (VirtualKeyCode::G, CoreAction::Pickup),
-            (VirtualKeyCode::Period, CoreAction::Wait),
+            (VirtualKeyCode::I, PlayerAction::OpenMenu(Menu::Inventory)),
+            (VirtualKeyCode::Escape, PlayerAction::OpenMenu(Menu::System)),
+            (VirtualKeyCode::G, PlayerAction::Pickup),
+            (VirtualKeyCode::Period, PlayerAction::Wait),
         ]),
         menu: HashMap::from([
             // Standard confirm/cancel and cardinals

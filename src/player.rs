@@ -7,7 +7,62 @@ use crate::components::{WantsToMelee, WantsToPickupItem};
 use super::components::{CombatStats, Item, Player, Viewshed};
 use super::map::Map;
 use super::message_log::MessageLog;
-use super::{InventoryMenuState, Menu, RunState, State};
+use super::{InventoryMenuState, MenuState, RunState, State};
+
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+pub enum PlayerMoveDirection {
+    North,
+    NorthEast,
+    East,
+    SouthEast,
+    South,
+    SouthWest,
+    West,
+    NorthWest,
+}
+
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+pub enum Menu {
+    Inventory,
+    Character,
+    Quests,
+    System,
+}
+
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+pub enum PlayerAction {
+    MovePlayer(PlayerMoveDirection),
+    OpenMenu(Menu),
+    Pickup,
+    Wait,
+}
+
+pub fn do_player_action(action: PlayerAction, gs: &mut State) -> RunState {
+    // Player movement
+    match action {
+        PlayerAction::MovePlayer(direction) => match direction {
+            PlayerMoveDirection::North => try_move_player(0, -1, &mut gs.ecs),
+            PlayerMoveDirection::West => try_move_player(-1, 0, &mut gs.ecs),
+            PlayerMoveDirection::East => try_move_player(1, 0, &mut gs.ecs),
+            PlayerMoveDirection::South => try_move_player(0, 1, &mut gs.ecs),
+            PlayerMoveDirection::NorthWest => try_move_player(-1, -1, &mut gs.ecs),
+            PlayerMoveDirection::NorthEast => try_move_player(1, -1, &mut gs.ecs),
+            PlayerMoveDirection::SouthWest => try_move_player(-1, 1, &mut gs.ecs),
+            PlayerMoveDirection::SouthEast => try_move_player(1, 1, &mut gs.ecs),
+        },
+        PlayerAction::Pickup => get_item(&mut gs.ecs),
+        PlayerAction::OpenMenu(menu) => match menu {
+            Menu::Inventory => {
+                return RunState::ActiveMenu(MenuState::Inventory(
+                    InventoryMenuState::AwaitingInput,
+                ))
+            }
+            _ => return RunState::AwaitingInput,
+        },
+        _ => return RunState::AwaitingInput,
+    }
+    RunState::PlayerTurn
+}
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Point>();
@@ -48,44 +103,6 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     }
 }
 
-pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
-    // Player movement
-    match ctx.key {
-        None => return RunState::AwaitingInput,
-        Some(key) => match key {
-            // Laptop controls
-
-            // vim-style HJKL
-            VirtualKeyCode::K => try_move_player(0, -1, &mut gs.ecs),
-            VirtualKeyCode::H => try_move_player(-1, 0, &mut gs.ecs),
-            VirtualKeyCode::L => try_move_player(1, 0, &mut gs.ecs),
-            VirtualKeyCode::J => try_move_player(0, 1, &mut gs.ecs),
-            // diagonals on YUBN
-            VirtualKeyCode::Y => try_move_player(-1, -1, &mut gs.ecs),
-            VirtualKeyCode::U => try_move_player(1, -1, &mut gs.ecs),
-            VirtualKeyCode::B => try_move_player(-1, 1, &mut gs.ecs),
-            VirtualKeyCode::N => try_move_player(1, 1, &mut gs.ecs),
-
-            // Actions
-            VirtualKeyCode::G => get_item(&mut gs.ecs),
-
-            // Menus
-            VirtualKeyCode::I => {
-                return RunState::ActiveMenu(Menu::Inventory(InventoryMenuState::AwaitingInput))
-            }
-
-            // Arrow keys
-            VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
-            VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
-            VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
-            VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
-
-            _ => return RunState::AwaitingInput,
-        },
-    }
-    RunState::PlayerTurn
-}
-
 pub fn player_input_inventory_menu(ctx: &mut BTerm) -> RunState {
     match ctx.key {
         None => {}
@@ -94,7 +111,7 @@ pub fn player_input_inventory_menu(ctx: &mut BTerm) -> RunState {
             _ => {}
         },
     }
-    RunState::ActiveMenu(Menu::Inventory(InventoryMenuState::AwaitingInput))
+    RunState::ActiveMenu(MenuState::Inventory(InventoryMenuState::AwaitingInput))
 }
 
 fn get_item(ecs: &mut World) {
