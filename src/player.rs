@@ -9,7 +9,7 @@ use super::map::Map;
 use super::message_log::MessageLog;
 use super::{InventoryMenuState, MenuState, RunState, State};
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum PlayerMoveDirection {
     North,
     NorthEast,
@@ -21,7 +21,7 @@ pub enum PlayerMoveDirection {
     NorthWest,
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum Menu {
     Inventory,
     Character,
@@ -29,7 +29,7 @@ pub enum Menu {
     System,
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum PlayerAction {
     MovePlayer(PlayerMoveDirection),
     OpenMenu(Menu),

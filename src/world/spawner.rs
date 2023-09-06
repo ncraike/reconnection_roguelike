@@ -2,7 +2,8 @@ pub use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
 use super::super::components::{
-    BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player, Renderable, Viewshed,
+    ActionsInWorld, BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player,
+    Renderable, Viewshed,
 };
 use super::super::map::TileGraphic;
 
@@ -26,6 +27,9 @@ pub fn create_player(ecs: &mut World, at: Point) -> Entity {
             visible_tiles: Vec::new(),
             range: 8,
             dirty: true,
+        })
+        .with(ActionsInWorld {
+            actions: Vec::new(),
         })
         .build()
 }

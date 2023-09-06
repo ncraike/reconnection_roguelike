@@ -6,6 +6,7 @@ use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::{Component, ConvertSaveload};
 
 use super::map::TileGraphic;
+use super::player::PlayerAction;
 
 #[derive(Component, Debug)]
 pub struct Name {
@@ -83,7 +84,13 @@ pub struct HealthRestore {
     pub heal_amount: i32,
 }
 
+#[derive(Component, Debug)]
+pub struct ActionsInWorld {
+    pub actions: Vec<PlayerAction>,
+}
+
 pub fn register_components(ecs: &mut World) {
+    ecs.register::<ActionsInWorld>();
     ecs.register::<BlocksTile>();
     ecs.register::<CombatStats>();
     ecs.register::<InInventory>();
