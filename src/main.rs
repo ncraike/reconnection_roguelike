@@ -1,7 +1,6 @@
-use bracket_geometry::prelude::Point;
 use bracket_lib::prelude::{main_loop, GameState};
 use bracket_terminal;
-use bracket_terminal::prelude::{BError, BTerm, VirtualKeyCode, EMBED};
+use bracket_terminal::prelude::{BError, BTerm, EMBED};
 
 use specs::prelude::*;
 
@@ -9,46 +8,26 @@ pub mod components;
 pub mod map;
 pub mod message_log;
 pub mod player;
+pub mod types;
 pub mod ui;
 pub mod world;
 
 use components::register_components;
-use map::{Map, MAP_HEIGHT, MAP_WIDTH};
+use map::Map;
 use message_log::MessageLog;
 use player::{do_player_action, player_input_inventory_menu};
-use ui::common::build_terminal;
-use ui::keyboard::{classic_laptop, Keybindings};
-use ui::main_view::render_main_view;
-use ui::menus::render_inventory_menu;
-use ui::systems::input::InputSystem;
-use world::spawner::{
-    create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
-    create_player,
-};
+use types::RunState;
+use ui::{BTermTiledUI, UI};
+use world::spawner::default_spawn;
 use world::systems;
 use world::systems::damage::delete_the_dead;
 use world::systems::map_indexing::MapIndexingSystem;
 use world::systems::visibility::VisibilitySystem;
+use world::WorldEngine;
 
 pub const GAME_TITLE: &str = "Reconnection";
 
 bracket_terminal::embedded_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum RunState {
-    AwaitingInput,
-    PreRun,
-    PlayerTurn,
-    MonsterTurn,
-    ActiveMenu(MenuState),
-}
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum MenuState {
-    Inventory(InventoryMenuState),
-    Stats,
-    Skills,
-}
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum InventoryMenuState {
@@ -63,14 +42,13 @@ pub struct State {
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
+        let ui = self.ecs.fetch::<UI>();
+        let world_engine = self.ecs.fetch::<WorldEngine>();
+
         let mut new_run_state;
         {
             let run_state = self.ecs.fetch::<RunState>();
             new_run_state = *run_state;
-        }
-        {
-            let mut key_writer = self.ecs.write_resource::<Option<VirtualKeyCode>>();
-            *key_writer = ctx.key.clone();
         }
 
         match new_run_state {
@@ -78,38 +56,12 @@ impl GameState for State {
                 self.run_systems();
                 new_run_state = RunState::AwaitingInput;
             }
-            RunState::AwaitingInput => {
-                let mut input = InputSystem {};
-                input.run_now(&self.ecs);
-                new_run_state = do_player_action(player_action, self);
-                // FIXME: fix "jitter" in vision rendering
-                let mut vis = VisibilitySystem {};
-                vis.run_now(&self.ecs);
-                // FIXME: fix out-of-date monster positions for tooltips
-                let mut map_index = MapIndexingSystem {};
-                map_index.run_now(&self.ecs);
-                self.ecs.maintain();
+            RunState::DeferringToUI => {
+                new_run_state = ui.defer_to(ctx, &self.ecs);
             }
-            RunState::PlayerTurn => {
-                self.run_systems();
-                new_run_state = RunState::MonsterTurn;
+            RunState::WorldTick => {
+                new_run_state = world_engine.defer_to(&mut self.ecs);
             }
-            RunState::MonsterTurn => {
-                self.run_systems();
-                new_run_state = RunState::AwaitingInput;
-            }
-            RunState::ActiveMenu(menu) => match menu {
-                MenuState::Inventory(state) => match state {
-                    InventoryMenuState::AwaitingInput => {
-                        new_run_state = player_input_inventory_menu(ctx);
-                    }
-                    InventoryMenuState::UseItem => {
-                        // FIXME: implement using items
-                    }
-                },
-                // FIXME: implement other options
-                _ => {}
-            },
         }
 
         {
@@ -117,18 +69,7 @@ impl GameState for State {
             *run_state_writer = new_run_state;
         }
 
-        match new_run_state {
-            RunState::ActiveMenu(menu) => match menu {
-                MenuState::Inventory(menu_state) => {
-                    render_inventory_menu(&self.ecs, ctx, menu_state);
-                }
-                _ => {}
-            },
-            _ => {
-                delete_the_dead(&mut self.ecs);
-                render_main_view(&self.ecs, ctx);
-            }
-        }
+        self.ecs.maintain();
     }
 }
 
@@ -142,11 +83,16 @@ impl State {
 fn main() -> BError {
     bracket_terminal::link_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
 
-    let terminal: BTerm = build_terminal()?;
+    let ui: UI = BTermTiledUI {};
+    let ui_context: UI::Context = ui.build_context();
+
+    let world_engine = WorldEngine {};
 
     let mut gs = State { ecs: World::new() };
     register_components(&mut gs.ecs);
 
+    gs.ecs.insert::<UI>(ui);
+    gs.ecs.insert(world_engine);
     gs.ecs.insert(RunState::PreRun);
 
     let map: Map = Map::new_map();
@@ -154,52 +100,7 @@ fn main() -> BError {
 
     gs.ecs.insert(MessageLog { entries: vec![] });
 
-    let keybindings: Keybindings = classic_laptop();
-    gs.ecs.insert(keybindings);
+    default_spawn(&mut gs.ecs);
 
-    let player = create_player(
-        &mut gs.ecs,
-        Point {
-            x: (MAP_WIDTH / 2) as i32,
-            y: (MAP_HEIGHT / 2) as i32,
-        },
-    );
-    gs.ecs.insert(player);
-    create_enemy_hound(
-        &mut gs.ecs,
-        Point {
-            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
-            y: (MAP_HEIGHT / 4) as i32,
-        },
-    );
-    create_enemy_big_stalker(
-        &mut gs.ecs,
-        Point {
-            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
-            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
-        },
-    );
-    create_bandage(
-        &mut gs.ecs,
-        Point {
-            x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
-            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
-        },
-    );
-    create_bandage(
-        &mut gs.ecs,
-        Point {
-            x: ((MAP_WIDTH / 2 - MAP_WIDTH / 4) + 1) as i32,
-            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
-        },
-    );
-    create_first_aid_kit(
-        &mut gs.ecs,
-        Point {
-            x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
-            y: ((MAP_HEIGHT / 2 + MAP_HEIGHT / 4) + 1) as i32,
-        },
-    );
-
-    main_loop(terminal, gs)
+    main_loop(ui_context, gs)
 }

@@ -5,7 +5,53 @@ use super::super::components::{
     ActionsInWorld, BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player,
     Renderable, Viewshed,
 };
-use super::super::map::TileGraphic;
+use super::super::map::{TileGraphic, MAP_HEIGHT, MAP_WIDTH};
+
+pub fn default_spawn(ecs: &mut World) {
+    let player = create_player(
+        ecs,
+        Point {
+            x: (MAP_WIDTH / 2) as i32,
+            y: (MAP_HEIGHT / 2) as i32,
+        },
+    );
+    ecs.insert(player);
+    create_enemy_hound(
+        ecs,
+        Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_enemy_big_stalker(
+        ecs,
+        Point {
+            x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_bandage(
+        ecs,
+        Point {
+            x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_bandage(
+        ecs,
+        Point {
+            x: ((MAP_WIDTH / 2 - MAP_WIDTH / 4) + 1) as i32,
+            y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
+        },
+    );
+    create_first_aid_kit(
+        ecs,
+        Point {
+            x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
+            y: ((MAP_HEIGHT / 2 + MAP_HEIGHT / 4) + 1) as i32,
+        },
+    );
+}
 
 pub fn create_player(ecs: &mut World, at: Point) -> Entity {
     ecs.create_entity()
