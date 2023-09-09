@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
 
-use super::super::super::player::{Menu, PlayerAction, PlayerMoveDirection};
+use super::super::player::{Menu, PlayerAction, PlayerMoveDirection};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MenuDirection {
@@ -27,9 +27,9 @@ pub struct Keybindings {
 impl Keybindings {
     fn match_key<Action: Copy>(
         map: &HashMap<VirtualKeyCode, Action>,
-        bterm: &BTerm,
+        key: Option<VirtualKeyCode>,
     ) -> Option<Action> {
-        match bterm.key {
+        match key {
             None => None,
             Some(key) => match map.get(&key) {
                 None => None,
@@ -38,12 +38,12 @@ impl Keybindings {
         }
     }
 
-    pub fn get_core_action(&self, bterm: &BTerm) -> Option<PlayerAction> {
-        Keybindings::match_key(&self.core, bterm)
+    pub fn get_core_action(&self, key: Option<VirtualKeyCode>) -> Option<PlayerAction> {
+        Keybindings::match_key(&self.core, key)
     }
 
-    pub fn get_menu_action(&self, bterm: &BTerm) -> Option<MenuAction> {
-        Keybindings::match_key(&self.menu, bterm)
+    pub fn get_menu_action(&self, key: Option<VirtualKeyCode>) -> Option<MenuAction> {
+        Keybindings::match_key(&self.menu, key)
     }
 }
 

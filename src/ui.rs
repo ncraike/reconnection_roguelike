@@ -1,5 +1,5 @@
 pub mod common;
-pub mod input;
+pub mod keyboard;
 pub mod main_view;
 pub mod menus;
 pub mod systems;

@@ -1,7 +1,7 @@
 use bracket_geometry::prelude::Point;
 use bracket_lib::prelude::{main_loop, GameState};
 use bracket_terminal;
-use bracket_terminal::prelude::{BError, BTerm, EMBED};
+use bracket_terminal::prelude::{BError, BTerm, VirtualKeyCode, EMBED};
 
 use specs::prelude::*;
 
@@ -17,9 +17,10 @@ use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use message_log::MessageLog;
 use player::{do_player_action, player_input_inventory_menu};
 use ui::common::build_terminal;
-use ui::input::keybindings::{classic_laptop, Keybindings};
+use ui::keyboard::{classic_laptop, Keybindings};
 use ui::main_view::render_main_view;
 use ui::menus::render_inventory_menu;
+use ui::systems::input::InputSystem;
 use world::spawner::{
     create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
     create_player,
@@ -62,13 +63,14 @@ pub struct State {
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
-        let mut keybindings;
-
         let mut new_run_state;
         {
             let run_state = self.ecs.fetch::<RunState>();
             new_run_state = *run_state;
-            keybindings = self.ecs.fetch::<Keybindings>();
+        }
+        {
+            let mut key_writer = self.ecs.write_resource::<Option<VirtualKeyCode>>();
+            *key_writer = ctx.key.clone();
         }
 
         match new_run_state {
@@ -77,19 +79,16 @@ impl GameState for State {
                 new_run_state = RunState::AwaitingInput;
             }
             RunState::AwaitingInput => {
-                match keybindings.get_core_action(ctx) {
-                    Some(player_action) => {
-                        new_run_state = do_player_action(player_action, self);
-                        // FIXME: fix "jitter" in vision rendering
-                        let mut vis = VisibilitySystem {};
-                        vis.run_now(&self.ecs);
-                        // FIXME: fix out-of-date monster positions for tooltips
-                        let mut map_index = MapIndexingSystem {};
-                        map_index.run_now(&self.ecs);
-                        self.ecs.maintain();
-                    }
-                    None => (),
-                }
+                let mut input = InputSystem {};
+                input.run_now(&self.ecs);
+                new_run_state = do_player_action(player_action, self);
+                // FIXME: fix "jitter" in vision rendering
+                let mut vis = VisibilitySystem {};
+                vis.run_now(&self.ecs);
+                // FIXME: fix out-of-date monster positions for tooltips
+                let mut map_index = MapIndexingSystem {};
+                map_index.run_now(&self.ecs);
+                self.ecs.maintain();
             }
             RunState::PlayerTurn => {
                 self.run_systems();
