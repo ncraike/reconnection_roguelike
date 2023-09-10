@@ -3,7 +3,7 @@ use bracket_pathfinding::prelude::a_star_search;
 use bracket_terminal::prelude::console;
 use specs::prelude::*;
 
-use super::super::super::components::{Monster, Name, Player, Point, Viewshed, WantsToMelee};
+use super::super::super::components::{Enemy, Name, Player, Point, Viewshed, WantsToMelee};
 use super::super::super::map::Map;
 use super::super::super::RunState;
 
@@ -13,7 +13,7 @@ impl<'a> MonsterAI {
     fn get_player_pos(
         &self,
         player_store: &ReadStorage<'a, Player>,
-        monster_store: &ReadStorage<'a, Monster>,
+        monster_store: &ReadStorage<'a, Enemy>,
         point_store: &WriteStorage<'a, Point>,
     ) -> Option<Point> {
         match (player_store, !monster_store, point_store).join().next() {
@@ -35,7 +35,7 @@ impl<'a> System<'a> for MonsterAI {
         WriteStorage<'a, Viewshed>,
         WriteStorage<'a, Point>,
         WriteStorage<'a, WantsToMelee>,
-        ReadStorage<'a, Monster>,
+        ReadStorage<'a, Enemy>,
         ReadStorage<'a, Name>,
         ReadStorage<'a, Player>,
     );

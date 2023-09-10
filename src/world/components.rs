@@ -22,7 +22,7 @@ pub struct Renderable {
 pub struct Player {}
 
 #[derive(Component, Debug)]
-pub struct Monster {}
+pub struct Enemy {}
 
 #[derive(Component, Debug)]
 pub struct Item {}
@@ -96,7 +96,7 @@ pub fn register_components(ecs: &mut World) {
     ecs.register::<InInventory>();
     ecs.register::<Item>();
     ecs.register::<HealthRestore>();
-    ecs.register::<Monster>();
+    ecs.register::<Enemy>();
     ecs.register::<Name>();
     ecs.register::<Player>();
     ecs.register::<Point>();

@@ -10,7 +10,7 @@ use super::message_log::MessageLog;
 use super::{InventoryMenuState, MenuState, RunState, State};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
-pub enum PlayerMoveDirection {
+pub enum WorldDirection {
     North,
     NorthEast,
     East,
@@ -30,28 +30,28 @@ pub enum Menu {
 }
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
-pub enum PlayerAction {
-    MovePlayer(PlayerMoveDirection),
-    OpenMenu(Menu),
+pub enum Action {
+    Move(WorldDirection),
+    MeleeAttack(WorldDirection),
     Pickup,
     Wait,
 }
 
-pub fn do_player_action(action: PlayerAction, gs: &mut State) -> RunState {
+pub fn do_player_action(action: Action, gs: &mut State) -> RunState {
     // Player movement
     match action {
-        PlayerAction::MovePlayer(direction) => match direction {
-            PlayerMoveDirection::North => try_move_player(0, -1, &mut gs.ecs),
-            PlayerMoveDirection::West => try_move_player(-1, 0, &mut gs.ecs),
-            PlayerMoveDirection::East => try_move_player(1, 0, &mut gs.ecs),
-            PlayerMoveDirection::South => try_move_player(0, 1, &mut gs.ecs),
-            PlayerMoveDirection::NorthWest => try_move_player(-1, -1, &mut gs.ecs),
-            PlayerMoveDirection::NorthEast => try_move_player(1, -1, &mut gs.ecs),
-            PlayerMoveDirection::SouthWest => try_move_player(-1, 1, &mut gs.ecs),
-            PlayerMoveDirection::SouthEast => try_move_player(1, 1, &mut gs.ecs),
+        Action::Move(direction) => match direction {
+            WorldDirection::North => try_move_player(0, -1, &mut gs.ecs),
+            WorldDirection::West => try_move_player(-1, 0, &mut gs.ecs),
+            WorldDirection::East => try_move_player(1, 0, &mut gs.ecs),
+            WorldDirection::South => try_move_player(0, 1, &mut gs.ecs),
+            WorldDirection::NorthWest => try_move_player(-1, -1, &mut gs.ecs),
+            WorldDirection::NorthEast => try_move_player(1, -1, &mut gs.ecs),
+            WorldDirection::SouthWest => try_move_player(-1, 1, &mut gs.ecs),
+            WorldDirection::SouthEast => try_move_player(1, 1, &mut gs.ecs),
         },
-        PlayerAction::Pickup => get_item(&mut gs.ecs),
-        PlayerAction::OpenMenu(menu) => match menu {
+        Action::Pickup => get_item(&mut gs.ecs),
+        Action::OpenMenu(menu) => match menu {
             Menu::Inventory => {
                 return RunState::ActiveMenu(MenuState::Inventory(
                     InventoryMenuState::AwaitingInput,

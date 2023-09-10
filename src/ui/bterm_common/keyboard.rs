@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bracket_terminal::prelude::{BTerm, VirtualKeyCode};
 
-use super::super::player::{Menu, PlayerAction, PlayerMoveDirection};
+use super::super::player::{Menu, MoveDirection, PlayerAction};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MenuDirection {
@@ -53,36 +53,36 @@ pub fn classic_laptop() -> Keybindings {
             // vim-style HJKL cardinal movement
             (
                 VirtualKeyCode::H,
-                PlayerAction::MovePlayer(PlayerMoveDirection::West),
+                PlayerAction::MovePlayer(MoveDirection::West),
             ),
             (
                 VirtualKeyCode::J,
-                PlayerAction::MovePlayer(PlayerMoveDirection::South),
+                PlayerAction::MovePlayer(MoveDirection::South),
             ),
             (
                 VirtualKeyCode::K,
-                PlayerAction::MovePlayer(PlayerMoveDirection::North),
+                PlayerAction::MovePlayer(MoveDirection::North),
             ),
             (
                 VirtualKeyCode::L,
-                PlayerAction::MovePlayer(PlayerMoveDirection::East),
+                PlayerAction::MovePlayer(MoveDirection::East),
             ),
             // YUBN diagonal movement
             (
                 VirtualKeyCode::Y,
-                PlayerAction::MovePlayer(PlayerMoveDirection::NorthWest),
+                PlayerAction::MovePlayer(MoveDirection::NorthWest),
             ),
             (
                 VirtualKeyCode::U,
-                PlayerAction::MovePlayer(PlayerMoveDirection::NorthEast),
+                PlayerAction::MovePlayer(MoveDirection::NorthEast),
             ),
             (
                 VirtualKeyCode::B,
-                PlayerAction::MovePlayer(PlayerMoveDirection::SouthWest),
+                PlayerAction::MovePlayer(MoveDirection::SouthWest),
             ),
             (
                 VirtualKeyCode::N,
-                PlayerAction::MovePlayer(PlayerMoveDirection::SouthEast),
+                PlayerAction::MovePlayer(MoveDirection::SouthEast),
             ),
             (VirtualKeyCode::I, PlayerAction::OpenMenu(Menu::Inventory)),
             (VirtualKeyCode::Escape, PlayerAction::OpenMenu(Menu::System)),

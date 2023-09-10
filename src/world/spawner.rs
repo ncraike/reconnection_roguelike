@@ -2,8 +2,8 @@ pub use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
 use super::super::components::{
-    ActionsInWorld, BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player,
-    Renderable, Viewshed,
+    ActionsInWorld, BlocksTile, CombatStats, Enemy, HealthRestore, Item, Name, Player, Renderable,
+    Viewshed,
 };
 use super::super::map::{TileGraphic, MAP_HEIGHT, MAP_WIDTH};
 
@@ -82,7 +82,7 @@ pub fn create_player(ecs: &mut World, at: Point) -> Entity {
 
 pub fn create_enemy_hound(ecs: &mut World, at: Point) -> Entity {
     ecs.create_entity()
-        .with(Monster {})
+        .with(Enemy {})
         .with(Name {
             name: String::from("H-32"),
         })
@@ -107,7 +107,7 @@ pub fn create_enemy_hound(ecs: &mut World, at: Point) -> Entity {
 
 pub fn create_enemy_big_stalker(ecs: &mut World, at: Point) -> Entity {
     ecs.create_entity()
-        .with(Monster {})
+        .with(Enemy {})
         .with(Name {
             name: String::from("S-07"),
         })
