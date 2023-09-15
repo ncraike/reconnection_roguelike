@@ -9,50 +9,28 @@ pub mod components;
 pub mod map;
 pub mod message_log;
 pub mod player;
+pub mod types;
 pub mod ui;
 pub mod world;
 
 use components::register_components;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use message_log::MessageLog;
-use player::{player_input, player_input_inventory_menu};
-use ui::common::build_terminal;
-use ui::main_view::render_main_view;
-use ui::menus::render_inventory_menu;
+use types::RunState;
+use ui::common::UIState; // FIXME: move to UI setup
+use ui::keyboard::{classic_laptop, Keybindings};
+use ui::UI;
+use world::engine::WorldEngineState;
 use world::spawner::{
     create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
     create_player,
 };
 use world::systems;
-use world::systems::damage::delete_the_dead;
-use world::systems::map_indexing::MapIndexingSystem;
-use world::systems::visibility::VisibilitySystem;
+use world::WorldEngine; // FIXME: move to WorldEngine setup
 
 pub const GAME_TITLE: &str = "Reconnection";
 
 bracket_terminal::embedded_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum RunState {
-    AwaitingInput,
-    PreRun,
-    PlayerTurn,
-    MonsterTurn,
-    ActiveMenu(Menu),
-}
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum Menu {
-    Inventory(InventoryMenuState),
-    Stats,
-    Skills,
-}
-
-#[derive(PartialEq, Copy, Clone)]
-pub enum InventoryMenuState {
-    AwaitingInput,
-    UseItem,
-}
 
 pub struct State {
     ecs: World,
@@ -61,6 +39,9 @@ pub struct State {
 // Implement the game loop
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
+        let ui = *self.ecs.fetch::<UI>();
+        let world_engine = *self.ecs.fetch::<WorldEngine>();
+
         let mut new_run_state;
         {
             let run_state = self.ecs.fetch::<RunState>();
@@ -70,38 +51,14 @@ impl GameState for State {
         match new_run_state {
             RunState::PreRun => {
                 self.run_systems();
-                new_run_state = RunState::AwaitingInput;
+                new_run_state = RunState::DeferringToUI;
             }
-            RunState::AwaitingInput => {
-                new_run_state = player_input(self, ctx);
-                // FIXME: fix "jitter" in vision rendering
-                let mut vis = VisibilitySystem {};
-                vis.run_now(&self.ecs);
-                // FIXME: fix out-of-date monster positions for tooltips
-                let mut map_index = MapIndexingSystem {};
-                map_index.run_now(&self.ecs);
-                self.ecs.maintain();
+            RunState::DeferringToUI => {
+                new_run_state = ui.defer_to(ctx, &mut self.ecs);
             }
-            RunState::PlayerTurn => {
-                self.run_systems();
-                new_run_state = RunState::MonsterTurn;
+            RunState::WorldTick => {
+                new_run_state = world_engine.defer_to(&mut self.ecs);
             }
-            RunState::MonsterTurn => {
-                self.run_systems();
-                new_run_state = RunState::AwaitingInput;
-            }
-            RunState::ActiveMenu(menu) => match menu {
-                Menu::Inventory(state) => match state {
-                    InventoryMenuState::AwaitingInput => {
-                        new_run_state = player_input_inventory_menu(ctx);
-                    }
-                    InventoryMenuState::UseItem => {
-                        // FIXME: implement using items
-                    }
-                },
-                // FIXME: implement other options
-                _ => {}
-            },
         }
 
         {
@@ -109,18 +66,7 @@ impl GameState for State {
             *run_state_writer = new_run_state;
         }
 
-        match new_run_state {
-            RunState::ActiveMenu(menu) => match menu {
-                Menu::Inventory(menu_state) => {
-                    render_inventory_menu(&self.ecs, ctx, menu_state);
-                }
-                _ => {}
-            },
-            _ => {
-                delete_the_dead(&mut self.ecs);
-                render_main_view(&self.ecs, ctx);
-            }
-        }
+        self.ecs.maintain();
     }
 }
 
@@ -134,10 +80,20 @@ impl State {
 fn main() -> BError {
     bracket_terminal::link_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
 
-    let terminal: BTerm = build_terminal()?;
-
     let mut gs = State { ecs: World::new() };
     register_components(&mut gs.ecs);
+
+    let ui: UI = UI {};
+    gs.ecs.insert::<UI>(UI {});
+    gs.ecs.insert::<UIState>(UIState::PlayerInWorld); // FIXME: move to UI setup
+    gs.ecs.insert::<Keybindings>(classic_laptop()); // FIXME: move to UI setup
+
+    let ctx = ui.build_terminal()?;
+
+    let world_engine: WorldEngine = WorldEngine {};
+    gs.ecs.insert::<WorldEngine>(world_engine);
+    gs.ecs
+        .insert::<WorldEngineState>(WorldEngineState::PlayerTurn); // FIXME: move to WorldEngine setup
 
     gs.ecs.insert(RunState::PreRun);
 
@@ -190,5 +146,5 @@ fn main() -> BError {
         },
     );
 
-    main_loop(terminal, gs)
+    main_loop(ctx, gs)
 }

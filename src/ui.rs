@@ -1,4 +1,5 @@
 pub mod common;
+pub mod keyboard;
 pub mod main_view;
 pub mod menus;
 
@@ -10,3 +11,5 @@ mod utils;
 
 #[allow(dead_code)]
 mod colors;
+
+pub use common::UI;

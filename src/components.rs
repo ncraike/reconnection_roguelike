@@ -54,6 +54,12 @@ pub struct SufferDamage {
     pub amount: Vec<i32>,
 }
 
+#[derive(Component, Debug, ConvertSaveload, Clone)]
+pub struct WantsToMove {
+    // FIXME: add Map
+    pub destination: Point,
+}
+
 impl SufferDamage {
     pub fn new_damage(store: &mut WriteStorage<SufferDamage>, victim: Entity, amount: i32) {
         if let Some(suffering) = store.get_mut(victim) {
@@ -97,5 +103,6 @@ pub fn register_components(ecs: &mut World) {
     ecs.register::<SufferDamage>();
     ecs.register::<Viewshed>();
     ecs.register::<WantsToMelee>();
+    ecs.register::<WantsToMove>();
     ecs.register::<WantsToPickupItem>();
 }

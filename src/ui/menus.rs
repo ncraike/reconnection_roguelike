@@ -7,7 +7,6 @@ use specs::prelude::*;
 use std::cmp;
 
 use super::super::components::{InInventory, Name};
-use super::super::InventoryMenuState;
 
 use super::colors;
 use super::common::{Consoles, TEXT_BOX_HEIGHT, TEXT_BOX_HEIGHT_IN_TILES};
@@ -57,7 +56,7 @@ impl MenuInventoryView {
     }
 }
 
-pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm, _menu_state: InventoryMenuState) {
+pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm) {
     let view = MenuInventoryView::from_context(ctx);
     let player = ecs.fetch::<Entity>();
     let names = ecs.read_storage::<Name>();

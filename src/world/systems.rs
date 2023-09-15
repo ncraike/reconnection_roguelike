@@ -5,6 +5,7 @@ use inventory::InventorySystem;
 use map_indexing::MapIndexingSystem;
 use melee_combat::MeleeCombatSystem;
 use monster_ai::MonsterAI;
+use movement::MovementSystem;
 use visibility::VisibilitySystem;
 
 pub mod damage;
@@ -12,6 +13,7 @@ pub mod inventory;
 pub mod map_indexing;
 pub mod melee_combat;
 pub mod monster_ai;
+pub mod movement;
 pub mod visibility;
 
 pub fn run(ecs: &World) {
@@ -23,6 +25,9 @@ pub fn run(ecs: &World) {
 
     let mut mob = MonsterAI {};
     mob.run_now(ecs);
+
+    let mut movement = MovementSystem {};
+    movement.run_now(ecs);
 
     let mut melee = MeleeCombatSystem {};
     melee.run_now(ecs);
