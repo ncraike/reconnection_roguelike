@@ -29,13 +29,13 @@ impl<'a> System<'a> for MovementSystem {
         {
             if !map.bounds().point_in_rect(wants_to_move.destination) {
                 log.entries.push("Could not move out of bounds".to_string());
-                return;
+                continue;
             }
             let dest_idx = map.to_index(wants_to_move.destination);
             if map.blocked[dest_idx] {
                 log.entries
                     .push("Could not move; destination blocked".to_string());
-                return;
+                continue;
             }
 
             // Move is possible

@@ -74,6 +74,7 @@ impl<'a> System<'a> for MonsterAI {
                 {
                     if monster_viewshed.visible_tiles.contains(&player_pos) {
                         let distance = DistanceAlg::Pythagoras.distance2d(player_pos, *monster_pos);
+                        // Player is in melee range: attack
                         if distance < 1.5 {
                             wants_to_melee_store
                                 .insert(
@@ -83,22 +84,22 @@ impl<'a> System<'a> for MonsterAI {
                                     },
                                 )
                                 .expect("Unable to insert attack against player");
-                            return;
-                        }
-                        let monster_pos_idx = map.to_index(*monster_pos);
-                        let player_pos_idx = map.to_index(player_pos);
-                        let path = a_star_search(monster_pos_idx, player_pos_idx, &mut *map);
-                        if path.success && path.steps.len() > 1 {
-                            let destination = map.to_point(path.steps[1]);
-                            wants_to_move_store
-                                .insert(
-                                    entity,
-                                    WantsToMove {
-                                        destination: destination,
-                                    },
-                                )
-                                .expect("Queueing monster's move failed");
-                            return;
+                        // Player is not in melee range: move closer
+                        } else {
+                            let monster_pos_idx = map.to_index(*monster_pos);
+                            let player_pos_idx = map.to_index(player_pos);
+                            let path = a_star_search(monster_pos_idx, player_pos_idx, &mut *map);
+                            if path.success && path.steps.len() > 1 {
+                                let destination = map.to_point(path.steps[1]);
+                                wants_to_move_store
+                                    .insert(
+                                        entity,
+                                        WantsToMove {
+                                            destination: destination,
+                                        },
+                                    )
+                                    .expect("Queueing monster's move failed");
+                            }
                         }
                     }
                 }

@@ -37,4 +37,7 @@ pub fn run(ecs: &World) {
 
     let mut inventory_system = InventorySystem {};
     inventory_system.run_now(ecs);
+
+    vis.run_now(ecs);
+    mapindex.run_now(ecs);
 }
