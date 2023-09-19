@@ -1,13 +1,11 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use super::super::components::{Player, WantsToMelee, WantsToMove};
 use super::super::types::RunState;
-use super::super::world::actors::{check_player_move_attempt, MoveAttemptResult, WorldAction};
 use super::super::GAME_TITLE;
-use super::keyboard::{Keybindings, Keybound};
-use super::main_view::render_main_view;
+use super::keyboard::{match_key, Keybindings, Keybound};
 use super::menus::render_inventory_menu;
+use super::player_in_world::{player_in_world_controller, render_player_in_world_view};
 
 pub const DEFAULT_WINDOW_WIDTH_IN_TILES: u32 = 48;
 pub const DEFAULT_WINDOW_HEIGHT_IN_TILES: u32 = 18;
@@ -39,10 +37,16 @@ pub enum Consoles {
     Text,
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum UIState {
     PlayerInWorld,
     ActiveMenu(Menu),
+}
+
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
+pub struct NewStates {
+    pub ui_state: UIState,
+    pub run_state: RunState,
 }
 
 #[derive(PartialEq, Copy, Clone)]
@@ -122,80 +126,19 @@ impl UI {
         let mut new_run_state: RunState = RunState::DeferringToUI;
         let mut new_ui_state = *world.fetch::<UIState>();
 
-        let entities = world.entities();
-        let player_store = world.read_storage::<Player>();
-        let mut wants_to_move_store = world.write_storage::<WantsToMove>();
-        let mut wants_to_melee_store = world.write_storage::<WantsToMelee>();
-
-        let keybindings = world.fetch::<Keybindings>();
-
         match new_ui_state {
             UIState::PlayerInWorld => {
-                render_main_view(world, ctx);
-                match keybindings.world_focus_action(ctx.key.clone()) {
-                    None => (),
-                    Some(keybound) => {
-                        match keybound {
-                            Keybound::WorldAction(world_action) => {
-                                match world_action {
-                                    WorldAction::Move(direction) => {
-                                        let move_attempt_result =
-                                            check_player_move_attempt(world, direction);
-                                        match move_attempt_result {
-                                            MoveAttemptResult::MoveToFreeSpace(destination) => {
-                                                for (player_entity, _player_component) in
-                                                    (&entities, &player_store).join()
-                                                {
-                                                    wants_to_move_store
-                                                        .insert(
-                                                            player_entity,
-                                                            WantsToMove {
-                                                                destination: destination,
-                                                            },
-                                                        )
-                                                        .expect("Queueing player move failed");
-                                                }
-                                            }
-                                            MoveAttemptResult::AttackHostile(target) => {
-                                                for (player_entity, _player_component) in
-                                                    (&entities, &player_store).join()
-                                                {
-                                                    wants_to_melee_store
-                                                        .insert(
-                                                            player_entity,
-                                                            WantsToMelee { target: target },
-                                                        )
-                                                        .expect(
-                                                            "Queueing player melee attack failed",
-                                                        );
-                                                }
-                                            }
-                                            // FIXME: give some UI feedback
-                                            MoveAttemptResult::Blocked => (),
-                                        }
-                                    }
-                                    // FIXME
-                                    WorldAction::Pickup => (),
-                                    WorldAction::Wait => (),
-                                }
-                                //queue_world_action(world_action);
-                                new_run_state = RunState::WorldTick;
-                            }
-                            Keybound::UIAction(ui_action) => match ui_action {
-                                UIAction::OpenMenu(menu) => {
-                                    new_ui_state = UIState::ActiveMenu(menu);
-                                }
-                                _ => (),
-                            },
-                        }
-                    }
-                }
+                render_player_in_world_view(world, ctx);
+                let new_states = player_in_world_controller(world, ctx.key);
+                new_run_state = new_states.run_state;
+                new_ui_state = new_states.ui_state;
             }
             UIState::ActiveMenu(menu) => {
+                let keybindings = world.fetch::<Keybindings>();
                 match menu {
                     Menu::Inventory => {
                         render_inventory_menu(world, ctx);
-                        match keybindings.menu_focus_action(ctx.key.clone()) {
+                        match match_key(&keybindings.in_menu, ctx.key) {
                             None => (),
                             Some(keybound) => match keybound {
                                 Keybound::WorldAction(_) => (),

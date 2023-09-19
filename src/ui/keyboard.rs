@@ -11,39 +11,27 @@ pub enum Keybound {
     WorldAction(WorldAction),
     UIAction(UIAction),
 }
+type KeybindingMap = HashMap<VirtualKeyCode, Keybound>;
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Keybindings {
-    world_focus: HashMap<VirtualKeyCode, Keybound>,
-    menu_focus: HashMap<VirtualKeyCode, Keybound>,
+    pub player_in_world: KeybindingMap,
+    pub in_menu: KeybindingMap,
 }
 
-impl Keybindings {
-    fn match_key(
-        map: &HashMap<VirtualKeyCode, Keybound>,
-        key: Option<VirtualKeyCode>,
-    ) -> Option<Keybound> {
-        match key {
+pub fn match_key(map: &KeybindingMap, key: Option<VirtualKeyCode>) -> Option<Keybound> {
+    match key {
+        None => None,
+        Some(key) => match map.get(&key) {
             None => None,
-            Some(key) => match map.get(&key) {
-                None => None,
-                Some(action) => Some(*action),
-            },
-        }
-    }
-
-    pub fn world_focus_action(&self, key: Option<VirtualKeyCode>) -> Option<Keybound> {
-        Self::match_key(&self.world_focus, key)
-    }
-
-    pub fn menu_focus_action(&self, key: Option<VirtualKeyCode>) -> Option<Keybound> {
-        Self::match_key(&self.menu_focus, key)
+            Some(action) => Some(*action),
+        },
     }
 }
 
 pub fn classic_laptop() -> Keybindings {
     Keybindings {
-        world_focus: HashMap::from([
+        player_in_world: HashMap::from([
             // vim-style HJKL cardinal movement
             (
                 VirtualKeyCode::H,
@@ -95,7 +83,7 @@ pub fn classic_laptop() -> Keybindings {
                 Keybound::WorldAction(WorldAction::Wait),
             ),
         ]),
-        menu_focus: HashMap::from([
+        in_menu: HashMap::from([
             // Standard confirm/cancel and cardinals
             (
                 VirtualKeyCode::Return,

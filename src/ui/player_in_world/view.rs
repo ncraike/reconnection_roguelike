@@ -2,14 +2,14 @@ use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
 
-use super::camera::{get_camera_bounds_in_world, render_camera};
-use super::common::{Consoles, TEXT_BOX_HEIGHT, TEXT_BOX_HEIGHT_IN_TILES};
-use super::messages::render_messages;
-use super::stats::render_stats;
-use super::tooltips::render_tooltips;
+use super::super::camera::{get_camera_bounds_in_world, render_camera};
+use super::super::common::{Consoles, TEXT_BOX_HEIGHT, TEXT_BOX_HEIGHT_IN_TILES};
+use super::super::messages::render_messages;
+use super::super::stats::render_stats;
+use super::super::tooltips::render_tooltips;
 
 #[derive(Debug)]
-pub struct MainView {
+pub struct PlayerInWorldView {
     pub camera_view_2x: Rect,
     pub message_log_view: Rect,
     pub stats_view: Rect,
@@ -19,8 +19,8 @@ pub struct MainView {
     pub mouse_pt_in_text: Point,
 }
 
-impl MainView {
-    pub fn from_context(ctx: &mut BTerm) -> MainView {
+impl PlayerInWorldView {
+    pub fn from_context(ctx: &mut BTerm) -> PlayerInWorldView {
         ctx.set_active_console(Consoles::TilesTerrain as usize);
         let (width_in_tiles, height_in_tiles) = ctx.get_char_size();
         let mouse_pt_in_tiles = ctx.mouse_point();
@@ -30,7 +30,7 @@ impl MainView {
         let stats_width = width_in_text - message_log_width;
         let mouse_pt_in_text = ctx.mouse_point();
 
-        MainView {
+        PlayerInWorldView {
             camera_view_2x: Rect::with_size(
                 0,
                 0,
@@ -61,8 +61,8 @@ impl MainView {
     }
 }
 
-pub fn render_main_view(ecs: &World, ctx: &mut BTerm) {
-    let main_view = MainView::from_context(ctx);
+pub fn render_player_in_world_view(ecs: &World, ctx: &mut BTerm) {
+    let main_view = PlayerInWorldView::from_context(ctx);
     let maybe_camera_in_world = get_camera_bounds_in_world(ecs, main_view.camera_view_2x);
     if maybe_camera_in_world.is_none() {
         // No player yet?
