@@ -1,7 +1,7 @@
 use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
-use super::super::components::{CombatStats, Player};
+use super::super::components::{CombatStats, Item, Player};
 use super::super::map::Map;
 use super::types::{convert_direction_to_delta, WorldDirection};
 
@@ -19,6 +19,11 @@ pub enum MoveAttemptResult {
     // FIXME: add other interactions, e.g. open door
     // FIXME: add failure case for lack of vision
     Blocked,
+}
+
+pub enum PickupAttemptResult {
+    ItemAvailable(Entity),
+    NothingToPickup,
 }
 
 pub fn check_player_move_attempt(world: &World, direction: WorldDirection) -> MoveAttemptResult {
@@ -60,4 +65,22 @@ pub fn check_player_move_attempt(world: &World, direction: WorldDirection) -> Mo
 
     // This shouldn't happen, as it means the player has no position and viewshed
     return MoveAttemptResult::Blocked;
+}
+
+pub fn check_player_pickup_attempt(world: &World) -> PickupAttemptResult {
+    let entities = world.entities();
+    let player_entity = world.fetch::<Entity>();
+
+    let item_store = world.read_storage::<Item>();
+    let point_store = world.read_storage::<Point>();
+    let player_pos = point_store
+        .get(*player_entity)
+        .expect("Could not get player position");
+
+    for (item_entity, _item, pos) in (&entities, &item_store, &point_store).join() {
+        if pos == player_pos {
+            return PickupAttemptResult::ItemAvailable(item_entity);
+        }
+    }
+    return PickupAttemptResult::NothingToPickup;
 }

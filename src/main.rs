@@ -8,7 +8,6 @@ use specs::prelude::*;
 pub mod components;
 pub mod map;
 pub mod message_log;
-pub mod player;
 pub mod types;
 pub mod ui;
 pub mod world;
@@ -16,7 +15,7 @@ pub mod world;
 use components::register_components;
 use map::{Map, MAP_HEIGHT, MAP_WIDTH};
 use message_log::MessageLog;
-use types::RunState;
+use types::{RunState, UITask};
 use ui::common::UIState; // FIXME: move to UI setup
 use ui::keyboard::{classic_laptop, Keybindings};
 use ui::UI;
@@ -51,11 +50,16 @@ impl GameState for State {
         match new_run_state {
             RunState::PreRun => {
                 self.run_systems();
-                new_run_state = RunState::DeferringToUI;
+                new_run_state = RunState::DeferToUIFor(UITask::GetPlayerAction);
             }
-            RunState::DeferringToUI => {
-                new_run_state = ui.defer_to(ctx, &mut self.ecs);
-            }
+            RunState::DeferToUIFor(ui_task) => match ui_task {
+                UITask::GetPlayerAction => {
+                    new_run_state = ui.defer_to_get_player_action(ctx, &mut self.ecs);
+                }
+                UITask::ShowWorldEvent => {
+                    new_run_state = ui.defer_to_show_world_event(ctx, &mut self.ecs);
+                }
+            },
             RunState::WorldTick => {
                 new_run_state = world_engine.defer_to(&mut self.ecs);
             }

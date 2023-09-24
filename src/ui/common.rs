@@ -1,7 +1,7 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use super::super::types::RunState;
+use super::super::types::{RunState, UITask};
 use super::super::GAME_TITLE;
 use super::keyboard::{match_key, Keybindings, Keybound};
 use super::menus::render_inventory_menu;
@@ -122,8 +122,8 @@ impl UI {
             .build()
     }
 
-    pub fn defer_to(&self, ctx: &mut BTerm, world: &mut World) -> RunState {
-        let mut new_run_state: RunState = RunState::DeferringToUI;
+    pub fn defer_to_get_player_action(&self, ctx: &mut BTerm, world: &mut World) -> RunState {
+        let mut new_run_state: RunState = RunState::DeferToUIFor(UITask::GetPlayerAction);
         let mut new_ui_state = *world.fetch::<UIState>();
 
         match new_ui_state {
@@ -161,5 +161,10 @@ impl UI {
         *ui_state_writer = new_ui_state;
 
         return new_run_state;
+    }
+
+    pub fn defer_to_show_world_event(&self, ctx: &mut BTerm, world: &mut World) -> RunState {
+        render_player_in_world_view(world, ctx);
+        return RunState::WorldTick;
     }
 }

@@ -32,10 +32,8 @@ impl<'a> System<'a> for InventorySystem {
                 .expect("Unable to add item to inventory");
 
             if pickup.collected_by == *player_entity {
-                messages.entries.push(format!(
-                    "You pickup the {}.",
-                    names.get(pickup.item).unwrap().name
-                ));
+                let name = &names.get(pickup.item).unwrap().name;
+                messages.entries.push(format!("You pickup the {}.", name));
             }
         }
         wants_to_pickup.clear();

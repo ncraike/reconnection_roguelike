@@ -1,11 +1,15 @@
 use bracket_terminal::prelude::VirtualKeyCode;
 use specs::prelude::*;
 
-use crate::components::{Player, WantsToMelee, WantsToMove};
-use crate::types::RunState;
+use crate::components::{Player, WantsToMelee, WantsToMove, WantsToPickupItem};
+use crate::message_log::MessageLog;
+use crate::types::{RunState, UITask};
 use crate::ui::common::{NewStates, UIAction, UIState};
 use crate::ui::keyboard::{match_key, Keybindings, Keybound};
-use crate::world::actors::{check_player_move_attempt, MoveAttemptResult, WorldAction};
+use crate::world::actors::{
+    check_player_move_attempt, check_player_pickup_attempt, MoveAttemptResult, PickupAttemptResult,
+    WorldAction,
+};
 use crate::world::types::WorldDirection;
 
 pub fn player_in_world_controller(
@@ -14,7 +18,7 @@ pub fn player_in_world_controller(
 ) -> NewStates {
     let mut new_states = NewStates {
         ui_state: UIState::PlayerInWorld,
-        run_state: RunState::DeferringToUI,
+        run_state: RunState::DeferToUIFor(UITask::GetPlayerAction),
     };
 
     let maybe_keybound;
@@ -33,7 +37,9 @@ pub fn player_in_world_controller(
                             new_states = move_attempt(world, direction);
                         }
                         // FIXME
-                        WorldAction::Pickup => (),
+                        WorldAction::Pickup => {
+                            new_states = pickup_attempt(world);
+                        }
                         // FIXME
                         WorldAction::Wait => (),
                     }
@@ -56,6 +62,7 @@ pub fn move_attempt(world: &mut World, direction: WorldDirection) -> NewStates {
     let player_store = world.read_storage::<Player>();
     let mut wants_to_move_store = world.write_storage::<WantsToMove>();
     let mut wants_to_melee_store = world.write_storage::<WantsToMelee>();
+    let mut messages = world.fetch_mut::<MessageLog>();
 
     let move_attempt_result = check_player_move_attempt(world, direction);
     match move_attempt_result {
@@ -87,9 +94,45 @@ pub fn move_attempt(world: &mut World, direction: WorldDirection) -> NewStates {
             }
         }
         // FIXME: give some UI feedback
-        MoveAttemptResult::Blocked => NewStates {
-            ui_state: UIState::PlayerInWorld,
-            run_state: RunState::WorldTick,
-        },
+        MoveAttemptResult::Blocked => {
+            messages.entries.push("You can't move there.".to_string());
+            NewStates {
+                ui_state: UIState::PlayerInWorld,
+                run_state: RunState::DeferToUIFor(UITask::GetPlayerAction),
+            }
+        }
+    }
+}
+
+pub fn pickup_attempt(world: &mut World) -> NewStates {
+    let player_entity = world.fetch::<Entity>();
+    let mut messages = world.fetch_mut::<MessageLog>();
+    let mut wants_to_pickup_store = world.write_storage::<WantsToPickupItem>();
+
+    match check_player_pickup_attempt(world) {
+        PickupAttemptResult::NothingToPickup => {
+            messages
+                .entries
+                .push("There is nothing here to pick up.".to_string());
+            NewStates {
+                ui_state: UIState::PlayerInWorld,
+                run_state: RunState::DeferToUIFor(UITask::GetPlayerAction),
+            }
+        }
+        PickupAttemptResult::ItemAvailable(item) => {
+            wants_to_pickup_store
+                .insert(
+                    *player_entity,
+                    WantsToPickupItem {
+                        collected_by: *player_entity,
+                        item: item,
+                    },
+                )
+                .expect("Unable to add want-to-pickup");
+            NewStates {
+                ui_state: UIState::PlayerInWorld,
+                run_state: RunState::WorldTick,
+            }
+        }
     }
 }

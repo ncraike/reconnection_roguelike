@@ -1,6 +1,12 @@
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
+pub enum UITask {
+    GetPlayerAction,
+    ShowWorldEvent,
+}
+
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub enum RunState {
     PreRun,
-    DeferringToUI,
+    DeferToUIFor(UITask),
     WorldTick,
 }

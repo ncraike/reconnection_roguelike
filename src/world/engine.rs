@@ -1,6 +1,6 @@
 use specs::prelude::{World, WorldExt};
 
-use super::super::types::RunState;
+use super::super::types::{RunState, UITask};
 use super::systems::damage::delete_the_dead;
 use super::systems::run;
 
@@ -22,12 +22,12 @@ impl WorldEngine {
             WorldEngineState::PlayerTurn => {
                 run(world);
                 new_engine_state = WorldEngineState::MonstersTurn;
-                new_run_state = RunState::WorldTick;
+                new_run_state = RunState::DeferToUIFor(UITask::ShowWorldEvent);
             }
             WorldEngineState::MonstersTurn => {
                 run(world);
                 new_engine_state = WorldEngineState::PlayerTurn;
-                new_run_state = RunState::DeferringToUI;
+                new_run_state = RunState::DeferToUIFor(UITask::GetPlayerAction);
             }
         }
 
