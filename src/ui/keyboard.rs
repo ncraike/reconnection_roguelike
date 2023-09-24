@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bracket_terminal::prelude::VirtualKeyCode;
 
-use super::super::world::actors::WorldAction;
+use super::super::world::player::WorldAction;
 use super::super::world::types::WorldDirection;
 use super::common::{Menu, MenuDirection, UIAction};
 

@@ -6,7 +6,7 @@ use crate::message_log::MessageLog;
 use crate::types::{RunState, UITask};
 use crate::ui::common::{NewStates, UIAction, UIState};
 use crate::ui::keyboard::{match_key, Keybindings, Keybound};
-use crate::world::actors::{
+use crate::world::player::{
     check_player_move_attempt, check_player_pickup_attempt, MoveAttemptResult, PickupAttemptResult,
     WorldAction,
 };
