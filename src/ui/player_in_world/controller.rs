@@ -1,6 +1,3 @@
-use bracket_terminal::prelude::VirtualKeyCode;
-use specs::prelude::*;
-
 use crate::components::{Player, WantsToMelee, WantsToMove, WantsToPickupItem};
 use crate::message_log::MessageLog;
 use crate::types::{RunState, UITask};
@@ -8,9 +5,10 @@ use crate::ui::common::{NewStates, UIAction, UIState};
 use crate::ui::keyboard::{match_key, Keybindings, Keybound};
 use crate::world::player::{
     check_player_move_attempt, check_player_pickup_attempt, MoveAttemptResult, PickupAttemptResult,
-    WorldAction,
 };
-use crate::world::types::WorldDirection;
+use crate::world::types::{WorldAction, WorldDirection};
+use bracket_terminal::prelude::VirtualKeyCode;
+use specs::prelude::*;
 
 pub fn player_in_world_controller(
     world: &mut World,

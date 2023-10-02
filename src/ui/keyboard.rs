@@ -1,10 +1,7 @@
-use std::collections::HashMap;
-
-use bracket_terminal::prelude::VirtualKeyCode;
-
-use super::super::world::player::WorldAction;
-use super::super::world::types::WorldDirection;
 use super::common::{Menu, MenuDirection, UIAction};
+use crate::world::types::{WorldAction, WorldDirection};
+use bracket_terminal::prelude::VirtualKeyCode;
+use std::collections::HashMap;
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum Keybound {

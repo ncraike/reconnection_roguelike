@@ -5,13 +5,6 @@ use super::super::components::{CombatStats, Item, Player};
 use super::super::map::Map;
 use super::types::{convert_direction_to_delta, WorldDirection};
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
-pub enum WorldAction {
-    Move(WorldDirection),
-    Pickup,
-    Wait,
-}
-
 pub enum MoveAttemptResult {
     MoveToFreeSpace(Point),
     AttackHostile(Entity),

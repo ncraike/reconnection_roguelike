@@ -12,6 +12,13 @@ pub enum WorldDirection {
     NorthWest,
 }
 
+#[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
+pub enum WorldAction {
+    Move(WorldDirection),
+    Pickup,
+    Wait,
+}
+
 // FIXME: consider not using Point for distance. Ressurect ultraviolet Vec2i?
 pub fn convert_direction_to_delta(direction: WorldDirection) -> Point {
     // Remember origin is top-left
