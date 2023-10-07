@@ -1,6 +1,16 @@
 use crate::ui::units::{Pixels, Text, Tiles1x, Tiles2x};
 
 #[test]
+fn pixel_add() {
+    assert_eq!(Pixels(1) + Pixels(2), Pixels(3));
+}
+
+#[test]
+fn pixel_mul() {
+    assert_eq!(Pixels(3) * 4, Pixels(12));
+}
+
+#[test]
 fn tile1x_width_in_pixels() {
     let tiles_wide = Tiles1x::new_width(3);
     assert_eq!(Pixels::from(tiles_wide), Pixels(48));
