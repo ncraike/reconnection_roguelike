@@ -8,7 +8,7 @@
 				"$rustc"
 			],
 			"group": "test",
-			"label": "rust: all tests"
+			"label": "rust: all tests",
 		},
 		{
 			"type": "cargo",
