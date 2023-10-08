@@ -1,12 +1,12 @@
 use crate::ui::units::{Pixels, Text, Tiles1x, Tiles2x, Width};
 
 #[test]
-fn pixel_add() {
+fn pixels_add() {
     assert_eq!(Pixels(1) + Pixels(2), Pixels(3));
 }
 
 #[test]
-fn pixel_mul() {
+fn pixels_mul() {
     assert_eq!(Pixels(3) * 4, Pixels(12));
 }
 
@@ -19,25 +19,25 @@ fn width_add() {
 }
 
 #[test]
-fn tile1x_width_in_pixels() {
+fn tiles1x_width_in_pixels() {
     let tiles_wide = Tiles1x::new_width(3);
     assert_eq!(Pixels::from(tiles_wide), Pixels(48));
 }
 
 #[test]
-fn tile1x_height_in_pixels() {
+fn tiles1x_height_in_pixels() {
     let tiles_high = Tiles1x::new_height(5);
     assert_eq!(Pixels::from(tiles_high), Pixels(120));
 }
 
 #[test]
-fn tile2x_width_in_pixels() {
+fn tiles2x_width_in_pixels() {
     let tiles2x_wide = Tiles2x::new_width(3);
     assert_eq!(Pixels::from(tiles2x_wide), Pixels(96));
 }
 
 #[test]
-fn tile2x_height_in_pixels() {
+fn tiles2x_height_in_pixels() {
     let tiles2x_high = Tiles2x::new_height(5);
     assert_eq!(Pixels::from(tiles2x_high), Pixels(240));
 }
