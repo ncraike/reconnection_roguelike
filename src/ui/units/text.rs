@@ -1,6 +1,8 @@
+extern crate derive_more;
 use super::base::{Height, Pixels, Width};
+use derive_more::{Add, Mul};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Add, Mul)]
 pub struct Text(pub i32);
 
 pub type TextWidth = Width<Text>;
