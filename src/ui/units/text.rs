@@ -1,5 +1,6 @@
 extern crate derive_more;
 use super::base::{Height, Pixels, Width};
+use super::traits::Unit;
 use derive_more::{Add, Mul};
 
 #[derive(Debug, Clone, Copy, PartialEq, Add, Mul)]
@@ -15,6 +16,22 @@ impl Text {
 
     pub fn new_height(value: i32) -> Height<Text> {
         Height::<Text>(Text(value))
+    }
+}
+
+impl Unit for Text {
+    type ValueType = i32;
+
+    fn new(value: i32) -> Text {
+        Text(value)
+    }
+
+    fn zero() -> Text {
+        Text(0)
+    }
+
+    fn value(&self) -> i32 {
+        self.0
     }
 }
 

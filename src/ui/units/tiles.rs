@@ -2,6 +2,7 @@ extern crate derive_more;
 use super::base::{Height, Pixels, Width};
 use super::point_and_size::{Point2D, Size2D};
 use super::pos_x_y::{PosX, PosY};
+use super::traits::Unit;
 use derive_more::{Add, Mul};
 
 #[derive(Debug, Clone, Copy, PartialEq, Add, Mul)]
@@ -20,6 +21,22 @@ impl Tiles1x {
             w: Width(Tiles1x(w)),
             h: Height(Tiles1x(h)),
         }
+    }
+}
+
+impl Unit for Tiles1x {
+    type ValueType = i32;
+
+    fn new(value: i32) -> Tiles1x {
+        Tiles1x(value)
+    }
+
+    fn zero() -> Tiles1x {
+        Tiles1x(0)
+    }
+
+    fn value(&self) -> i32 {
+        self.0
     }
 }
 
@@ -53,6 +70,22 @@ impl Tiles2x {
             w: Width(Tiles2x(w)),
             h: Height(Tiles2x(h)),
         }
+    }
+}
+
+impl Unit for Tiles2x {
+    type ValueType = i32;
+
+    fn new(value: i32) -> Tiles2x {
+        Tiles2x(value)
+    }
+
+    fn zero() -> Tiles2x {
+        Tiles2x(0)
+    }
+
+    fn value(&self) -> i32 {
+        self.0
     }
 }
 
