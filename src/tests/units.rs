@@ -1,4 +1,4 @@
-use crate::ui::units::{Pixels, Text, Tiles1x, Tiles2x};
+use crate::ui::units::{Pixels, Text, Tiles1x, Tiles2x, Width};
 
 #[test]
 fn pixel_add() {
@@ -8,6 +8,14 @@ fn pixel_add() {
 #[test]
 fn pixel_mul() {
     assert_eq!(Pixels(3) * 4, Pixels(12));
+}
+
+#[test]
+fn width_add() {
+    assert_eq!(
+        Width::<Pixels>(Pixels(1)) + Width::<Pixels>(Pixels(2)),
+        Width::<Pixels>(Pixels(3))
+    );
 }
 
 #[test]
