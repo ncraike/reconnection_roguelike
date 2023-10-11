@@ -14,7 +14,7 @@ impl<'a> System<'a> for DamageSystem {
 
     fn run(&mut self, data: Self::SystemData) {
         let (mut stats_store, mut damage_store) = data;
-        for (mut stats, damage) in (&mut stats_store, &damage_store).join() {
+        for (stats, damage) in (&mut stats_store, &damage_store).join() {
             stats.hp -= damage.amount.iter().sum::<i32>();
         }
 

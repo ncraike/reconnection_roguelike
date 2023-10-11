@@ -20,7 +20,7 @@ impl<'a> System<'a> for MovementSystem {
         let (mut map, name_store, mut position_store, mut wants_to_move_store, mut viewshed_store) =
             data;
 
-        for (name_component, wants_to_move, mut position, mut viewshed) in (
+        for (name_component, wants_to_move, position, viewshed) in (
             &name_store,
             &wants_to_move_store,
             &mut position_store,
