@@ -11,15 +11,27 @@ pub struct Box2D<T: Unit> {
 }
 
 impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
+    pub fn new_from_p1_p2(p1: Point2D<T>, p2: Point2D<T>) -> Self {
+        Self { p1: p1, p2: p2 }
+    }
+
+    pub fn new_from_x1_y1_x2_y2(x1: T, y1: T, x2: T, y2: T) -> Self {
+        Self::new_from_p1_p2(
+            Point2D::<T>::new_from_x_y(x1, y1),
+            Point2D::<T>::new_from_x_y(x2, y2),
+        )
+    }
+
     pub fn new_from_point_and_size(point: Point2D<T>, size: Size2D<T>) -> Self {
-        Box2D::<T> {
-            p1: point,
-            p2: point + size,
-        }
+        Self::new_from_p1_p2(point, point + size)
     }
 
     pub fn new_from_size(size: Size2D<T>) -> Self {
         Self::new_from_point_and_size(Point2D::<T>::origin(), size)
+    }
+
+    pub fn new_from_width_height(width: T, height: T) -> Self {
+        Self::new_from_size(Size2D::new_from_width_height(width, height))
     }
 
     pub fn x1(&self) -> PosX<T> {
@@ -38,23 +50,28 @@ impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
         self.p2.y
     }
 
+    pub fn size(&self) -> Size2D<T> {
+        self.p2 - self.p1
+    }
+
     pub fn width(&self) -> Width<T> {
-        self.p2.x - self.p1.x
+        self.size().w
     }
 
     pub fn height(&self) -> Height<T> {
-        self.p2.y - self.p1.y
+        self.size().h
     }
 
     pub fn normalize(&self) -> Self {
-        let p1 = Point2D::<T> {
-            x: min(self.p1.x, self.p2.x),
-            y: min(self.p1.y, self.p2.y),
-        };
-        let p2 = Point2D::<T> {
-            x: max(self.p1.x, self.p2.x),
-            y: max(self.p1.y, self.p2.y),
-        };
-        Self { p1: p1, p2: p2 }
+        Self::new_from_p1_p2(
+            Point2D::<T> {
+                x: min(self.p1.x, self.p2.x),
+                y: min(self.p1.y, self.p2.y),
+            },
+            Point2D::<T> {
+                x: max(self.p1.x, self.p2.x),
+                y: max(self.p1.y, self.p2.y),
+            },
+        )
     }
 }
