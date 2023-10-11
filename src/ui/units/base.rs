@@ -19,6 +19,10 @@ impl Unit for Pixels {
     fn value(&self) -> i32 {
         self.0
     }
+
+    fn abs(&self) -> i32 {
+        self.value().abs()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Mul)]

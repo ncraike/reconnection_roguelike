@@ -38,6 +38,10 @@ impl Unit for Tiles1x {
     fn value(&self) -> i32 {
         self.0
     }
+
+    fn abs(&self) -> i32 {
+        self.value().abs()
+    }
 }
 
 impl From<Width<Tiles1x>> for Pixels {
@@ -86,6 +90,10 @@ impl Unit for Tiles2x {
 
     fn value(&self) -> i32 {
         self.0
+    }
+
+    fn abs(&self) -> i32 {
+        self.value().abs()
     }
 }
 

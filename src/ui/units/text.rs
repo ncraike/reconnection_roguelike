@@ -30,6 +30,10 @@ impl Unit for TextChars {
     fn value(&self) -> i32 {
         self.0
     }
+
+    fn abs(&self) -> i32 {
+        self.value().abs()
+    }
 }
 
 impl From<Width<TextChars>> for Pixels {
