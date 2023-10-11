@@ -3,9 +3,9 @@ use super::base::{Height, Pixels, Width};
 use super::point_and_size::{Point2D, Size2D};
 use super::pos_x_y::{PosX, PosY};
 use super::traits::Unit;
-use derive_more::{Add, Mul};
+use derive_more::{Add, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq, Add, Mul)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
 pub struct Tiles1x(pub i32);
 
 impl Tiles1x {
@@ -54,7 +54,7 @@ impl From<Height<Tiles1x>> for Pixels {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Add, Mul)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
 pub struct Tiles2x(pub i32);
 
 impl Tiles2x {
