@@ -12,7 +12,7 @@ pub struct Point2D<T: Unit> {
 }
 
 impl<T: Unit> Point2D<T> {
-    pub fn new(x: T, y: T) -> Self {
+    pub fn new_from_x_y(x: T, y: T) -> Self {
         Self {
             x: PosX(x),
             y: PosY(y),
@@ -20,7 +20,7 @@ impl<T: Unit> Point2D<T> {
     }
 
     pub fn origin() -> Self {
-        Self::new(Unit::zero(), Unit::zero())
+        Self::new_from_x_y(Unit::zero(), Unit::zero())
     }
 }
 
@@ -31,7 +31,7 @@ pub struct Size2D<T: Unit> {
 }
 
 impl<T: Unit> Size2D<T> {
-    pub fn new(w: T, h: T) -> Self {
+    pub fn new_from_width_height(w: T, h: T) -> Self {
         Self {
             w: Width(w),
             h: Height(h),
@@ -39,7 +39,7 @@ impl<T: Unit> Size2D<T> {
     }
 
     pub fn nothing() -> Self {
-        Self::new(Unit::zero(), Unit::zero())
+        Self::new_from_width_height(Unit::zero(), Unit::zero())
     }
 
     pub fn abs(&self) -> Self {
