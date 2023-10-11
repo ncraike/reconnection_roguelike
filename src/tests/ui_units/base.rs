@@ -15,6 +15,11 @@ fn width_mul() {
 }
 
 #[test]
+fn width_abs() {
+    assert_eq!(Width(Pixels(-3)).abs(), Width(Pixels(3)));
+}
+
+#[test]
 fn height_add() {
     assert_eq!(
         Height::<Pixels>(Pixels(1)) + Height::<Pixels>(Pixels(2)),

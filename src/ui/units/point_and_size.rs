@@ -41,6 +41,13 @@ impl<T: Unit> Size2D<T> {
     pub fn nothing() -> Self {
         Self::new(Unit::zero(), Unit::zero())
     }
+
+    pub fn abs(&self) -> Self {
+        Self {
+            w: self.w.abs(),
+            h: self.h.abs(),
+        }
+    }
 }
 
 impl<T: Unit + AddTrait<Output = T>> AddTrait<Size2D<T>> for Point2D<T> {

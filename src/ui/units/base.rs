@@ -7,8 +7,20 @@ use std::ops::Sub as SubTrait;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
 pub struct Width<T: Unit>(pub T);
 
+impl<T: Unit> Width<T> {
+    pub fn abs(&self) -> Self {
+        Self(self.0.abs())
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
 pub struct Height<T: Unit>(pub T);
+
+impl<T: Unit> Height<T> {
+    pub fn abs(&self) -> Self {
+        Self(self.0.abs())
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosX<T: Unit>(pub T);

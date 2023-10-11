@@ -29,6 +29,14 @@ fn size2d_nothing() {
 }
 
 #[test]
+fn size2d_abs() {
+    assert_eq!(
+        Size2D::new(Pixels(-3), Pixels(-4)).abs(),
+        Size2D::new(Pixels(3), Pixels(4)),
+    );
+}
+
+#[test]
 fn point2d_add_size2d() {
     assert_eq!(
         Point2D::new(Pixels(3), Pixels(4)) + Size2D::new(Pixels(2), Pixels(3)),
