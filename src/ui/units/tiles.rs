@@ -27,20 +27,20 @@ impl Tiles1x {
 impl Unit for Tiles1x {
     type ValueType = i32;
 
-    fn new(value: i32) -> Tiles1x {
-        Tiles1x(value)
+    fn new(value: i32) -> Self {
+        Self(value)
     }
 
-    fn zero() -> Tiles1x {
-        Tiles1x(0)
+    fn zero() -> Self {
+        Self(0)
     }
 
     fn value(&self) -> i32 {
         self.0
     }
 
-    fn abs(&self) -> i32 {
-        self.value().abs()
+    fn abs(&self) -> Self {
+        Self(self.value().abs())
     }
 }
 
@@ -80,20 +80,20 @@ impl Tiles2x {
 impl Unit for Tiles2x {
     type ValueType = i32;
 
-    fn new(value: i32) -> Tiles2x {
-        Tiles2x(value)
+    fn new(value: i32) -> Self {
+        Self(value)
     }
 
-    fn zero() -> Tiles2x {
-        Tiles2x(0)
+    fn zero() -> Self {
+        Self(0)
     }
 
     fn value(&self) -> i32 {
         self.0
     }
 
-    fn abs(&self) -> i32 {
-        self.value().abs()
+    fn abs(&self) -> Self {
+        Self(self.value().abs())
     }
 }
 

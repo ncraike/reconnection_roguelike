@@ -20,20 +20,20 @@ impl TextChars {
 impl Unit for TextChars {
     type ValueType = i32;
 
-    fn new(value: i32) -> TextChars {
-        TextChars(value)
+    fn new(value: i32) -> Self {
+        Self(value)
     }
 
-    fn zero() -> TextChars {
-        TextChars(0)
+    fn zero() -> Self {
+        Self(0)
     }
 
     fn value(&self) -> i32 {
         self.0
     }
 
-    fn abs(&self) -> i32 {
-        self.value().abs()
+    fn abs(&self) -> Self {
+        Self(self.value().abs())
     }
 }
 
