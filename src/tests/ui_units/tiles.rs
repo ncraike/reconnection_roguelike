@@ -56,7 +56,7 @@ fn tiles1x_new_size2d() {
 
 #[test]
 fn tiles2x_width_in_pixels() {
-    let tiles2x_wide = Width(Tiles2x((3)));
+    let tiles2x_wide = Width(Tiles2x(3));
     assert_eq!(Pixels::from(tiles2x_wide), Pixels(96));
 }
 
