@@ -10,5 +10,5 @@ pub use base::{Height, Pixels, Width};
 pub use box2d::Box2D;
 pub use point_and_size::{Point2D, Size2D};
 pub use pos_x_y::{PosX, PosY};
-pub use text::Text;
+pub use text::TextChars;
 pub use tiles::{Tiles1x, Tiles2x};
