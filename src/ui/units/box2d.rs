@@ -48,11 +48,11 @@ impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
     }
 
     pub fn width(&self) -> Width<T> {
-        self.size().w
+        self.size().width
     }
 
     pub fn height(&self) -> Height<T> {
-        self.size().h
+        self.size().height
     }
 
     pub fn normalize(&self) -> Self {

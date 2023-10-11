@@ -39,15 +39,15 @@ fn point2d_new_box2d_from_width_height() {
 #[test]
 fn size2d_new_from_width_height() {
     let size2d = Size2D::new_from_width_height(Pixels::new_width(3), Pixels::new_height(4));
-    assert_eq!(size2d.w, Width(Pixels(3)));
-    assert_eq!(size2d.h, Height(Pixels(4)));
+    assert_eq!(size2d.width, Width(Pixels(3)));
+    assert_eq!(size2d.height, Height(Pixels(4)));
 }
 
 #[test]
 fn size2d_nothing() {
     let size2d = Size2D::<Pixels>::nothing();
-    assert_eq!(size2d.w, Width(Pixels(0)));
-    assert_eq!(size2d.h, Height(Pixels(0)));
+    assert_eq!(size2d.width, Width(Pixels(0)));
+    assert_eq!(size2d.height, Height(Pixels(0)));
 }
 
 #[test]

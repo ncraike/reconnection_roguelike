@@ -36,13 +36,16 @@ impl<T: Unit + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Point2D
 
 #[derive(Debug, Clone, Copy, PartialEq, Add, Mul)]
 pub struct Size2D<T: Unit> {
-    pub w: Width<T>,
-    pub h: Height<T>,
+    pub width: Width<T>,
+    pub height: Height<T>,
 }
 
 impl<T: Unit> Size2D<T> {
     pub fn new_from_width_height(w: Width<T>, h: Height<T>) -> Self {
-        Self { w: w, h: h }
+        Self {
+            width: w,
+            height: h,
+        }
     }
 
     pub fn nothing() -> Self {
@@ -51,8 +54,8 @@ impl<T: Unit> Size2D<T> {
 
     pub fn abs(&self) -> Self {
         Self {
-            w: self.w.abs(),
-            h: self.h.abs(),
+            width: self.width.abs(),
+            height: self.height.abs(),
         }
     }
 }
@@ -62,8 +65,8 @@ impl<T: Unit + AddTrait<Output = T>> AddTrait<Size2D<T>> for Point2D<T> {
 
     fn add(self, rhs: Size2D<T>) -> Self::Output {
         Self {
-            x: self.x + rhs.w,
-            y: self.y + rhs.h,
+            x: self.x + rhs.width,
+            y: self.y + rhs.height,
         }
     }
 }
@@ -73,8 +76,8 @@ impl<T: Unit + SubTrait<Output = T>> SubTrait<Point2D<T>> for Point2D<T> {
 
     fn sub(self, rhs: Point2D<T>) -> Size2D<T> {
         Size2D::<T> {
-            w: self.x - rhs.x,
-            h: self.y - rhs.y,
+            width: self.x - rhs.x,
+            height: self.y - rhs.y,
         }
     }
 }

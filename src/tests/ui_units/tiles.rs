@@ -48,8 +48,8 @@ fn tiles1x_new_size2d() {
     assert_eq!(
         Tiles1x::new_size2d(1, 2),
         Size2D {
-            w: Width(Tiles1x(1)),
-            h: Height(Tiles1x(2)),
+            width: Width(Tiles1x(1)),
+            height: Height(Tiles1x(2)),
         }
     );
 }
@@ -87,8 +87,8 @@ fn tiles2x_new_size2d() {
     assert_eq!(
         Tiles2x::new_size2d(1, 2),
         Size2D {
-            w: Width(Tiles2x(1)),
-            h: Height(Tiles2x(2)),
+            width: Width(Tiles2x(1)),
+            height: Height(Tiles2x(2)),
         }
     );
 }
