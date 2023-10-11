@@ -1,9 +1,9 @@
 pub use bracket_geometry::prelude::Point;
 use serde::{Deserialize, Serialize};
-use specs::error::NoError;
 use specs::prelude::*;
 use specs::saveload::{ConvertSaveload, Marker};
 use specs_derive::{Component, ConvertSaveload};
+use std::convert::Infallible as NoError;
 
 use super::map::TileGraphic;
 
