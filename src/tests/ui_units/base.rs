@@ -1,4 +1,5 @@
-use crate::ui::units::{Height, Pixels, Width};
+use crate::ui::units::{Height, Pixels, PosX, PosY, Width};
+use std::cmp::min;
 
 #[test]
 fn width_add() {
@@ -27,4 +28,44 @@ fn height_mul() {
         Height::<Pixels>(Pixels(3)) * 4,
         Height::<Pixels>(Pixels(12))
     );
+}
+
+#[test]
+fn posx_add_width() {
+    assert_eq!(PosX(Pixels(4)) + Width(Pixels(3)), PosX(Pixels(7)))
+}
+
+#[test]
+fn posx_ord() {
+    assert!(PosX(Pixels(7)) > PosX(Pixels(5)));
+}
+
+#[test]
+fn posx_min() {
+    assert_eq!(min(PosX(Pixels(3)), PosX(Pixels(5))), PosX(Pixels(3)));
+}
+
+#[test]
+fn posx_sub_posx_gives_width() {
+    assert_eq!(PosX(Pixels(7)) - PosX(Pixels(3)), Width(Pixels(4)))
+}
+
+#[test]
+fn posy_add_height() {
+    assert_eq!(PosY(Pixels(4)) + Height(Pixels(3)), PosY(Pixels(7)))
+}
+
+#[test]
+fn posy_gt() {
+    assert!(PosY(Pixels(5)) > PosY(Pixels(3)));
+}
+
+#[test]
+fn posy_min() {
+    assert_eq!(min(PosY(Pixels(3)), PosY(Pixels(5))), PosY(Pixels(3)));
+}
+
+#[test]
+fn posy_sub_posy_gives_height() {
+    assert_eq!(PosY(Pixels(7)) - PosY(Pixels(3)), Height(Pixels(4)))
 }

@@ -1,6 +1,5 @@
-use super::base::{Height, Width};
+use super::base::{Height, PosX, PosY, Width};
 use super::point_and_size::{Point2D, Size2D};
-use super::pos_x_y::{PosX, PosY};
 use super::traits::Unit;
 use std::cmp::{max, min};
 use std::ops::{Add, Sub};

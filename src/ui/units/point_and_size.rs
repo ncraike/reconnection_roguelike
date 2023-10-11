@@ -1,6 +1,5 @@
 extern crate derive_more;
-use super::base::{Height, Width};
-use super::pos_x_y::{PosX, PosY};
+use super::base::{Height, PosX, PosY, Width};
 use super::traits::Unit;
 use derive_more::{Add, Mul};
 use std::ops::Add as AddTrait;
