@@ -5,6 +5,7 @@ mod point_and_size;
 mod text;
 mod tiles;
 mod traits;
+mod utils;
 
 pub use base::{Height, PosX, PosY, Width};
 pub use box2d::Box2D;

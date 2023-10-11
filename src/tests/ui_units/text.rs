@@ -1,15 +1,15 @@
-use crate::ui::units::{Pixels, TextChars};
+use crate::ui::units::{Height, Pixels, TextChars, Width};
 
 #[test]
 fn text_width_in_pixels() {
     let text_width = TextChars::new_width(4);
-    assert_eq!(Pixels::from(text_width), Pixels(32));
+    assert_eq!(Width::<Pixels>::from(text_width), Pixels::new_width(32));
 }
 
 #[test]
 fn text_height_in_pixels() {
     let text_height = TextChars::new_height(3);
-    assert_eq!(Pixels::from(text_height), Pixels(48));
+    assert_eq!(Height::<Pixels>::from(text_height), Pixels::new_height(48));
 }
 
 #[test]

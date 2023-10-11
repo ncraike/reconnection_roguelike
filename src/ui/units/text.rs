@@ -3,8 +3,13 @@ use super::base::{Height, PosX, PosY, Width};
 use super::box2d::Box2D;
 use super::pixels::Pixels;
 use super::point_and_size::{Point2D, Size2D};
+use super::tiles::{Tiles1x, Tiles2x};
 use super::traits::Unit;
+use super::utils::{div_ceil, div_floor};
 use derive_more::{Add, Mul, Sub};
+
+const TEXT_CHARS_WIDTH_IN_PIXELS: i32 = 8;
+const TEXT_CHARS_HEIGHT_IN_PIXELS: i32 = 16;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Mul, Sub)]
 pub struct TextChars(pub i32);
@@ -63,16 +68,82 @@ impl Unit for TextChars {
     }
 }
 
-impl From<Width<TextChars>> for Pixels {
-    fn from(width: Width<TextChars>) -> Self {
-        let quantity = width.0 .0;
-        Pixels(quantity * 8)
+impl Width<TextChars> {
+    pub fn to_pixel_width(&self) -> Width<Pixels> {
+        let quantity = self.0 .0;
+        Width(Pixels(quantity * TEXT_CHARS_WIDTH_IN_PIXELS))
+    }
+
+    pub fn from_pixel_width_floor(pixel_width: Width<Pixels>) -> Self {
+        let pixels = pixel_width.0 .0;
+        Self(TextChars(div_floor(pixels, TEXT_CHARS_WIDTH_IN_PIXELS)))
+    }
+
+    pub fn from_pixel_width_ceil(pixel_width: Width<Pixels>) -> Self {
+        let pixels = pixel_width.0 .0;
+        Self(TextChars(div_ceil(pixels, TEXT_CHARS_WIDTH_IN_PIXELS)))
+    }
+
+    pub fn from_tiles1x_floor(tiles1x_width: Width<Tiles1x>) -> Self {
+        Self::from_pixel_width_floor(tiles1x_width.to_pixel_width())
+    }
+
+    pub fn from_tiles1x_ceil(tiles1x_width: Width<Tiles1x>) -> Self {
+        Self::from_pixel_width_ceil(tiles1x_width.to_pixel_width())
+    }
+
+    pub fn from_tiles2x_floor(tiles2x_width: Width<Tiles2x>) -> Self {
+        Self::from_pixel_width_floor(tiles2x_width.to_pixel_width())
+    }
+
+    pub fn from_tiles2x_ceil(tiles2x_width: Width<Tiles2x>) -> Self {
+        Self::from_pixel_width_ceil(tiles2x_width.to_pixel_width())
     }
 }
 
-impl From<Height<TextChars>> for Pixels {
+impl From<Width<TextChars>> for Width<Pixels> {
+    fn from(width: Width<TextChars>) -> Self {
+        let quantity = width.0 .0;
+        Width(Pixels(quantity * 8))
+    }
+}
+
+impl Height<TextChars> {
+    pub fn to_pixel_height(&self) -> Height<Pixels> {
+        let quantity = self.0 .0;
+        Height(Pixels(quantity * TEXT_CHARS_HEIGHT_IN_PIXELS))
+    }
+
+    pub fn from_pixel_height_floor(pixel_height: Height<Pixels>) -> Self {
+        let pixels = pixel_height.0 .0;
+        Self(TextChars(div_floor(pixels, TEXT_CHARS_HEIGHT_IN_PIXELS)))
+    }
+
+    pub fn from_pixel_height_ceil(pixel_height: Height<Pixels>) -> Self {
+        let pixels = pixel_height.0 .0;
+        Self(TextChars(div_ceil(pixels, TEXT_CHARS_HEIGHT_IN_PIXELS)))
+    }
+
+    pub fn from_tiles1x_floor(tiles1x_height: Height<Tiles1x>) -> Self {
+        Self::from_pixel_height_floor(tiles1x_height.to_pixel_height())
+    }
+
+    pub fn from_tiles1x_ceil(tiles1x_height: Height<Tiles1x>) -> Self {
+        Self::from_pixel_height_ceil(tiles1x_height.to_pixel_height())
+    }
+
+    pub fn from_tiles2x_floor(tiles2x_height: Height<Tiles2x>) -> Self {
+        Self::from_pixel_height_floor(tiles2x_height.to_pixel_height())
+    }
+
+    pub fn from_tiles2x_ceil(tiles2x_height: Height<Tiles2x>) -> Self {
+        Self::from_pixel_height_ceil(tiles2x_height.to_pixel_height())
+    }
+}
+
+impl From<Height<TextChars>> for Height<Pixels> {
     fn from(height: Height<TextChars>) -> Self {
         let quantity = height.0 .0;
-        Pixels(quantity * 16)
+        Height(Pixels(quantity * 16))
     }
 }

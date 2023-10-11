@@ -13,13 +13,13 @@ fn tiles1x_mul() {
 #[test]
 fn tiles1x_width_in_pixels() {
     let tiles_wide = Width(Tiles1x(3));
-    assert_eq!(Pixels::from(tiles_wide), Pixels(48));
+    assert_eq!(tiles_wide.to_pixel_width(), Pixels::new_width(48));
 }
 
 #[test]
 fn tiles1x_height_in_pixels() {
     let tiles_high = Height(Tiles1x(5));
-    assert_eq!(Pixels::from(tiles_high), Pixels(120));
+    assert_eq!(tiles_high.to_pixel_height(), Pixels::new_height(120));
 }
 
 #[test]
@@ -57,13 +57,13 @@ fn tiles1x_new_size2d() {
 #[test]
 fn tiles2x_width_in_pixels() {
     let tiles2x_wide = Width(Tiles2x(3));
-    assert_eq!(Pixels::from(tiles2x_wide), Pixels(96));
+    assert_eq!(tiles2x_wide.to_pixel_width(), Pixels::new_width(96));
 }
 
 #[test]
 fn tiles2x_height_in_pixels() {
     let tiles2x_high = Height(Tiles2x(5));
-    assert_eq!(Pixels::from(tiles2x_high), Pixels(240));
+    assert_eq!(tiles2x_high.to_pixel_height(), Pixels::new_height(240));
 }
 
 #[test]
