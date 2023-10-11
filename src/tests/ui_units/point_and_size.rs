@@ -1,35 +1,45 @@
 use crate::ui::units::{Height, Pixels, Point2D, PosX, PosY, Size2D, Width};
 
 #[test]
-fn point2d_add_size2d() {
-    let point2d = Point2D {
-        x: PosX(Pixels(3)),
-        y: PosY(Pixels(4)),
-    };
-    let size2d = Size2D {
-        w: Width(Pixels(2)),
-        h: Height(Pixels(3)),
-    };
-    let expected = Point2D {
-        x: PosX(Pixels(5)),
-        y: PosY(Pixels(7)),
-    };
-    assert_eq!(point2d + size2d, expected);
+fn point2d_new() {
+    let point2d = Point2D::new(Pixels(3), Pixels(4));
+    assert_eq!(point2d.x, PosX(Pixels(3)));
+    assert_eq!(point2d.y, PosY(Pixels(4)));
 }
 
 #[test]
-fn size2d_add_size2d() {
+fn point2d_origin() {
+    let origin = Point2D::<Pixels>::origin();
+    assert_eq!(origin.x, PosX(Pixels(0)));
+    assert_eq!(origin.y, PosY(Pixels(0)));
+}
+
+#[test]
+fn size2d_new() {
+    let size2d = Size2D::new(Pixels(3), Pixels(4));
+    assert_eq!(size2d.w, Width(Pixels(3)));
+    assert_eq!(size2d.h, Height(Pixels(4)));
+}
+
+#[test]
+fn size2d_nothing() {
+    let size2d = Size2D::<Pixels>::nothing();
+    assert_eq!(size2d.w, Width(Pixels(0)));
+    assert_eq!(size2d.h, Height(Pixels(0)));
+}
+
+#[test]
+fn point2d_add_size2d() {
     assert_eq!(
-        Size2D {
-            w: Width(Pixels(1)),
-            h: Height(Pixels(2)),
-        } + Size2D {
-            w: Width(Pixels(3)),
-            h: Height(Pixels(4)),
-        },
-        Size2D {
-            w: Width(Pixels(4)),
-            h: Height(Pixels(6)),
-        }
+        Point2D::new(Pixels(3), Pixels(4)) + Size2D::new(Pixels(2), Pixels(3)),
+        Point2D::new(Pixels(5), Pixels(7))
+    );
+}
+
+#[test]
+fn point2d_sub_point2d_gives_size2d() {
+    assert_eq!(
+        Point2D::new(Pixels(5), Pixels(7)) - Point2D::new(Pixels(3), Pixels(4)),
+        Size2D::new(Pixels(2), Pixels(3))
     );
 }
