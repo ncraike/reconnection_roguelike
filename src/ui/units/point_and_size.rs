@@ -1,5 +1,6 @@
 extern crate derive_more;
 use super::base::{Height, PosX, PosY, Width};
+use super::box2d::Box2D;
 use super::traits::Unit;
 use derive_more::{Add, Mul};
 use std::ops::Add as AddTrait;
@@ -11,16 +12,25 @@ pub struct Point2D<T: Unit> {
     pub y: PosY<T>,
 }
 
-impl<T: Unit> Point2D<T> {
-    pub fn new_from_x_y(x: T, y: T) -> Self {
-        Self {
-            x: PosX(x),
-            y: PosY(y),
-        }
+impl<T: Unit + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Point2D<T> {
+    pub fn new_from_x_y(x: PosX<T>, y: PosY<T>) -> Self {
+        Self { x: x, y: y }
     }
 
     pub fn origin() -> Self {
-        Self::new_from_x_y(Unit::zero(), Unit::zero())
+        Self::new_from_x_y(PosX(Unit::zero()), PosY(Unit::zero()))
+    }
+
+    pub fn new_box2d_from_other_point(&self, p2: Point2D<T>) -> Box2D<T> {
+        Box2D::new_from_p1_p2(*self, p2)
+    }
+
+    pub fn new_box2d_from_size(&self, size: Size2D<T>) -> Box2D<T> {
+        Box2D::new_from_point_and_size(*self, size)
+    }
+
+    pub fn new_box2d_from_width_height(&self, width: Width<T>, height: Height<T>) -> Box2D<T> {
+        Box2D::new_from_point_and_size(*self, Size2D::<T>::new_from_width_height(width, height))
     }
 }
 
@@ -31,15 +41,12 @@ pub struct Size2D<T: Unit> {
 }
 
 impl<T: Unit> Size2D<T> {
-    pub fn new_from_width_height(w: T, h: T) -> Self {
-        Self {
-            w: Width(w),
-            h: Height(h),
-        }
+    pub fn new_from_width_height(w: Width<T>, h: Height<T>) -> Self {
+        Self { w: w, h: h }
     }
 
     pub fn nothing() -> Self {
-        Self::new_from_width_height(Unit::zero(), Unit::zero())
+        Self::new_from_width_height(Width(Unit::zero()), Height(Unit::zero()))
     }
 
     pub fn abs(&self) -> Self {

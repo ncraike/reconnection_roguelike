@@ -1,4 +1,4 @@
-use crate::ui::units::{Box2D, Pixels, PosX, PosY};
+use crate::ui::units::{Box2D, Height, Pixels, PosX, PosY, Width};
 
 #[test]
 fn box2d_new_from_p1_p2() {
@@ -8,15 +8,6 @@ fn box2d_new_from_p1_p2() {
     assert_eq!(box2d.y1(), PosY(Pixels(2)));
     assert_eq!(box2d.x2(), PosX(Pixels(3)));
     assert_eq!(box2d.y2(), PosY(Pixels(5)));
-}
-
-#[test]
-fn box2d_new_from_x1_y1_x2_y2() {
-    let box2d = Box2D::new_from_x1_y1_x2_y2(Pixels(3), Pixels(4), Pixels(6), Pixels(7));
-    assert_eq!(box2d.x1(), PosX(Pixels(3)));
-    assert_eq!(box2d.y1(), PosY(Pixels(4)));
-    assert_eq!(box2d.x2(), PosX(Pixels(6)));
-    assert_eq!(box2d.y2(), PosY(Pixels(7)));
 }
 
 #[test]
@@ -39,7 +30,7 @@ fn box2d_new_from_size() {
 
 #[test]
 fn box2d_new_from_width_and_height() {
-    let box2d = Box2D::new_from_width_height(Pixels(3), Pixels(4));
+    let box2d = Box2D::new_from_width_height(Width(Pixels(3)), Height(Pixels(4)));
     assert_eq!(box2d.x1(), PosX(Pixels(0)));
     assert_eq!(box2d.y1(), PosY(Pixels(0)));
     assert_eq!(box2d.x2(), PosX(Pixels(3)));

@@ -15,13 +15,6 @@ impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
         Self { p1: p1, p2: p2 }
     }
 
-    pub fn new_from_x1_y1_x2_y2(x1: T, y1: T, x2: T, y2: T) -> Self {
-        Self::new_from_p1_p2(
-            Point2D::<T>::new_from_x_y(x1, y1),
-            Point2D::<T>::new_from_x_y(x2, y2),
-        )
-    }
-
     pub fn new_from_point_and_size(point: Point2D<T>, size: Size2D<T>) -> Self {
         Self::new_from_p1_p2(point, point + size)
     }
@@ -30,7 +23,7 @@ impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
         Self::new_from_point_and_size(Point2D::<T>::origin(), size)
     }
 
-    pub fn new_from_width_height(width: T, height: T) -> Self {
+    pub fn new_from_width_height(width: Width<T>, height: Height<T>) -> Self {
         Self::new_from_size(Size2D::new_from_width_height(width, height))
     }
 

@@ -27,7 +27,7 @@ fn pixels_new_width_height_posx_posy() {
 fn pixels_new_point2d() {
     assert_eq!(
         Pixels::new_point2d(3, 4),
-        Point2D::new_from_x_y(Pixels(3), Pixels(4))
+        Point2D::new_from_x_y(PosX(Pixels(3)), PosY(Pixels(4)))
     );
 }
 
@@ -35,7 +35,7 @@ fn pixels_new_point2d() {
 fn pixels_new_size2d() {
     assert_eq!(
         Pixels::new_size2d(3, 4),
-        Size2D::new_from_width_height(Pixels(3), Pixels(4))
+        Size2D::new_from_width_height(Width(Pixels(3)), Height(Pixels(4)))
     );
 }
 
