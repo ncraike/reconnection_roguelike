@@ -1,5 +1,6 @@
 extern crate derive_more;
-use super::base::{Height, Pixels, Width};
+use super::base::{Height, Width};
+use super::pixels::Pixels;
 use super::point_and_size::{Point2D, Size2D};
 use super::pos_x_y::{PosX, PosY};
 use super::traits::Unit;
