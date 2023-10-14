@@ -1,4 +1,6 @@
-use crate::ui::units::{Height, Pixels, Point2D, PosX, PosY, Size2D, Tiles1x, Tiles2x, Width};
+use crate::ui::units::{
+    Height, Pixels, Point2D, PosX, PosY, Size2D, TextChars, Tiles1x, Tiles2x, Width,
+};
 
 #[test]
 fn tiles1x_add() {
@@ -12,14 +14,14 @@ fn tiles1x_mul() {
 
 #[test]
 fn tiles1x_width_in_pixels() {
-    let tiles_wide = Width(Tiles1x(3));
-    assert_eq!(tiles_wide.to_pixel_width(), Pixels::new_width(48));
+    let tiles_wide = Width(Tiles1x(1));
+    assert_eq!(tiles_wide.to_pixel_width(), Pixels::new_width(16));
 }
 
 #[test]
-fn tiles1x_height_in_pixels() {
-    let tiles_high = Height(Tiles1x(5));
-    assert_eq!(tiles_high.to_pixel_height(), Pixels::new_height(120));
+fn tiles1x_3_width_in_pixels() {
+    let tiles_wide = Width(Tiles1x(3));
+    assert_eq!(tiles_wide.to_pixel_width(), Pixels::new_width(48));
 }
 
 #[test]
@@ -30,6 +32,42 @@ fn tiles1x_width_add() {
 #[test]
 fn tiles1x_width_mul() {
     assert_eq!(Width(Tiles1x(3)) * 4, Width(Tiles1x(12)));
+}
+
+#[test]
+fn tiles1x_height_in_pixels() {
+    let tiles_high = Height(Tiles1x(1));
+    assert_eq!(tiles_high.to_pixel_height(), Pixels::new_height(24));
+}
+
+#[test]
+fn tiles1x_5_height_in_pixels() {
+    let tiles_high = Height(Tiles1x(5));
+    assert_eq!(tiles_high.to_pixel_height(), Pixels::new_height(120));
+}
+
+#[test]
+fn tiles1x_height_from_pixel_height_floor() {
+    assert_eq!(
+        Height::<Tiles1x>::from_pixel_height_floor(Pixels::new_height(51)),
+        Tiles1x::new_height(2)
+    );
+}
+
+#[test]
+fn tiles1x_height_from_pixel_height_ceil() {
+    assert_eq!(
+        Height::<Tiles1x>::from_pixel_height_ceil(Pixels::new_height(51)),
+        Tiles1x::new_height(3)
+    );
+}
+
+#[test]
+fn tiles1x_height_from_text_chars_floor() {
+    assert_eq!(
+        Height::<Tiles1x>::from_text_chars_floor(TextChars::new_height(4)),
+        Tiles1x::new_height(2)
+    );
 }
 
 #[test]
