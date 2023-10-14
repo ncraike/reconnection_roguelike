@@ -129,7 +129,7 @@ impl Height<Tiles1x> {
 impl From<Height<Tiles1x>> for Height<Pixels> {
     fn from(height: Height<Tiles1x>) -> Self {
         let quantity = height.0 .0;
-        Height(Pixels(quantity * 24))
+        Height(Pixels(quantity * TILES_1X_HEIGHT_IN_PIXELS))
     }
 }
 
@@ -224,17 +224,17 @@ impl From<Width<Tiles2x>> for Width<Pixels> {
 impl Height<Tiles2x> {
     pub fn to_pixel_height(&self) -> Height<Pixels> {
         let quantity = self.0 .0;
-        Height(Pixels(quantity * TILES_1X_HEIGHT_IN_PIXELS))
+        Height(Pixels(quantity * TILES_2X_HEIGHT_IN_PIXELS))
     }
 
     pub fn from_pixel_height_floor(pixel_height: Height<Pixels>) -> Self {
         let pixels = pixel_height.0 .0;
-        Self(Tiles2x(div_floor(pixels, TILES_1X_HEIGHT_IN_PIXELS)))
+        Self(Tiles2x(div_floor(pixels, TILES_2X_HEIGHT_IN_PIXELS)))
     }
 
     pub fn from_pixel_height_ceil(pixel_height: Height<Pixels>) -> Self {
         let pixels = pixel_height.0 .0;
-        Self(Tiles2x(div_ceil(pixels, TILES_1X_HEIGHT_IN_PIXELS)))
+        Self(Tiles2x(div_ceil(pixels, TILES_2X_HEIGHT_IN_PIXELS)))
     }
 
     pub fn from_text_chars_floor(text_chars_height: Height<TextChars>) -> Self {
