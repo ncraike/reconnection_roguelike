@@ -89,3 +89,27 @@ fn tiles1x_new_size2d() {
         }
     );
 }
+
+#[test]
+fn tiles1x_size_to_pixels() {
+    assert_eq!(
+        Tiles1x::new_size2d(4, 3).to_pixels(),
+        Pixels::new_size2d(64, 72)
+    );
+}
+
+#[test]
+fn tiles1x_size_from_pixels_floor() {
+    assert_eq!(
+        Size2D::<Tiles1x>::from_pixels_floor(Pixels::new_size2d(66, 73)),
+        Tiles1x::new_size2d(4, 3)
+    )
+}
+
+#[test]
+fn tiles1x_size_from_pixels_ceil() {
+    assert_eq!(
+        Size2D::<Tiles1x>::from_pixels_ceil(Pixels::new_size2d(61, 70)),
+        Tiles1x::new_size2d(4, 3)
+    )
+}

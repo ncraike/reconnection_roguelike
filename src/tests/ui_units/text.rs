@@ -1,4 +1,4 @@
-use crate::ui::units::{Height, Pixels, TextChars, Tiles1x, Width};
+use crate::ui::units::{Height, Pixels, Size2D, TextChars, Tiles1x, Width};
 
 #[test]
 fn text_width_in_pixels() {
@@ -39,4 +39,20 @@ fn text_size_to_pixels() {
         TextChars::new_size2d(4, 3).to_pixels(),
         Pixels::new_size2d(32, 48)
     );
+}
+
+#[test]
+fn text_size_from_pixels_floor() {
+    assert_eq!(
+        Size2D::<TextChars>::from_pixels_floor(Pixels::new_size2d(34, 51)),
+        TextChars::new_size2d(4, 3)
+    )
+}
+
+#[test]
+fn text_size_from_pixels_ceil() {
+    assert_eq!(
+        Size2D::<TextChars>::from_pixels_ceil(Pixels::new_size2d(30, 47)),
+        TextChars::new_size2d(4, 3)
+    )
 }

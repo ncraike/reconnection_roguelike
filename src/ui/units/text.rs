@@ -149,10 +149,10 @@ impl From<Height<TextChars>> for Height<Pixels> {
 
 impl Size2D<TextChars> {
     pub fn from_pixels_floor(pixels_size: Size2D<Pixels>) -> Self {
-        Size2D::<TextChars> {
-            width: Width::<TextChars>::from_pixels_floor(pixels_size.width),
-            height: Height::<TextChars>::from_pixels_floor(pixels_size.height),
-        }
+        Size2D::<TextChars>::new_from_width_height(
+            Width::<TextChars>::from_pixels_floor(pixels_size.width),
+            Height::<TextChars>::from_pixels_floor(pixels_size.height),
+        )
     }
 
     pub fn from_pixels_ceil(pixels_size: Size2D<Pixels>) -> Self {
