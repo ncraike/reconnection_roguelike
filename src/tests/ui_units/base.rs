@@ -20,6 +20,11 @@ fn width_abs() {
 }
 
 #[test]
+fn width_to_primitive() {
+    assert_eq!(Width(Pixels(3)).to_primitive(), 3)
+}
+
+#[test]
 fn height_add() {
     assert_eq!(
         Height::<Pixels>(Pixels(1)) + Height::<Pixels>(Pixels(2)),
@@ -33,6 +38,16 @@ fn height_mul() {
         Height::<Pixels>(Pixels(3)) * 4,
         Height::<Pixels>(Pixels(12))
     );
+}
+
+#[test]
+fn height_to_primitive() {
+    assert_eq!(Height(Pixels(5)).to_primitive(), 5)
+}
+
+#[test]
+fn posx_to_primitive() {
+    assert_eq!(PosX(Pixels(4)).to_primitive(), 4)
 }
 
 #[test]
@@ -53,6 +68,11 @@ fn posx_min() {
 #[test]
 fn posx_sub_posx_gives_width() {
     assert_eq!(PosX(Pixels(7)) - PosX(Pixels(3)), Width(Pixels(4)))
+}
+
+#[test]
+fn posy_to_primitive() {
+    assert_eq!(PosY(Pixels(2)).to_primitive(), 2)
 }
 
 #[test]

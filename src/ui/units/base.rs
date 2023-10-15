@@ -11,6 +11,10 @@ impl<T: Unit> Width<T> {
     pub fn abs(&self) -> Self {
         Self(self.0.abs())
     }
+
+    pub fn to_primitive(&self) -> T::ValueType {
+        self.0.to_primitive()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
@@ -20,13 +24,29 @@ impl<T: Unit> Height<T> {
     pub fn abs(&self) -> Self {
         Self(self.0.abs())
     }
+
+    pub fn to_primitive(&self) -> T::ValueType {
+        self.0.to_primitive()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosX<T: Unit>(pub T);
 
+impl<T: Unit> PosX<T> {
+    pub fn to_primitive(&self) -> T::ValueType {
+        self.0.to_primitive()
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosY<T: Unit>(pub T);
+
+impl<T: Unit> PosY<T> {
+    pub fn to_primitive(&self) -> T::ValueType {
+        self.0.to_primitive()
+    }
+}
 
 impl<T: Unit + AddTrait<Output = T>> AddTrait<Width<T>> for PosX<T> {
     type Output = Self;
