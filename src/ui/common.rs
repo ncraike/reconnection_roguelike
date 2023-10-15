@@ -1,7 +1,7 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use crate::ui::units::{Box2D, Height, Pixels, TextChars, Tiles2x, Width};
+use crate::ui::units::{Box2D, TextChars, Tiles2x};
 
 use super::super::types::{RunState, UITask};
 use super::super::GAME_TITLE;
