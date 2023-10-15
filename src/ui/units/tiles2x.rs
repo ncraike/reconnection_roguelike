@@ -137,6 +137,20 @@ impl From<Height<Tiles2x>> for Height<Pixels> {
 }
 
 impl Size2D<Tiles2x> {
+    pub fn from_pixels_floor(pixels_size: Size2D<Pixels>) -> Self {
+        Size2D::<Tiles2x> {
+            width: Width::<Tiles2x>::from_pixels_floor(pixels_size.width),
+            height: Height::<Tiles2x>::from_pixels_floor(pixels_size.height),
+        }
+    }
+
+    pub fn from_pixels_ceil(pixels_size: Size2D<Pixels>) -> Self {
+        Size2D::<Tiles2x> {
+            width: Width::<Tiles2x>::from_pixels_ceil(pixels_size.width),
+            height: Height::<Tiles2x>::from_pixels_ceil(pixels_size.height),
+        }
+    }
+
     pub fn to_pixels(&self) -> Size2D<Pixels> {
         Size2D::<Pixels>::new_from_width_height(self.width.to_pixels(), self.height.to_pixels())
     }

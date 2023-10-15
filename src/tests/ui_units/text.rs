@@ -32,3 +32,11 @@ fn text_width_add() {
 fn text_width_mul() {
     assert_eq!(TextChars::new_width(3) * 4, TextChars::new_width(12));
 }
+
+#[test]
+fn text_size_to_pixels() {
+    assert_eq!(
+        TextChars::new_size2d(4, 3).to_pixels(),
+        Pixels::new_size2d(32, 48)
+    );
+}
