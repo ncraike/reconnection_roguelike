@@ -19,12 +19,12 @@ impl Unit for Pixels {
         Self(0)
     }
 
-    fn value(&self) -> i32 {
+    fn to_primitive(&self) -> i32 {
         self.0
     }
 
     fn abs(&self) -> Self {
-        Self(self.value().abs())
+        Self(self.to_primitive().abs())
     }
 }
 
