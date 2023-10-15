@@ -1,4 +1,4 @@
-use crate::ui::units::{Height, Pixels, TextChars, Tiles1x, Tiles2x, Width};
+use crate::ui::units::{Height, Pixels, TextChars, Tiles1x, Width};
 
 #[test]
 fn text_width_in_pixels() {
