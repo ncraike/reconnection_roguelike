@@ -165,4 +165,32 @@ impl Size2D<TextChars> {
     pub fn to_pixels(&self) -> Size2D<Pixels> {
         Size2D::<Pixels>::new_from_width_height(self.width.to_pixels(), self.height.to_pixels())
     }
+
+    pub fn to_tiles1x_floor(&self) -> Size2D<Tiles1x> {
+        Size2D::<Tiles1x>::new_from_width_height(
+            Width::<Tiles1x>::from_pixels_floor(self.width.to_pixels()),
+            Height::<Tiles1x>::from_pixels_floor(self.height.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles1x_ceil(&self) -> Size2D<Tiles1x> {
+        Size2D::<Tiles1x>::new_from_width_height(
+            Width::<Tiles1x>::from_pixels_ceil(self.width.to_pixels()),
+            Height::<Tiles1x>::from_pixels_ceil(self.height.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles2x_floor(&self) -> Size2D<Tiles2x> {
+        Size2D::<Tiles2x>::new_from_width_height(
+            Width::<Tiles2x>::from_pixels_floor(self.width.to_pixels()),
+            Height::<Tiles2x>::from_pixels_floor(self.height.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles2x_ceil(&self) -> Size2D<Tiles2x> {
+        Size2D::<Tiles2x>::new_from_width_height(
+            Width::<Tiles2x>::from_pixels_ceil(self.width.to_pixels()),
+            Height::<Tiles2x>::from_pixels_ceil(self.height.to_pixels()),
+        )
+    }
 }

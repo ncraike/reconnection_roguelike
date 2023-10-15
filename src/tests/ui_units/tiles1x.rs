@@ -1,4 +1,6 @@
-use crate::ui::units::{Height, Pixels, Point2D, PosX, PosY, Size2D, TextChars, Tiles1x, Width};
+use crate::ui::units::{
+    Height, Pixels, Point2D, PosX, PosY, Size2D, TextChars, Tiles1x, Tiles2x, Width,
+};
 
 #[test]
 fn tiles1x_add() {
@@ -111,5 +113,37 @@ fn tiles1x_size_from_pixels_ceil() {
     assert_eq!(
         Size2D::<Tiles1x>::from_pixels_ceil(Pixels::new_size2d(61, 70)),
         Tiles1x::new_size2d(4, 3)
+    )
+}
+
+#[test]
+fn tiles1x_size_to_text_chars_floor() {
+    assert_eq!(
+        Tiles1x::new_size2d(5, 3).to_text_chars_floor(),
+        TextChars::new_size2d(10, 4)
+    )
+}
+
+#[test]
+fn tiles1x_size_to_text_chars_ceil() {
+    assert_eq!(
+        Tiles1x::new_size2d(5, 3).to_text_chars_ceil(),
+        TextChars::new_size2d(10, 5)
+    )
+}
+
+#[test]
+fn tiles1x_size_to_tiles2x_floor() {
+    assert_eq!(
+        Tiles1x::new_size2d(12, 9).to_tiles2x_floor(),
+        Tiles2x::new_size2d(6, 4)
+    )
+}
+
+#[test]
+fn tiles1x_size_to_tiles2x_ceil() {
+    assert_eq!(
+        Tiles1x::new_size2d(13, 9).to_tiles2x_ceil(),
+        Tiles2x::new_size2d(7, 5)
     )
 }
