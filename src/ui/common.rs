@@ -90,17 +90,13 @@ impl UI {
         let window_size = window_bounds().size();
         let window_width_in_tiles2x = window_size.width.abs().0 .0 as u32;
         let window_height_in_tiles2x = window_size.height.abs().0 .0 as u32;
-        let tiles2x_font_width = Tiles2x::new_width(1).to_pixel_width().0 .0 as u32;
-        let tiles2x_font_height = Tiles2x::new_height(1).to_pixel_height().0 .0 as u32;
+        let tiles2x_font_width = Tiles2x::new_width(1).to_pixels().0 .0 as u32;
+        let tiles2x_font_height = Tiles2x::new_height(1).to_pixels().0 .0 as u32;
 
-        let window_width_in_text_chars = Width::<TextChars>::from_tiles2x_ceil(window_size.width)
-            .0
-             .0 as u32;
-        let window_height_in_text_chars = Height::<TextChars>::from_tiles2x_ceil(window_size.height)
-            .0
-             .0 as u32;
-        let text_font_width = TextChars::new_width(1).to_pixel_width().0 .0 as u32;
-        let text_font_height = TextChars::new_height(1).to_pixel_height().0 .0 as u32;
+        let window_width_in_text_chars = window_size.width.to_text_chars_ceil().0 .0 as u32;
+        let window_height_in_text_chars = window_size.height.to_text_chars_ceil().0 .0 as u32;
+        let text_font_width = TextChars::new_width(1).to_pixels().0 .0 as u32;
+        let text_font_height = TextChars::new_height(1).to_pixels().0 .0 as u32;
 
         BTermBuilder::new()
             .with_title(GAME_TITLE)

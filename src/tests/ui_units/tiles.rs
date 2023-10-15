@@ -15,13 +15,21 @@ fn tiles1x_mul() {
 #[test]
 fn tiles1x_width_in_pixels() {
     let tiles_wide = Width(Tiles1x(1));
-    assert_eq!(tiles_wide.to_pixel_width(), Pixels::new_width(16));
+    assert_eq!(tiles_wide.to_pixels(), Pixels::new_width(16));
 }
 
 #[test]
 fn tiles1x_3_width_in_pixels() {
     let tiles_wide = Width(Tiles1x(3));
-    assert_eq!(tiles_wide.to_pixel_width(), Pixels::new_width(48));
+    assert_eq!(tiles_wide.to_pixels(), Pixels::new_width(48));
+}
+
+#[test]
+fn tiles1x_3_width_to_text_chars_floor() {
+    assert_eq!(
+        Tiles1x::new_width(3).to_text_chars_floor(),
+        TextChars::new_width(6)
+    );
 }
 
 #[test]
@@ -37,36 +45,28 @@ fn tiles1x_width_mul() {
 #[test]
 fn tiles1x_height_in_pixels() {
     let tiles_high = Height(Tiles1x(1));
-    assert_eq!(tiles_high.to_pixel_height(), Pixels::new_height(24));
+    assert_eq!(tiles_high.to_pixels(), Pixels::new_height(24));
 }
 
 #[test]
 fn tiles1x_5_height_in_pixels() {
     let tiles_high = Height(Tiles1x(5));
-    assert_eq!(tiles_high.to_pixel_height(), Pixels::new_height(120));
+    assert_eq!(tiles_high.to_pixels(), Pixels::new_height(120));
 }
 
 #[test]
-fn tiles1x_height_from_pixel_height_floor() {
+fn tiles1x_height_from_pixels_floor() {
     assert_eq!(
-        Height::<Tiles1x>::from_pixel_height_floor(Pixels::new_height(51)),
+        Height::<Tiles1x>::from_pixels_floor(Pixels::new_height(51)),
         Tiles1x::new_height(2)
     );
 }
 
 #[test]
-fn tiles1x_height_from_pixel_height_ceil() {
+fn tiles1x_height_from_pixels_ceil() {
     assert_eq!(
-        Height::<Tiles1x>::from_pixel_height_ceil(Pixels::new_height(51)),
+        Height::<Tiles1x>::from_pixels_ceil(Pixels::new_height(51)),
         Tiles1x::new_height(3)
-    );
-}
-
-#[test]
-fn tiles1x_height_from_text_chars_floor() {
-    assert_eq!(
-        Height::<Tiles1x>::from_text_chars_floor(TextChars::new_height(4)),
-        Tiles1x::new_height(2)
     );
 }
 
@@ -95,13 +95,13 @@ fn tiles1x_new_size2d() {
 #[test]
 fn tiles2x_width_in_pixels() {
     let tiles2x_wide = Width(Tiles2x(3));
-    assert_eq!(tiles2x_wide.to_pixel_width(), Pixels::new_width(96));
+    assert_eq!(tiles2x_wide.to_pixels(), Pixels::new_width(96));
 }
 
 #[test]
 fn tiles2x_height_in_pixels() {
     let tiles2x_high = Height(Tiles2x(5));
-    assert_eq!(tiles2x_high.to_pixel_height(), Pixels::new_height(240));
+    assert_eq!(tiles2x_high.to_pixels(), Pixels::new_height(240));
 }
 
 #[test]
