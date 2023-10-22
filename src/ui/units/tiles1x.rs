@@ -308,3 +308,51 @@ impl Point2D<Tiles1x> {
         )
     }
 }
+
+impl Box2D<Tiles1x> {
+    pub fn from_pixels_floor(pixels_box: Box2D<Pixels>) -> Self {
+        Box2D::<Tiles1x>::new_from_p1_p2(
+            Point2D::<Tiles1x>::from_pixels_floor(pixels_box.p1),
+            Point2D::<Tiles1x>::from_pixels_floor(pixels_box.p2),
+        )
+    }
+
+    pub fn from_pixels_ceil(pixels_box: Box2D<Pixels>) -> Self {
+        Box2D::<Tiles1x>::new_from_p1_p2(
+            Point2D::<Tiles1x>::from_pixels_ceil(pixels_box.p1),
+            Point2D::<Tiles1x>::from_pixels_ceil(pixels_box.p2),
+        )
+    }
+
+    pub fn to_pixels(&self) -> Box2D<Pixels> {
+        Box2D::<Pixels>::new_from_p1_p2(self.p1.to_pixels(), self.p2.to_pixels())
+    }
+
+    pub fn to_text_chars_floor(&self) -> Box2D<TextChars> {
+        Box2D::<TextChars>::new_from_p1_p2(
+            Point2D::<TextChars>::from_pixels_floor(self.p1.to_pixels()),
+            Point2D::<TextChars>::from_pixels_floor(self.p2.to_pixels()),
+        )
+    }
+
+    pub fn to_text_chars_ceil(&self) -> Box2D<TextChars> {
+        Box2D::<TextChars>::new_from_p1_p2(
+            Point2D::<TextChars>::from_pixels_ceil(self.p1.to_pixels()),
+            Point2D::<TextChars>::from_pixels_ceil(self.p2.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles2x_floor(&self) -> Box2D<Tiles2x> {
+        Box2D::<Tiles2x>::new_from_p1_p2(
+            Point2D::<Tiles2x>::from_pixels_floor(self.p1.to_pixels()),
+            Point2D::<Tiles2x>::from_pixels_floor(self.p2.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles2x_ceil(&self) -> Box2D<Tiles2x> {
+        Box2D::<Tiles2x>::new_from_p1_p2(
+            Point2D::<Tiles2x>::from_pixels_ceil(self.p1.to_pixels()),
+            Point2D::<Tiles2x>::from_pixels_ceil(self.p2.to_pixels()),
+        )
+    }
+}
