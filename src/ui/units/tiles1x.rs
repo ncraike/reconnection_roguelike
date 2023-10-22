@@ -147,6 +147,72 @@ impl From<Height<Tiles1x>> for Height<Pixels> {
     }
 }
 
+impl PosX<Tiles1x> {
+    pub fn from_pixels_floor(pixels_posx: PosX<Pixels>) -> Self {
+        let pixels = pixels_posx.to_primitive();
+        Self(Tiles1x(div_floor(pixels, TILES_1X_WIDTH_IN_PIXELS)))
+    }
+
+    pub fn from_pixels_ceil(pixels_posx: PosX<Pixels>) -> Self {
+        let pixels = pixels_posx.to_primitive();
+        Self(Tiles1x(div_ceil(pixels, TILES_1X_WIDTH_IN_PIXELS)))
+    }
+
+    pub fn to_pixels(&self) -> PosX<Pixels> {
+        let quantity = self.to_primitive();
+        PosX(Pixels(quantity * TILES_1X_WIDTH_IN_PIXELS))
+    }
+
+    pub fn to_text_chars_floor(&self) -> PosX<TextChars> {
+        PosX::<TextChars>::from_pixels_floor(self.to_pixels())
+    }
+
+    pub fn to_text_chars_ceil(&self) -> PosX<TextChars> {
+        PosX::<TextChars>::from_pixels_ceil(self.to_pixels())
+    }
+
+    pub fn to_tiles2x_floor(&self) -> PosX<Tiles2x> {
+        PosX::<Tiles2x>::from_pixels_floor(self.to_pixels())
+    }
+
+    pub fn to_tiles2x_ceil(&self) -> PosX<Tiles2x> {
+        PosX::<Tiles2x>::from_pixels_ceil(self.to_pixels())
+    }
+}
+
+impl PosY<Tiles1x> {
+    pub fn from_pixels_floor(pixels_posy: PosY<Pixels>) -> Self {
+        let pixels = pixels_posy.to_primitive();
+        Self(Tiles1x(div_floor(pixels, TILES_1X_WIDTH_IN_PIXELS)))
+    }
+
+    pub fn from_pixels_ceil(pixel_posy: PosY<Pixels>) -> Self {
+        let pixels = pixel_posy.to_primitive();
+        Self(Tiles1x(div_ceil(pixels, TILES_1X_WIDTH_IN_PIXELS)))
+    }
+
+    pub fn to_pixels(&self) -> PosY<Pixels> {
+        let quantity = self.to_primitive();
+        PosY(Pixels(quantity * TILES_1X_WIDTH_IN_PIXELS))
+    }
+
+    pub fn to_text_chars_floor(&self) -> PosY<TextChars> {
+        PosY::<TextChars>::from_pixels_floor(self.to_pixels())
+    }
+
+    pub fn to_text_chars_ceil(&self) -> PosY<TextChars> {
+        PosY::<TextChars>::from_pixels_ceil(self.to_pixels())
+    }
+
+    pub fn to_tiles2x_floor(&self) -> PosY<Tiles2x> {
+        PosY::<Tiles2x>::from_pixels_floor(self.to_pixels())
+    }
+
+    pub fn to_tiles2x_ceil(&self) -> PosY<Tiles2x> {
+        PosY::<Tiles2x>::from_pixels_ceil(self.to_pixels())
+    }
+}
+
 impl Size2D<Tiles1x> {
     pub fn from_pixels_floor(pixels_size: Size2D<Pixels>) -> Self {
         Size2D::<Tiles1x>::new_from_width_height(
@@ -191,6 +257,54 @@ impl Size2D<Tiles1x> {
         Size2D::<Tiles2x>::new_from_width_height(
             Width::<Tiles2x>::from_pixels_ceil(self.width.to_pixels()),
             Height::<Tiles2x>::from_pixels_ceil(self.height.to_pixels()),
+        )
+    }
+}
+
+impl Point2D<Tiles1x> {
+    pub fn from_pixels_floor(pixels: Point2D<Pixels>) -> Self {
+        Point2D::<Tiles1x>::new_from_x_y(
+            PosX::<Tiles1x>::from_pixels_floor(pixels.x),
+            PosY::<Tiles1x>::from_pixels_floor(pixels.y),
+        )
+    }
+
+    pub fn from_pixels_ceil(pixels: Point2D<Pixels>) -> Self {
+        Point2D::<Tiles1x>::new_from_x_y(
+            PosX::<Tiles1x>::from_pixels_ceil(pixels.x),
+            PosY::<Tiles1x>::from_pixels_ceil(pixels.y),
+        )
+    }
+
+    pub fn to_pixels(&self) -> Point2D<Pixels> {
+        Point2D::<Pixels>::new_from_x_y(self.x.to_pixels(), self.y.to_pixels())
+    }
+
+    pub fn to_text_chars_floor(&self) -> Point2D<TextChars> {
+        Point2D::<TextChars>::new_from_x_y(
+            PosX::<TextChars>::from_pixels_floor(self.x.to_pixels()),
+            PosY::<TextChars>::from_pixels_floor(self.y.to_pixels()),
+        )
+    }
+
+    pub fn to_text_chars_ceil(&self) -> Point2D<TextChars> {
+        Point2D::<TextChars>::new_from_x_y(
+            PosX::<TextChars>::from_pixels_ceil(self.x.to_pixels()),
+            PosY::<TextChars>::from_pixels_ceil(self.y.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles2x_floor(&self) -> Point2D<Tiles2x> {
+        Point2D::<Tiles2x>::new_from_x_y(
+            PosX::<Tiles2x>::from_pixels_floor(self.x.to_pixels()),
+            PosY::<Tiles2x>::from_pixels_floor(self.y.to_pixels()),
+        )
+    }
+
+    pub fn to_tiles2x_ceil(&self) -> Point2D<Tiles2x> {
+        Point2D::<Tiles2x>::new_from_x_y(
+            PosX::<Tiles2x>::from_pixels_ceil(self.x.to_pixels()),
+            PosY::<Tiles2x>::from_pixels_ceil(self.y.to_pixels()),
         )
     }
 }
