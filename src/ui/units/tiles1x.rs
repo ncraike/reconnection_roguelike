@@ -356,3 +356,8 @@ impl Box2D<Tiles1x> {
         )
     }
 }
+
+pub const ONE_TILE1X: Size2D<Tiles1x> = Size2D::<Tiles1x> {
+    width: Width(Tiles1x(1)),
+    height: Height(Tiles1x(1)),
+};

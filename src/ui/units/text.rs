@@ -356,3 +356,8 @@ impl Box2D<TextChars> {
         )
     }
 }
+
+pub const ONE_TEXT_CHAR: Size2D<TextChars> = Size2D::<TextChars> {
+    width: Width(TextChars(1)),
+    height: Height(TextChars(1)),
+};

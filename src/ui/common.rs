@@ -1,7 +1,7 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use crate::ui::units::{Box2D, TextChars, Tiles2x};
+use crate::ui::units::{Height, Size2D, Tiles2x, Width, ONE_TEXT_CHAR, ONE_TILE2X};
 
 use super::super::types::{RunState, UITask};
 use super::super::GAME_TITLE;
@@ -9,24 +9,25 @@ use super::keyboard::{match_key, Keybindings, Keybound};
 use super::menus::render_inventory_menu;
 use super::player_in_world::{player_in_world_controller, render_player_in_world_view};
 
-pub fn window_bounds() -> Box2D<Tiles2x> {
-    Tiles2x::new_box2d_from_width_height(48, 18)
-}
+pub const WINDOW_SIZE: Size2D<Tiles2x> = Size2D::<Tiles2x> {
+    width: Width(Tiles2x(48)),
+    height: Height(Tiles2x(18)),
+};
 
-pub const TILE_1X_WIDTH: u32 = 16;
-pub const TILE_1X_HEIGHT: u32 = 24;
-pub const TILE_2X_WIDTH: u32 = 32;
-pub const TILE_2X_HEIGHT: u32 = 48;
-pub const TEXT_FONT_WIDTH: u32 = 8;
-pub const TEXT_FONT_HEIGHT: u32 = 16;
+// pub const TILE_1X_WIDTH: u32 = 16;
+// pub const TILE_1X_HEIGHT: u32 = 24;
+// pub const TILE_2X_WIDTH: u32 = 32;
+// pub const TILE_2X_HEIGHT: u32 = 48;
+// pub const TEXT_FONT_WIDTH: u32 = 8;
+// pub const TEXT_FONT_HEIGHT: u32 = 16;
 
 // pub const DEFAULT_WINDOW_WIDTH_IN_TEXT: u32 =
 //     DEFAULT_WINDOW_WIDTH_IN_TILES * TILE_2X_WIDTH / TEXT_FONT_WIDTH;
 // pub const DEFAULT_WINDOW_HEIGHT_IN_TEXT: u32 =
 //     DEFAULT_WINDOW_HEIGHT_IN_TILES * TILE_2X_HEIGHT / TEXT_FONT_HEIGHT;
 
-pub const TEXT_BOX_HEIGHT: u32 = 6;
-pub const TEXT_BOX_HEIGHT_IN_TILES: u32 = TEXT_BOX_HEIGHT * TEXT_FONT_HEIGHT / TILE_2X_HEIGHT;
+// pub const TEXT_BOX_HEIGHT: u32 = 6;
+// pub const TEXT_BOX_HEIGHT_IN_TILES: u32 = TEXT_BOX_HEIGHT * TEXT_FONT_HEIGHT / TILE_2X_HEIGHT;
 
 pub const TILE_1X_FONT: &str = "reconnection_16x24_tiles_at_1x.png";
 pub const TILE_2X_FONT: &str = "reconnection_16x24_tiles_at_2x.png";
@@ -87,54 +88,50 @@ pub struct UI {}
 
 impl UI {
     pub fn build_terminal(&self) -> BResult<BTerm> {
-        let window_size = window_bounds().size();
-        let tiles2x_size = Tiles2x::new_size2d(1, 1);
-        let text_size = TextChars::new_size2d(1, 1);
-
         BTermBuilder::new()
             .with_title(GAME_TITLE)
             .with_tile_dimensions(
-                tiles2x_size.width.to_pixels().to_primitive(),
-                tiles2x_size.height.to_pixels().to_primitive(),
+                ONE_TILE2X.width.to_pixels().to_primitive(),
+                ONE_TILE2X.height.to_pixels().to_primitive(),
             )
             .with_dimensions(
-                window_size.width.to_primitive(),
-                window_size.height.to_primitive(),
+                WINDOW_SIZE.width.to_primitive(),
+                WINDOW_SIZE.height.to_primitive(),
             )
             .with_automatic_console_resize(true)
             .with_fitscreen(true)
             .with_font(
                 TILE_2X_FONT,
-                tiles2x_size.width.to_pixels().to_primitive(),
-                tiles2x_size.height.to_pixels().to_primitive(),
+                ONE_TILE2X.width.to_pixels().to_primitive(),
+                ONE_TILE2X.height.to_pixels().to_primitive(),
             )
             .with_font(
                 TEXT_FONT,
-                text_size.width.to_pixels().to_primitive(),
-                text_size.height.to_pixels().to_primitive(),
+                ONE_TEXT_CHAR.width.to_pixels().to_primitive(),
+                ONE_TEXT_CHAR.height.to_pixels().to_primitive(),
             )
             // Terrain
             .with_simple_console(
-                window_size.width.to_primitive(),
-                window_size.height.to_primitive(),
+                WINDOW_SIZE.width.to_primitive(),
+                WINDOW_SIZE.height.to_primitive(),
                 TILE_2X_FONT,
             )
             // Entities (items)
             .with_sparse_console_no_bg(
-                window_size.width.to_primitive(),
-                window_size.height.to_primitive(),
+                WINDOW_SIZE.width.to_primitive(),
+                WINDOW_SIZE.height.to_primitive(),
                 TILE_2X_FONT,
             )
             // Entities (player, NPCs, enemies)
             .with_sparse_console_no_bg(
-                window_size.width.to_primitive(),
-                window_size.height.to_primitive(),
+                WINDOW_SIZE.width.to_primitive(),
+                WINDOW_SIZE.height.to_primitive(),
                 TILE_2X_FONT,
             )
             // Text
             .with_sparse_console_no_bg(
-                window_size.to_text_chars_floor().width.to_primitive(),
-                window_size.to_text_chars_floor().height.to_primitive(),
+                WINDOW_SIZE.to_text_chars_floor().width.to_primitive(),
+                WINDOW_SIZE.to_text_chars_floor().height.to_primitive(),
                 TEXT_FONT,
             )
             .build()
