@@ -67,4 +67,64 @@ impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
             },
         )
     }
+
+    pub fn split_from_left(&self, offset_from_left: Width<T>) -> (Box2D<T>, Box2D<T>) {
+        let left_box = Self {
+            p1: self.p1,
+            p2: Point2D::<T> {
+                x: self.p1.x + offset_from_left,
+                y: self.p2.y,
+            },
+        };
+        let right_box = Self {
+            p1: left_box.p2,
+            p2: self.p2,
+        };
+        (left_box, right_box)
+    }
+
+    pub fn split_from_right(&self, offset_from_right: Width<T>) -> (Box2D<T>, Box2D<T>) {
+        let left_box = Self {
+            p1: self.p1,
+            p2: Point2D::<T> {
+                x: self.p2.x - offset_from_right,
+                y: self.p2.y,
+            },
+        };
+        let right_box = Self {
+            p1: left_box.p2,
+            p2: self.p2,
+        };
+        (left_box, right_box)
+    }
+
+    pub fn split_from_top(&self, offset_from_top: Height<T>) -> (Box2D<T>, Box2D<T>) {
+        let top_box = Self {
+            p1: self.p1,
+            p2: Point2D::<T> {
+                x: self.p2.x,
+                y: self.p1.y + offset_from_top,
+            },
+        };
+        let bottom_box = Self {
+            p1: top_box.p2,
+            p2: self.p2,
+        };
+        (top_box, bottom_box)
+    }
+
+    pub fn split_from_bottom(&self, offset_from_bottom: Height<T>) -> (Box2D<T>, Box2D<T>) {
+        let top_box = Self {
+            p1: self.p1,
+            p2: Point2D::<T> {
+                x: self.p2.x,
+                y: self.p2.y - offset_from_bottom,
+            },
+        };
+        let bottom_box = Self {
+            p1: top_box.p2,
+            p2: self.p2,
+        };
+        (top_box, bottom_box)
+    }
 }
