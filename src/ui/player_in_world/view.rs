@@ -2,11 +2,16 @@ use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
 
+use crate::ui::common::Consoles;
+use crate::ui::units::{Box2D, Height, TextChars};
+use crate::ui::utils::{get_mouse_point_in_text_chars, get_mouse_point_in_tiles2x, window_size};
+
 use super::super::camera::{get_camera_bounds_in_world, render_camera};
-use super::super::common::{Consoles, TEXT_BOX_HEIGHT, TEXT_BOX_HEIGHT_IN_TILES};
 use super::super::messages::render_messages;
 use super::super::stats::render_stats;
 use super::super::tooltips::render_tooltips;
+
+pub const MESSAGE_BOX_HEIGHT: Height<TextChars> = Height(TextChars(6));
 
 #[derive(Debug)]
 pub struct PlayerInWorldView {
@@ -21,9 +26,13 @@ pub struct PlayerInWorldView {
 
 impl PlayerInWorldView {
     pub fn from_context(ctx: &mut BTerm) -> PlayerInWorldView {
-        ctx.set_active_console(Consoles::TilesTerrain as usize);
-        let (width_in_tiles, height_in_tiles) = ctx.get_char_size();
-        let mouse_pt_in_tiles = ctx.mouse_point();
+        let window = Box2D::new_from_size(window_size(ctx));
+        let (camera_view, bottom_hud) =
+            window.split_from_bottom(MESSAGE_BOX_HEIGHT.to_tiles2x_ceil());
+
+        let mouse_pt_in_tiles2x = get_mouse_point_in_tiles2x(ctx);
+        let mouse_pt_in_text_chars = get_mouse_point_in_text_chars(ctx);
+
         ctx.set_active_console(Consoles::Text as usize);
         let (width_in_text, height_in_text) = ctx.get_char_size();
         let message_log_width = width_in_text / 2;

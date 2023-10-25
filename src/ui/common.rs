@@ -1,7 +1,7 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use crate::ui::units::{Height, Size2D, Tiles2x, Width, ONE_TEXT_CHAR, ONE_TILE2X};
+use crate::ui::units::{Height, Point2D, Size2D, Tiles2x, Width, ONE_TEXT_CHAR, ONE_TILE2X};
 
 use super::super::types::{RunState, UITask};
 use super::super::GAME_TITLE;
@@ -9,7 +9,7 @@ use super::keyboard::{match_key, Keybindings, Keybound};
 use super::menus::render_inventory_menu;
 use super::player_in_world::{player_in_world_controller, render_player_in_world_view};
 
-pub const WINDOW_SIZE: Size2D<Tiles2x> = Size2D::<Tiles2x> {
+pub const DEFAULT_WINDOW_SIZE: Size2D<Tiles2x> = Size2D::<Tiles2x> {
     width: Width(Tiles2x(48)),
     height: Height(Tiles2x(18)),
 };
@@ -95,8 +95,8 @@ impl UI {
                 ONE_TILE2X.height.to_pixels().to_primitive(),
             )
             .with_dimensions(
-                WINDOW_SIZE.width.to_primitive(),
-                WINDOW_SIZE.height.to_primitive(),
+                DEFAULT_WINDOW_SIZE.width.to_primitive(),
+                DEFAULT_WINDOW_SIZE.height.to_primitive(),
             )
             .with_automatic_console_resize(true)
             .with_fitscreen(true)
@@ -112,26 +112,32 @@ impl UI {
             )
             // Terrain
             .with_simple_console(
-                WINDOW_SIZE.width.to_primitive(),
-                WINDOW_SIZE.height.to_primitive(),
+                DEFAULT_WINDOW_SIZE.width.to_primitive(),
+                DEFAULT_WINDOW_SIZE.height.to_primitive(),
                 TILE_2X_FONT,
             )
             // Entities (items)
             .with_sparse_console_no_bg(
-                WINDOW_SIZE.width.to_primitive(),
-                WINDOW_SIZE.height.to_primitive(),
+                DEFAULT_WINDOW_SIZE.width.to_primitive(),
+                DEFAULT_WINDOW_SIZE.height.to_primitive(),
                 TILE_2X_FONT,
             )
             // Entities (player, NPCs, enemies)
             .with_sparse_console_no_bg(
-                WINDOW_SIZE.width.to_primitive(),
-                WINDOW_SIZE.height.to_primitive(),
+                DEFAULT_WINDOW_SIZE.width.to_primitive(),
+                DEFAULT_WINDOW_SIZE.height.to_primitive(),
                 TILE_2X_FONT,
             )
             // Text
             .with_sparse_console_no_bg(
-                WINDOW_SIZE.to_text_chars_floor().width.to_primitive(),
-                WINDOW_SIZE.to_text_chars_floor().height.to_primitive(),
+                DEFAULT_WINDOW_SIZE
+                    .to_text_chars_floor()
+                    .width
+                    .to_primitive(),
+                DEFAULT_WINDOW_SIZE
+                    .to_text_chars_floor()
+                    .height
+                    .to_primitive(),
                 TEXT_FONT,
             )
             .build()
