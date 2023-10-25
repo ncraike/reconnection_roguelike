@@ -7,12 +7,12 @@ use super::tiles1x::Tiles1x;
 use super::tiles2x::Tiles2x;
 use super::traits::Unit;
 use super::utils::{div_ceil, div_floor};
-use derive_more::{Add, Mul, Sub};
+use derive_more::{Add, Div, Mul, Sub};
 
 const TEXT_CHARS_WIDTH_IN_PIXELS: i32 = 8;
 const TEXT_CHARS_HEIGHT_IN_PIXELS: i32 = 16;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Mul, Sub)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Mul, Sub, Div)]
 pub struct TextChars(pub i32);
 
 impl TextChars {

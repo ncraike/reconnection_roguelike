@@ -1,10 +1,10 @@
 extern crate derive_more;
 use super::traits::Unit;
-use derive_more::{Add, Mul, Sub};
+use derive_more::{Add, Div, Mul, Sub};
 use std::ops::Add as AddTrait;
 use std::ops::Sub as SubTrait;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div)]
 pub struct Width<T: Unit>(pub T);
 
 impl<T: Unit> Width<T> {
@@ -17,7 +17,7 @@ impl<T: Unit> Width<T> {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div)]
 pub struct Height<T: Unit>(pub T);
 
 impl<T: Unit> Height<T> {

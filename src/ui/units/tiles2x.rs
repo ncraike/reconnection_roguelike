@@ -7,9 +7,9 @@ use super::text::TextChars;
 use super::tiles1x::{Tiles1x, TILES_1X_HEIGHT_IN_PIXELS, TILES_1X_WIDTH_IN_PIXELS};
 use super::traits::Unit;
 use super::utils::{div_ceil, div_floor};
-use derive_more::{Add, Mul, Sub};
+use derive_more::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div)]
 pub struct Tiles2x(pub i32);
 
 impl Tiles2x {
