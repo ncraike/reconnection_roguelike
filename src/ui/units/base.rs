@@ -64,6 +64,14 @@ impl<T: Unit + SubTrait<Output = T>> SubTrait<PosX<T>> for PosX<T> {
     }
 }
 
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Width<T>> for PosX<T> {
+    type Output = PosX<T>;
+
+    fn sub(self, rhs: Width<T>) -> Self::Output {
+        PosX::<T>(self.0 - rhs.0)
+    }
+}
+
 impl<T: Unit + AddTrait<Output = T>> AddTrait<Height<T>> for PosY<T> {
     type Output = Self;
 
@@ -77,5 +85,12 @@ impl<T: Unit + SubTrait<Output = T>> SubTrait<PosY<T>> for PosY<T> {
 
     fn sub(self, rhs: PosY<T>) -> Self::Output {
         Height::<T>(self.0 - rhs.0)
+    }
+}
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Height<T>> for PosY<T> {
+    type Output = PosY<T>;
+
+    fn sub(self, rhs: Height<T>) -> Self::Output {
+        PosY::<T>(self.0 - rhs.0)
     }
 }
