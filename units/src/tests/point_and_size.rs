@@ -1,4 +1,4 @@
-use crate::ui::units::{Height, Pixels, Point2D, PosX, PosY, Size2D, Width};
+use crate::{Height, Pixels, Point2D, PosX, PosY, Size2D, Width};
 
 #[test]
 fn point2d_new_from_x_y() {

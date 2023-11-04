@@ -1,6 +1,4 @@
-use crate::ui::units::{
-    Height, Pixels, Point2D, PosX, PosY, Size2D, TextChars, Tiles1x, Tiles2x, Width,
-};
+use crate::{Height, Pixels, Point2D, PosX, PosY, Size2D, TextChars, Tiles1x, Tiles2x, Width};
 
 #[test]
 fn tiles2x_width_in_pixels() {

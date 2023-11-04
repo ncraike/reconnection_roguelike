@@ -1,4 +1,4 @@
-use crate::ui::units::{Height, Pixels, PosX, PosY, Width};
+use crate::{Height, Pixels, PosX, PosY, Width};
 use std::cmp::min;
 
 #[test]

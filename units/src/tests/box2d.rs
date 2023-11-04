@@ -1,4 +1,4 @@
-use crate::ui::units::{Box2D, Height, Pixels, PosX, PosY, Width};
+use crate::{Box2D, Height, Pixels, PosX, PosY, Width};
 
 #[test]
 fn box2d_new_from_p1_p2() {

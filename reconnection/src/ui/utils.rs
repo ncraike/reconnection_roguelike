@@ -1,8 +1,8 @@
 use crate::ui::common::Consoles;
-use crate::ui::units::{Point2D, Size2D, TextChars, Tiles2x};
 use bracket_color::prelude::ColorPair;
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{to_cp437, BTerm, DrawBatch};
+use units::{Point2D, Size2D, TextChars, Tiles2x};
 
 pub fn window_size(ctx: &mut BTerm) -> Size2D<Tiles2x> {
     ctx.set_active_console(Consoles::TilesTerrain as usize);

@@ -3,8 +3,8 @@ use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
 
 use crate::ui::common::Consoles;
-use crate::ui::units::{Box2D, Height, Point2D, TextChars, Tiles2x};
 use crate::ui::utils::{get_mouse_point_in_text_chars, get_mouse_point_in_tiles2x, window_size};
+use units::{Box2D, Height, Point2D, TextChars, Tiles2x};
 
 use super::super::camera::{get_camera_bounds_in_world, render_camera};
 use super::super::messages::render_messages;

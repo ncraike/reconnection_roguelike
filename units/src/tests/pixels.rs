@@ -1,4 +1,4 @@
-use crate::ui::units::{Box2D, Height, Pixels, Point2D, PosX, PosY, Size2D, Width};
+use crate::{Box2D, Height, Pixels, Point2D, PosX, PosY, Size2D, Width};
 
 #[test]
 fn pixels_add() {

@@ -8,6 +8,9 @@ mod tiles2x;
 mod traits;
 mod utils;
 
+#[cfg(test)]
+mod tests;
+
 pub use base::{Height, PosX, PosY, Width};
 pub use box2d::Box2D;
 pub use pixels::Pixels;

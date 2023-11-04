@@ -5,9 +5,6 @@ pub mod types;
 pub mod ui;
 pub mod world;
 
-#[cfg(test)]
-mod tests;
-
 use bracket_lib::prelude::GameState;
 use bracket_terminal;
 use bracket_terminal::prelude::BTerm;
