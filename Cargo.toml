@@ -1,5 +1,5 @@
 [workspace]
-members = ["reconnection", "units"]
+members = ["reconnection", "units", "units-derive"]
 resolver = "2"
 
 [workspace.package]

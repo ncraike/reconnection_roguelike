@@ -1947,6 +1947,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "units-derive"
+version = "0.1.0"
+
+[[package]]
 name = "vec_map"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
