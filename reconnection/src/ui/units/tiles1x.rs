@@ -2,16 +2,17 @@ extern crate derive_more;
 use super::pixels::Pixels;
 use super::text::TextChars;
 use derive_more::{Add, Div, Mul, Sub};
-use units::integer::{
-    ConvertibleIntegerUnitDisparateXY, DerivedIntegerUnitDisparateXY, IntegerUnit, XYAxes,
-};
+use units::integer::ConvertibleIntegerUnitDisparateXY;
 use units::utils::{div_ceil, div_floor};
+use units_proc_macros::DerivedIntegerUnitI32;
 
 pub const TILES_1X_WIDTH_IN_PIXELS: i32 = 16;
 pub const TILES_1X_HEIGHT_IN_PIXELS: i32 = 24;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div)]
-pub struct Tiles1x(pub i32);
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div, DerivedIntegerUnitI32,
+)]
+pub struct Tiles1x(#[base_unit(Pixels, 16, 24)] pub i32);
 
 impl IntegerUnit for Tiles1x {
     type PrimitiveType = i32;
