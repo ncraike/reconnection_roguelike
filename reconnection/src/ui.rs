@@ -7,6 +7,7 @@ mod messages;
 mod player_in_world;
 mod stats;
 mod tooltips;
+mod units;
 mod utils;
 
 #[allow(dead_code)]
