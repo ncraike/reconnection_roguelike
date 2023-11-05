@@ -2,8 +2,8 @@ extern crate derive_more;
 use super::pixels::Pixels;
 use super::text::TextChars;
 use derive_more::{Add, Div, Mul, Sub};
-use units::integer_system::{
-    ConvertibleUnitDisparateXY, DerivedUnitDisparateXY, IntegerUnit, XYAxes,
+use units::integer::{
+    ConvertibleIntegerUnitDisparateXY, DerivedIntegerUnitDisparateXY, IntegerUnit, XYAxes,
 };
 use units::utils::{div_ceil, div_floor};
 
@@ -33,7 +33,7 @@ impl IntegerUnit for Tiles1x {
     }
 }
 
-impl DerivedUnitDisparateXY for Tiles1x {
+impl DerivedIntegerUnitDisparateXY for Tiles1x {
     type BaseUnit = Pixels;
 
     fn to_base_unit(&self, in_axis: XYAxes) -> Pixels {
@@ -58,7 +58,7 @@ impl DerivedUnitDisparateXY for Tiles1x {
     }
 }
 
-impl ConvertibleUnitDisparateXY<OtherUnit = TextChars> for Tiles1x {
+impl ConvertibleIntegerUnitDisparateXY<OtherUnit = TextChars> for Tiles1x {
     fn convert_to_floor(&self, in_axis: XYAxes) -> TextChars {
         TextChars::from_base_unit_to_floor(self.to_base_unit(in_axis), in_axis)
     }

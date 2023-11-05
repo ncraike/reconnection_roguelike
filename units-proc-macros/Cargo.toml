@@ -1,5 +1,5 @@
 [package]
-name = "units-derive"
+name = "units-proc-macros"
 version = "0.1.0"
 edition = "2021"
 authors.workspace = true
@@ -9,3 +9,7 @@ authors.workspace = true
 [lib]
 proc-macro = true
 
+[dependencies]
+quote = "1.0.33"
+proc-macro2 = "1.0.69"
+syn = "2.0.38"

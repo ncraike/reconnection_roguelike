@@ -1479,6 +1479,7 @@ dependencies = [
  "specs-derive",
  "statig",
  "units",
+ "units-proc-macros",
 ]
 
 [[package]]
@@ -1947,8 +1948,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "units-derive"
+name = "units-proc-macros"
 version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.38",
+]
 
 [[package]]
 name = "vec_map"

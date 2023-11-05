@@ -1,5 +1,5 @@
 [workspace]
-members = ["reconnection", "units", "units-derive"]
+members = ["reconnection", "units", "units-proc-macros"]
 resolver = "2"
 
 [workspace.package]

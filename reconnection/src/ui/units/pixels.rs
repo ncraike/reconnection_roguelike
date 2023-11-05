@@ -1,29 +1,10 @@
 extern crate derive_more;
+extern crate units_proc_macros;
 use derive_more::{Add, Mul, Sub};
-use units::integer_system::IntegerUnit;
+use units_proc_macros::IntegerUnitI32;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, IntegerUnitI32)]
 pub struct Pixels(pub i32);
-
-impl IntegerUnit for Pixels {
-    type PrimitiveType = i32;
-
-    fn new(value: Self::PrimitiveType) -> Self {
-        Self(value)
-    }
-
-    fn zero() -> Self {
-        Self(0)
-    }
-
-    fn to_primitive(&self) -> i32 {
-        self.0
-    }
-
-    fn abs(&self) -> Self {
-        Self(self.to_primitive().abs())
-    }
-}
 
 // impl Pixels {
 //     pub fn new_width(value: i32) -> Width<Self> {
