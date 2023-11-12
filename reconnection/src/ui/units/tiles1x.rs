@@ -3,7 +3,6 @@ use super::pixels::Pixels;
 use super::text::TextChars;
 use derive_more::{Add, Div, Mul, Sub};
 use units::integer::ConvertibleIntegerUnitDisparateXY;
-use units::utils::{div_ceil, div_floor};
 use units_proc_macros::DerivedIntegerUnitI32;
 
 pub const TILES_1X_WIDTH_IN_PIXELS: i32 = 16;
@@ -12,52 +11,8 @@ pub const TILES_1X_HEIGHT_IN_PIXELS: i32 = 24;
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div, DerivedIntegerUnitI32,
 )]
-pub struct Tiles1x(#[base_unit(Pixels, 16, 24)] pub i32);
-
-impl IntegerUnit for Tiles1x {
-    type PrimitiveType = i32;
-
-    fn new(value: i32) -> Self {
-        Self(value)
-    }
-
-    fn zero() -> Self {
-        Self(0)
-    }
-
-    fn to_primitive(&self) -> i32 {
-        self.0
-    }
-
-    fn abs(&self) -> Self {
-        Self(self.to_primitive().abs())
-    }
-}
-
-impl DerivedIntegerUnitDisparateXY for Tiles1x {
-    type BaseUnit = Pixels;
-
-    fn to_base_unit(&self, in_axis: XYAxes) -> Pixels {
-        match in_axis {
-            XYAxes::X => Pixels(TILES_1X_WIDTH_IN_PIXELS),
-            XYAxes::Y => Pixels(TILES_1X_HEIGHT_IN_PIXELS),
-        }
-    }
-
-    fn from_base_unit_to_floor(base_quantity: Pixels, in_axis: XYAxes) -> Self {
-        match in_axis {
-            XYAxes::X => Self(div_floor(base_quantity, TILES_1X_WIDTH_IN_PIXELS)),
-            XYAxes::Y => Self(div_floor(base_quantity, TILES_1X_HEIGHT_IN_PIXELS)),
-        }
-    }
-
-    fn from_base_unit_to_ceil(base_quantity: Pixels, in_axis: XYAxes) -> Self {
-        match in_axis {
-            XYAxes::X => Self(div_ceil(base_quantity, TILES_1X_WIDTH_IN_PIXELS)),
-            XYAxes::Y => Self(div_ceil(base_quantity, TILES_1X_HEIGHT_IN_PIXELS)),
-        }
-    }
-}
+#[base_unit(Pixels, 16, 24)]
+pub struct Tiles1x(pub i32);
 
 impl ConvertibleIntegerUnitDisparateXY<OtherUnit = TextChars> for Tiles1x {
     fn convert_to_floor(&self, in_axis: XYAxes) -> TextChars {
