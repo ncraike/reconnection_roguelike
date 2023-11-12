@@ -1,28 +1,28 @@
 extern crate derive_more;
 use super::pixels::Pixels;
 use super::text::TextChars;
+use super::tiles2x::Tiles2x;
 use derive_more::{Add, Div, Mul, Sub};
-use units::integer::ConvertibleIntegerUnitDisparateXY;
-use units_proc_macros::DerivedIntegerUnitI32;
-
-pub const TILES_1X_WIDTH_IN_PIXELS: i32 = 16;
-pub const TILES_1X_HEIGHT_IN_PIXELS: i32 = 24;
+use units_proc_macros::{ConvertibleIntegerUnitI32, DerivedIntegerUnitI32};
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div, DerivedIntegerUnitI32,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    DerivedIntegerUnitI32,
+    ConvertibleIntegerUnitI32,
 )]
 #[base_unit(Pixels, 16, 24)]
+#[convert_to(Pixels, TextChars, Tiles2x)]
 pub struct Tiles1x(pub i32);
-
-impl ConvertibleIntegerUnitDisparateXY<OtherUnit = TextChars> for Tiles1x {
-    fn convert_to_floor(&self, in_axis: XYAxes) -> TextChars {
-        TextChars::from_base_unit_to_floor(self.to_base_unit(in_axis), in_axis)
-    }
-
-    fn convert_to_ceil(&self, in_axis: XYAxes) -> TextChars {
-        TextChars::from_base_unit_to_ceil(self.to_base_unit(in_axis), in_axis)
-    }
-}
 
 // impl Tiles1x {
 //     pub fn new_width(value: i32) -> Width<Self> {
