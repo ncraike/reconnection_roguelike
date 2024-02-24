@@ -38,3 +38,13 @@ fn unit_i32_zero() {
 fn unit_i32_to_primitive() {
     assert_eq!(MyUnitI32(7).to_primitive(), 7);
 }
+
+#[test]
+fn unit_i32_mul() {
+    assert_eq!(MyUnitI32(3) * 4, MyUnitI32(12));
+}
+
+#[test]
+fn unit_i32_div() {
+    assert_eq!(MyUnitI32(6) / 2, MyUnitI32(3));
+}

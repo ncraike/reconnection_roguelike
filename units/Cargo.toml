@@ -6,3 +6,4 @@ authors.workspace = true
 
 [dependencies]
 derive_more = "0.99.17"
+bracket-geometry = { version = "~0.8" }

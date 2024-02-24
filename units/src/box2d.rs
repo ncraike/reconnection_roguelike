@@ -1,6 +1,7 @@
 use super::{HeightI32, PosXI32, PosYI32, Position2DI32, Size2DI32, UnitI32, WidthI32};
+use bracket_geometry::prelude::Rect;
 use std::cmp::{max, min};
-use std::ops::{Add, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Box2DI32<T: UnitI32> {
@@ -8,7 +9,16 @@ pub struct Box2DI32<T: UnitI32> {
     pub p2: Position2DI32<T>,
 }
 
-impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
+impl<
+        T: UnitI32
+            + Copy
+            + Add<Output = T>
+            + Sub<Output = T>
+            + Mul<i32, Output = T>
+            + Div<i32, Output = T>
+            + Ord,
+    > Box2DI32<T>
+{
     pub fn new_from_position_and_size(position: Position2DI32<T>, size: Size2DI32<T>) -> Self {
         Self {
             p1: position,
@@ -41,6 +51,10 @@ impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
 
     pub fn y2(&self) -> PosYI32<T> {
         self.p2.y
+    }
+
+    pub fn center(&self) -> Position2DI32<T> {
+        self.p1 + (self.size() / 2)
     }
 
     pub fn size(&self) -> Size2DI32<T> {
@@ -117,5 +131,14 @@ impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
             p2: self.p2,
         };
         (top_box, bottom_box)
+    }
+
+    pub fn to_bracket_geometry_rect(self) -> Rect {
+        Rect::with_exact(
+            self.x1().0.to_primitive(),
+            self.y1().0.to_primitive(),
+            self.x2().0.to_primitive(),
+            self.y2().0.to_primitive(),
+        )
     }
 }

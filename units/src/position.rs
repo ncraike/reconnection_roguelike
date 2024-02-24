@@ -1,7 +1,8 @@
-extern crate derive_more;
-use super::{HeightI32, Size2DI32, UnitI32, WidthI32};
+use bracket_geometry::prelude::Point;
 use std::ops::Add as AddTrait;
 use std::ops::Sub as SubTrait;
+extern crate derive_more;
+use super::{HeightI32, Size2DI32, UnitI32, WidthI32};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosXI32<T: UnitI32>(pub T);
@@ -48,6 +49,7 @@ impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<PosYI32<T>> for PosYI32<T> {
         HeightI32::<T>(self.0 - rhs.0)
     }
 }
+
 impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<HeightI32<T>> for PosYI32<T> {
     type Output = PosYI32<T>;
 
@@ -90,6 +92,13 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
 
     pub fn with_y_of(self, other_position: Self) -> Self {
         self.with_y(other_position.y)
+    }
+
+    pub fn to_bracket_geometry_point(self) -> Point {
+        Point {
+            x: self.x.0.to_primitive(),
+            y: self.y.0.to_primitive(),
+        }
     }
 }
 
