@@ -9,6 +9,24 @@ pub struct Box2DI32<T: UnitI32> {
 }
 
 impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
+    pub fn new_from_position_and_size(position: Position2DI32<T>, size: Size2DI32<T>) -> Self {
+        Self {
+            p1: position,
+            p2: position + size,
+        }
+    }
+
+    pub fn new_from_size(size: Size2DI32<T>) -> Self {
+        Self::new_from_position_and_size(Position2DI32::origin(), size)
+    }
+
+    pub fn new_from_width_height(width: WidthI32<T>, height: HeightI32<T>) -> Self {
+        Self::new_from_size(Size2DI32 {
+            width: width,
+            height: height,
+        })
+    }
+
     pub fn x1(&self) -> PosXI32<T> {
         self.p1.x
     }

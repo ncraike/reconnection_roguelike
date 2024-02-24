@@ -63,6 +63,13 @@ pub struct Position2DI32<T: UnitI32> {
 }
 
 impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Position2DI32<T> {
+    pub fn origin() -> Self {
+        Self {
+            x: PosXI32(T::zero()),
+            y: PosYI32(T::zero()),
+        }
+    }
+
     pub fn with_x(self, new_x: PosXI32<T>) -> Self {
         Self {
             x: new_x,
