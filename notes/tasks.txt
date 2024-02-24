@@ -7,6 +7,6 @@
 - Add more tests for Box2DI32 methods
  + normalize
  + split_from_left
- - split_from_right
+ + split_from_right
  - split_from_top
  - split_from_bottom

@@ -77,7 +77,10 @@ impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
             },
         };
         let right_box = Self {
-            p1: left_box.p2,
+            p1: Position2DI32::<T> {
+                x: self.p2.x - offset_from_right,
+                y: self.p1.y,
+            },
             p2: self.p2,
         };
         (left_box, right_box)

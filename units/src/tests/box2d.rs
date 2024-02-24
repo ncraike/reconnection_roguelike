@@ -124,6 +124,7 @@ fn split_from_left() {
     let (left_box, right_box) = orig_box.split_from_left(WidthI32(MyUnitI32(2)));
     assert_eq!(left_box.p1, orig_box.p1);
     assert_eq!(right_box.p2, orig_box.p2);
+    assert_eq!(left_box.width(), WidthI32(MyUnitI32(2)));
     assert_eq!(left_box.width() + right_box.width(), orig_box.width());
     assert_eq!(left_box.height(), orig_box.height());
     assert_eq!(right_box.height(), orig_box.height());
@@ -145,6 +146,53 @@ fn split_from_left() {
         Box2DI32 {
             p1: Position2DI32 {
                 x: PosXI32(MyUnitI32(4)),
+                y: PosYI32(MyUnitI32(3)),
+            },
+            p2: Position2DI32 {
+                x: PosXI32(MyUnitI32(7)),
+                y: PosYI32(MyUnitI32(8)),
+            },
+        }
+    );
+}
+
+#[test]
+fn split_from_right() {
+    let orig_box = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(7)),
+            y: PosYI32(MyUnitI32(8)),
+        },
+    };
+    let (left_box, right_box) = orig_box.split_from_right(WidthI32(MyUnitI32(2)));
+    assert_eq!(left_box.p1, orig_box.p1);
+    assert_eq!(right_box.p2, orig_box.p2);
+    assert_eq!(right_box.width(), WidthI32(MyUnitI32(2)));
+    assert_eq!(left_box.width() + right_box.width(), orig_box.width());
+    assert_eq!(left_box.height(), orig_box.height());
+    assert_eq!(right_box.height(), orig_box.height());
+    assert_eq!(
+        left_box,
+        Box2DI32 {
+            p1: Position2DI32 {
+                x: PosXI32(MyUnitI32(2)),
+                y: PosYI32(MyUnitI32(3)),
+            },
+            p2: Position2DI32 {
+                x: PosXI32(MyUnitI32(5)),
+                y: PosYI32(MyUnitI32(8)),
+            },
+        }
+    );
+    assert_eq!(
+        right_box,
+        Box2DI32 {
+            p1: Position2DI32 {
+                x: PosXI32(MyUnitI32(5)),
                 y: PosYI32(MyUnitI32(3)),
             },
             p2: Position2DI32 {
