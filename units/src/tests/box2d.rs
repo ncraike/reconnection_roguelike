@@ -2,7 +2,7 @@ use super::base::MyUnitI32;
 use crate::{Box2DI32, HeightI32, PosXI32, PosYI32, Position2DI32, Size2DI32, UnitI32, WidthI32};
 
 #[test]
-fn box2d_x1_y1_x2_y2() {
+fn x1_y1_x2_y2() {
     let box2d = Box2DI32::<MyUnitI32> {
         p1: Position2DI32 {
             x: PosXI32(MyUnitI32(2)),
@@ -20,7 +20,7 @@ fn box2d_x1_y1_x2_y2() {
 }
 
 #[test]
-fn box2d_size_width_height() {
+fn size_width_height() {
     let box2d = Box2DI32::<MyUnitI32> {
         p1: Position2DI32 {
             x: PosXI32(MyUnitI32(2)),
@@ -40,4 +40,71 @@ fn box2d_size_width_height() {
     );
     assert_eq!(box2d.width(), WidthI32(MyUnitI32(2)));
     assert_eq!(box2d.height(), HeightI32(MyUnitI32(3)));
+}
+
+#[test]
+fn normalize_does_not_change_already_normal() {
+    let box2d = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(4)),
+            y: PosYI32(MyUnitI32(5)),
+        },
+    };
+    assert_eq!(box2d.normalize(), box2d);
+}
+
+#[test]
+fn normalize_swaps_p1_p2() {
+    let box2d = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(4)),
+            y: PosYI32(MyUnitI32(5)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+    };
+    let normal_box2d = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(4)),
+            y: PosYI32(MyUnitI32(5)),
+        },
+    };
+    assert_eq!(box2d.normalize(), normal_box2d);
+}
+
+#[test]
+fn normalize_picks_top_left_bottom_right_corners() {
+    let box2d = Box2DI32::<MyUnitI32> {
+        // Bottom-left corner (assuming top-left origin)
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(5)),
+        },
+        // Top-right corner (assuming top-left origin)
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(4)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+    };
+    let normal_box2d = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(4)),
+            y: PosYI32(MyUnitI32(5)),
+        },
+    };
+    assert_eq!(box2d.normalize(), normal_box2d);
 }

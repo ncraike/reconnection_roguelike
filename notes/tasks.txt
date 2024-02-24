@@ -5,3 +5,5 @@
  + Position2DI32
  + Box2DI32
 - Add more tests for Box2DI32 methods
+ + normalize
+ - split_from_left
