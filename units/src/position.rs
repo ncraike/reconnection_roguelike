@@ -1,6 +1,5 @@
 extern crate derive_more;
-use super::base::UnitI32;
-use super::size::{HeightI32, Size2DI32, WidthI32};
+use super::{HeightI32, Size2DI32, UnitI32, WidthI32};
 use std::ops::Add as AddTrait;
 use std::ops::Sub as SubTrait;
 

@@ -1,5 +1,5 @@
 extern crate derive_more;
-use super::base::UnitI32;
+use super::UnitI32;
 use derive_more::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div)]
