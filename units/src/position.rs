@@ -62,6 +62,30 @@ pub struct Position2DI32<T: UnitI32> {
     pub y: PosYI32<T>,
 }
 
+impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Position2DI32<T> {
+    pub fn with_x(self, new_x: PosXI32<T>) -> Self {
+        Self {
+            x: new_x,
+            y: self.y,
+        }
+    }
+
+    pub fn with_x_of(self, other_position: Self) -> Self {
+        self.with_x(other_position.x)
+    }
+
+    pub fn with_y(self, new_y: PosYI32<T>) -> Self {
+        Self {
+            x: self.x,
+            y: new_y,
+        }
+    }
+
+    pub fn with_y_of(self, other_position: Self) -> Self {
+        self.with_y(other_position.y)
+    }
+}
+
 impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<Size2DI32<T>> for Position2DI32<T> {
     type Output = Self;
 

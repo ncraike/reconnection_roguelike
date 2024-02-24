@@ -51,16 +51,13 @@ impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
     }
 
     pub fn split_from_left(&self, offset_from_left: WidthI32<T>) -> (Box2DI32<T>, Box2DI32<T>) {
-        let left_box = Self {
-            p1: self.p1,
-            p2: Position2DI32::<T> {
-                x: self.p1.x + offset_from_left,
-                y: self.p2.y,
-            },
-        };
         let right_box = Self {
             p1: self.p1 + offset_from_left,
             p2: self.p2,
+        };
+        let left_box = Self {
+            p1: self.p1,
+            p2: self.p2.with_x_of(right_box.p1),
         };
         (left_box, right_box)
     }
@@ -71,26 +68,20 @@ impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
             p2: self.p2 - offset_from_right,
         };
         let right_box = Self {
-            p1: Position2DI32::<T> {
-                x: self.p2.x - offset_from_right,
-                y: self.p1.y,
-            },
+            p1: self.p1.with_x_of(left_box.p2),
             p2: self.p2,
         };
         (left_box, right_box)
     }
 
     pub fn split_from_top(&self, offset_from_top: HeightI32<T>) -> (Box2DI32<T>, Box2DI32<T>) {
-        let top_box = Self {
-            p1: self.p1,
-            p2: Position2DI32::<T> {
-                x: self.p2.x,
-                y: self.p1.y + offset_from_top,
-            },
-        };
         let bottom_box = Self {
             p1: self.p1 + offset_from_top,
             p2: self.p2,
+        };
+        let top_box = Self {
+            p1: self.p1,
+            p2: self.p2.with_y_of(bottom_box.p1),
         };
         (top_box, bottom_box)
     }
@@ -104,10 +95,7 @@ impl<T: UnitI32 + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2DI32<T> {
             p2: self.p2 - offset_from_bottom,
         };
         let bottom_box = Self {
-            p1: Position2DI32::<T> {
-                x: self.p1.x,
-                y: self.p2.y - offset_from_bottom,
-            },
+            p1: self.p1.with_y_of(top_box.p2),
             p2: self.p2,
         };
         (top_box, bottom_box)
