@@ -15,4 +15,4 @@
 + Add Position2DI32.with_x/y_of() to improve split_from_* more
 
 - Actually get the game building?
-  - Add UI unit(s) and world unit(s)
+  + Add UI unit(s) and world unit(s)
