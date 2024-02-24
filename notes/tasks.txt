@@ -11,4 +11,5 @@
  + split_from_top
  + split_from_bottom
 + Implement adding/subtracting width, height to Position2DI32
-- Re-implement Box2DI32.split_from_* to use adding/subtracting width/height
++ Re-implement Box2DI32.split_from_* to use adding/subtracting width/height
+- Add something else to Position2DI32 to improve split_from_* more?
