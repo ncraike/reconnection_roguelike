@@ -28,22 +28,18 @@ impl<T: UnitI32> HeightI32<T> {
     }
 }
 
-
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Size2DI32<T: UnitI32> {
     pub width: WidthI32<T>,
     pub height: HeightI32<T>,
 }
 
 impl<T: UnitI32> Size2DI32<T> {
-    pub fn new_from_width_height(w: WidthI32<T>, h: HeightI32<T>) -> Self {
-        Self {
-            width: w,
-            height: h,
-        }
-    }
-
     pub fn nothing() -> Self {
-        Self::new_from_width_height(WidthI32(UnitI32::zero()), HeightI32(UnitI32::zero()))
+        Self {
+            width: WidthI32(UnitI32::zero()),
+            height: HeightI32(UnitI32::zero()),
+        }
     }
 
     pub fn abs(&self) -> Self {

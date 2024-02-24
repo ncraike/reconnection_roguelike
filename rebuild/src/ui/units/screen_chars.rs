@@ -1,4 +1,4 @@
-use units::{UnitI32, Point2DI32};
+use units::{Position2DI32, UnitI32};
 
 pub struct ScreenChars(pub i32);
 
