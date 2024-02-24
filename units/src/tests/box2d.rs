@@ -202,3 +202,97 @@ fn split_from_right() {
         }
     );
 }
+
+#[test]
+fn split_from_top() {
+    let orig_box = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(7)),
+            y: PosYI32(MyUnitI32(9)),
+        },
+    };
+    let (top_box, bottom_box) = orig_box.split_from_top(HeightI32(MyUnitI32(2)));
+    assert_eq!(top_box.p1, orig_box.p1);
+    assert_eq!(bottom_box.p2, orig_box.p2);
+    assert_eq!(top_box.height(), HeightI32(MyUnitI32(2)));
+    assert_eq!(top_box.height() + bottom_box.height(), orig_box.height());
+    assert_eq!(top_box.width(), orig_box.width());
+    assert_eq!(bottom_box.width(), orig_box.width());
+    assert_eq!(
+        top_box,
+        Box2DI32 {
+            p1: Position2DI32 {
+                x: PosXI32(MyUnitI32(2)),
+                y: PosYI32(MyUnitI32(3)),
+            },
+            p2: Position2DI32 {
+                x: PosXI32(MyUnitI32(7)),
+                y: PosYI32(MyUnitI32(5)),
+            },
+        }
+    );
+    assert_eq!(
+        bottom_box,
+        Box2DI32 {
+            p1: Position2DI32 {
+                x: PosXI32(MyUnitI32(2)),
+                y: PosYI32(MyUnitI32(5)),
+            },
+            p2: Position2DI32 {
+                x: PosXI32(MyUnitI32(7)),
+                y: PosYI32(MyUnitI32(9)),
+            },
+        }
+    );
+}
+
+#[test]
+fn split_from_bottom() {
+    let orig_box = Box2DI32::<MyUnitI32> {
+        p1: Position2DI32 {
+            x: PosXI32(MyUnitI32(2)),
+            y: PosYI32(MyUnitI32(3)),
+        },
+        p2: Position2DI32 {
+            x: PosXI32(MyUnitI32(7)),
+            y: PosYI32(MyUnitI32(9)),
+        },
+    };
+    let (top_box, bottom_box) = orig_box.split_from_bottom(HeightI32(MyUnitI32(2)));
+    assert_eq!(top_box.p1, orig_box.p1);
+    assert_eq!(bottom_box.p2, orig_box.p2);
+    assert_eq!(bottom_box.height(), HeightI32(MyUnitI32(2)));
+    assert_eq!(top_box.height() + bottom_box.height(), orig_box.height());
+    assert_eq!(top_box.width(), orig_box.width());
+    assert_eq!(bottom_box.width(), orig_box.width());
+    assert_eq!(
+        top_box,
+        Box2DI32 {
+            p1: Position2DI32 {
+                x: PosXI32(MyUnitI32(2)),
+                y: PosYI32(MyUnitI32(3)),
+            },
+            p2: Position2DI32 {
+                x: PosXI32(MyUnitI32(7)),
+                y: PosYI32(MyUnitI32(7)),
+            },
+        }
+    );
+    assert_eq!(
+        bottom_box,
+        Box2DI32 {
+            p1: Position2DI32 {
+                x: PosXI32(MyUnitI32(2)),
+                y: PosYI32(MyUnitI32(7)),
+            },
+            p2: Position2DI32 {
+                x: PosXI32(MyUnitI32(7)),
+                y: PosYI32(MyUnitI32(9)),
+            },
+        }
+    );
+}

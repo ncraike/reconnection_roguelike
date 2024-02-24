@@ -8,5 +8,6 @@
  + normalize
  + split_from_left
  + split_from_right
- - split_from_top
- - split_from_bottom
+ + split_from_top
+ + split_from_bottom
+- Implement adding width, height to Position2DI32
