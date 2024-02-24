@@ -1,3 +1,4 @@
+use crate::components::WorldPosition2D;
 use derive_more::{Add, Div, Mul, Sub};
 use units::{Box2DI32, HeightI32, PosXI32, PosYI32, Position2DI32, Size2DI32, UnitI32, WidthI32};
 
@@ -43,6 +44,10 @@ impl WorldUnits {
             x: PosXI32(Self(x)),
             y: PosYI32(Self(y)),
         }
+    }
+
+    pub fn new_position2d_from_component(component: WorldPosition2D) -> Position2DI32<Self> {
+        Self::new_position2d(component.x, component.y)
     }
 
     pub fn new_box2d(p1: Position2DI32<Self>, p2: Position2DI32<Self>) -> Box2DI32<Self> {

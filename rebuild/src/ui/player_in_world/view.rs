@@ -1,34 +1,30 @@
-use bracket_geometry::prelude::Rect;
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
+use units::{Box2DI32, HeightI32, Position2DI32};
 
+use crate::ui::camera::{get_camera_bounds_in_world, render_camera};
 use crate::ui::common::Consoles;
-use crate::ui::utils::{get_mouse_point_in_text_chars, get_mouse_point_in_tiles2x, window_size};
-use units::{Box2D, Height, Point2D, TextChars, Tiles2x};
+use crate::ui::messages::render_messages;
+use crate::ui::stats::render_stats;
+use crate::ui::tooltips::render_tooltips;
+use crate::ui::units::ScreenChars;
+use crate::ui::utils::{get_mouse_position, window_size};
 
-use super::super::camera::{get_camera_bounds_in_world, render_camera};
-use super::super::messages::render_messages;
-use super::super::stats::render_stats;
-use super::super::tooltips::render_tooltips;
-
-pub const MESSAGE_BOX_HEIGHT: Height<TextChars> = Height(TextChars(6));
+pub const MESSAGE_BOX_HEIGHT: HeightI32<ScreenChars> = HeightI32(ScreenChars(6));
 
 #[derive(Debug)]
 pub struct PlayerInWorldView {
-    pub camera_view: Box2D<Tiles2x>,
-    pub message_log_view: Box2D<TextChars>,
-    pub stats_view: Box2D<TextChars>,
-    pub window: Box2D<Tiles2x>,
-    pub mouse_pt_in_tiles2x: Point2D<Tiles2x>,
-    pub mouse_pt_in_text_chars: Point2D<TextChars>,
+    pub camera_view: Box2DI32<ScreenChars>,
+    pub message_log_view: Box2DI32<ScreenChars>,
+    pub stats_view: Box2DI32<ScreenChars>,
+    pub window: Box2DI32<ScreenChars>,
+    pub mouse_position: Position2DI32<ScreenChars>,
 }
 
 impl PlayerInWorldView {
     pub fn from_context(ctx: &mut BTerm) -> PlayerInWorldView {
-        let window = Box2D::new_from_size(window_size(ctx));
-        let (camera_view, bottom_hud) =
-            window.split_from_bottom(MESSAGE_BOX_HEIGHT.to_tiles2x_ceil());
-        let bottom_hud = bottom_hud.to_text_chars_floor();
+        let window = ScreenChars::new_box2d_from_size(window_size(ctx));
+        let (camera_view, bottom_hud) = window.split_from_bottom(MESSAGE_BOX_HEIGHT);
         let (message_log_view, stats_view) = bottom_hud.split_from_left(bottom_hud.width() / 2);
 
         PlayerInWorldView {
@@ -36,8 +32,7 @@ impl PlayerInWorldView {
             message_log_view: message_log_view,
             stats_view: stats_view,
             window: window,
-            mouse_pt_in_tiles2x: get_mouse_point_in_tiles2x(ctx),
-            mouse_pt_in_text_chars: get_mouse_point_in_text_chars(ctx),
+            mouse_position: get_mouse_position(ctx),
         }
     }
 }

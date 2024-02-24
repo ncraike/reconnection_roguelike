@@ -1,22 +1,22 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use units::{Height, Point2D, Size2D, Tiles2x, Width, ONE_TEXT_CHAR, ONE_TILE2X};
+use units::{HeightI32, Size2DI32, WidthI32};
 
-use super::super::types::{RunState, UITask};
-use super::super::GAME_TITLE;
 use super::keyboard::{match_key, Keybindings, Keybound};
 use super::menus::render_inventory_menu;
 use super::player_in_world::{player_in_world_controller, render_player_in_world_view};
-
-pub const DEFAULT_WINDOW_SIZE: Size2D<Tiles2x> = Size2D::<Tiles2x> {
-    width: Width(Tiles2x(48)),
-    height: Height(Tiles2x(18)),
-};
+use super::units::ScreenChars;
+use crate::types::{RunState, UITask};
+use crate::GAME_TITLE;
 
 pub const TEXT_FONT: &str = "vga8x16.png";
 pub const TEXT_FONT_WIDTH: usize = 8;
 pub const TEXT_FONT_HEIGHT: usize = 16;
+pub const DEFAULT_WINDOW_SIZE: Size2DI32<ScreenChars> = Size2DI32::<ScreenChars> {
+    width: WidthI32(ScreenChars(80)),
+    height: HeightI32(ScreenChars(25)),
+};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum Consoles {
@@ -75,13 +75,8 @@ impl UI {
     pub fn build_terminal(&self) -> BResult<BTerm> {
         BTermBuilder::new()
             .with_title(GAME_TITLE)
-            .with_automatic_console_resize(true)
             .with_fitscreen(true)
-            .with_font(
-                TEXT_FONT,
-                TEXT_FONT_WIDTH,
-                TEXT_FONT_HEIGHT,
-            )
+            .with_font(TEXT_FONT, TEXT_FONT_WIDTH, TEXT_FONT_HEIGHT)
             // Terrain
             .with_simple_console(
                 DEFAULT_WINDOW_SIZE.width.to_primitive(),
@@ -102,14 +97,8 @@ impl UI {
             )
             // Text
             .with_sparse_console_no_bg(
-                DEFAULT_WINDOW_SIZE
-                    .to_text_chars_floor()
-                    .width
-                    .to_primitive(),
-                DEFAULT_WINDOW_SIZE
-                    .to_text_chars_floor()
-                    .height
-                    .to_primitive(),
+                DEFAULT_WINDOW_SIZE.width.to_primitive(),
+                DEFAULT_WINDOW_SIZE.height.to_primitive(),
                 TEXT_FONT,
             )
             .build()

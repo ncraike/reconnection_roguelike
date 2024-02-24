@@ -2,9 +2,12 @@ use bracket_color::prelude::ColorPair;
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
+use units::{Box2DI32, Position2DI32};
 
-use super::super::components::{Item, Player, Renderable};
-use super::super::map::{Map, TileGraphic};
+use crate::components::{Item, Player, Renderable, WorldPosition2D};
+use crate::map::{Map, TileGraphic};
+use crate::ui::units::ScreenChars;
+use crate::world::units::WorldUnits;
 
 use super::colors;
 use super::common::Consoles;
@@ -18,8 +21,11 @@ const SEEN: ColorPair = ColorPair {
     bg: colors::OPAQUE_GRAY,
 };
 
-pub fn get_camera_bounds_in_world(ecs: &World, camera_view: Rect) -> Option<Rect> {
-    let positions = ecs.read_storage::<Point>();
+pub fn get_camera_bounds_in_world(
+    ecs: &World,
+    camera_view: Box2DI32<ScreenChars>,
+) -> Option<Box2DI32<WorldUnits>> {
+    let positions = ecs.read_storage::<WorldPosition2D>();
     let players = ecs.read_storage::<Player>();
 
     for (player_pos, _player) in (&positions, &players).join() {

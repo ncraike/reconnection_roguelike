@@ -20,7 +20,7 @@ pub struct Renderable {
 #[derive(Component, Debug)]
 pub struct Player {}
 
-#[derive(Component, Debug)] 
+#[derive(Component, Debug)]
 pub struct Monster {}
 
 #[derive(Component, Debug)]
@@ -89,6 +89,12 @@ pub struct HealthRestore {
     pub heal_amount: i32,
 }
 
+#[derive(Component, Debug)]
+pub struct WorldPosition2D {
+    pub x: i32,
+    pub y: i32,
+}
+
 pub fn register_components(ecs: &mut World) {
     ecs.register::<BlocksTile>();
     ecs.register::<CombatStats>();
@@ -105,4 +111,5 @@ pub fn register_components(ecs: &mut World) {
     ecs.register::<WantsToMelee>();
     ecs.register::<WantsToMove>();
     ecs.register::<WantsToPickupItem>();
+    ecs.register::<WorldPosition2D>();
 }

@@ -15,7 +15,7 @@ pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Rect) {
     let stats_store = ecs.read_storage::<CombatStats>();
     let player_store = ecs.read_storage::<Player>();
 
-    batch.target(Consoles::Text as usize);
+    batch.target(Consoles::UIText as usize);
 
     for (_player, stats) in (&player_store, &stats_store).join() {
         let health_text = format!("HP: {} / {}", stats.hp, stats.max_hp);
@@ -55,6 +55,6 @@ pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Rect) {
     }
 
     batch
-        .submit(Consoles::Text as usize)
+        .submit(Consoles::UIText as usize)
         .expect("Couldn't render player stats");
 }

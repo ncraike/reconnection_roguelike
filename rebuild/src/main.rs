@@ -1,31 +1,26 @@
-use bracket_geometry::prelude::Point;
 use bracket_lib::prelude::main_loop;
 use bracket_terminal;
 use bracket_terminal::prelude::{BError, EMBED};
 
 use specs::prelude::*;
 
-use reconnection_roguelike::components::register_components;
-use reconnection_roguelike::map::{Map, MAP_HEIGHT, MAP_WIDTH};
-use reconnection_roguelike::message_log::MessageLog;
-use reconnection_roguelike::types::RunState;
-use reconnection_roguelike::ui::common::UIState; // FIXME: move to UI setup
-use reconnection_roguelike::ui::keyboard::{classic_laptop, Keybindings};
-use reconnection_roguelike::ui::UI;
-use reconnection_roguelike::world::engine::WorldEngineState;
-use reconnection_roguelike::world::spawner::{
+use crate::components::{register_components, WorldPosition2D};
+use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
+use crate::message_log::MessageLog;
+use crate::types::RunState;
+use crate::ui::common::UIState; // FIXME: move to UI setup
+use crate::ui::keyboard::{classic_laptop, Keybindings};
+use crate::ui::UI;
+use crate::world::engine::WorldEngineState;
+use crate::world::spawner::{
     create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
     create_player,
 };
-use reconnection_roguelike::world::WorldEngine; // FIXME: move to WorldEngine setup
+use crate::world::WorldEngine; // FIXME: move to WorldEngine setup
 
-use reconnection_roguelike::State;
-
-bracket_terminal::embedded_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
+use crate::State;
 
 fn main() -> BError {
-    bracket_terminal::link_resource!(TILE_FONT, "../resources/reconnection_16x24_tiles_at_2x.png");
-
     let mut gs = State { ecs: World::new() };
     register_components(&mut gs.ecs);
 
@@ -50,7 +45,7 @@ fn main() -> BError {
 
     let player = create_player(
         &mut gs.ecs,
-        Point {
+        WorldPosition2D {
             x: (MAP_WIDTH / 2) as i32,
             y: (MAP_HEIGHT / 2) as i32,
         },
@@ -58,35 +53,35 @@ fn main() -> BError {
     gs.ecs.insert(player);
     create_enemy_hound(
         &mut gs.ecs,
-        Point {
+        WorldPosition2D {
             x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 4) as i32,
         },
     );
     create_enemy_big_stalker(
         &mut gs.ecs,
-        Point {
+        WorldPosition2D {
             x: (MAP_WIDTH / 2 + MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
         },
     );
     create_bandage(
         &mut gs.ecs,
-        Point {
+        WorldPosition2D {
             x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
             y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
         },
     );
     create_bandage(
         &mut gs.ecs,
-        Point {
+        WorldPosition2D {
             x: ((MAP_WIDTH / 2 - MAP_WIDTH / 4) + 1) as i32,
             y: (MAP_HEIGHT / 2 + MAP_HEIGHT / 4) as i32,
         },
     );
     create_first_aid_kit(
         &mut gs.ecs,
-        Point {
+        WorldPosition2D {
             x: (MAP_WIDTH / 2 - MAP_WIDTH / 4) as i32,
             y: ((MAP_HEIGHT / 2 + MAP_HEIGHT / 4) + 1) as i32,
         },

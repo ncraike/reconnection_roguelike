@@ -1,53 +1,62 @@
-use crate::ui::common::Consoles;
 use bracket_color::prelude::ColorPair;
-use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{to_cp437, BTerm, DrawBatch};
-use units::{Point2D, Size2D, TextChars, Tiles2x};
+use units::{Box2DI32, Position2DI32, Size2DI32, WidthI32};
 
-pub fn window_size(ctx: &mut BTerm) -> Size2D<Tiles2x> {
-    ctx.set_active_console(Consoles::TilesTerrain as usize);
-    let (width_in_tiles, height_in_tiles) = ctx.get_char_size();
-    Tiles2x::new_size2d(width_in_tiles as i32, height_in_tiles as i32)
+use crate::ui::common::Consoles;
+use crate::ui::units::ScreenChars;
+
+pub fn window_size(ctx: &mut BTerm) -> Size2DI32<ScreenChars> {
+    ctx.set_active_console(Consoles::WorldTerrain as usize);
+    let (width, height) = ctx.get_char_size();
+    ScreenChars::new_size2d(width as i32, height as i32)
 }
 
-pub fn get_mouse_point_in_tiles2x(ctx: &mut BTerm) -> Point2D<Tiles2x> {
-    ctx.set_active_console(Consoles::TilesTerrain as usize);
+pub fn get_mouse_position(ctx: &mut BTerm) -> Position2DI32<ScreenChars> {
+    ctx.set_active_console(Consoles::WorldTerrain as usize);
     let bracket_point = ctx.mouse_point();
-    Tiles2x::new_point2d(bracket_point.x, bracket_point.y)
+    ScreenChars::new_position2d(bracket_point.x, bracket_point.y)
 }
 
-pub fn get_mouse_point_in_text_chars(ctx: &mut BTerm) -> Point2D<TextChars> {
-    ctx.set_active_console(Consoles::Text as usize);
-    let bracket_point = ctx.mouse_point();
-    TextChars::new_point2d(bracket_point.x, bracket_point.y)
-}
-
-pub fn draw_box_with_filled_bg(batch: &mut DrawBatch, bounds: Rect, colorpair: ColorPair) {
+pub fn draw_box_with_filled_bg(
+    batch: &mut DrawBatch,
+    bounds: Box2DI32<ScreenChars>,
+    colorpair: ColorPair,
+) {
+    let fill_bounds = Box2DI32 {
+        p1: bounds.p1,
+        p2: bounds.p2 + ScreenChars::new_size2d(1, 1),
+    };
     batch.fill_region(
-        Rect::with_exact(bounds.x1, bounds.y1, bounds.x2 + 1, bounds.y2 + 1),
+        fill_bounds.to_bracket_geometry_rect(),
         ColorPair::new(colorpair.bg, colorpair.bg),
         to_cp437('█'),
     );
-    batch.draw_box(bounds, colorpair);
+    batch.draw_box(bounds.to_bracket_geometry_rect(), colorpair);
 }
 
 pub fn print_color_with_filled_bg<S: ToString>(
     batch: &mut DrawBatch,
-    pos: Point,
+    position: Position2DI32<ScreenChars>,
     text: S,
     colorpair: ColorPair,
-    left_padding: i32,
-    right_padding: i32,
+    left_padding: WidthI32<ScreenChars>,
+    right_padding: WidthI32<ScreenChars>,
 ) {
     let as_string = text.to_string();
     // FIXME: this will be wrong for multi-byte characters
-    let width = as_string.len() as i32;
-    let fill_bounds = Rect::with_size(pos.x - left_padding, pos.y, width + right_padding + 1, 1);
+    let width = ScreenChars::new_width(as_string.len() as i32);
+    let fill_bounds = ScreenChars::new_box2d_from_position_and_size(
+        position - left_padding,
+        Size2DI32 {
+            width: width + right_padding + ScreenChars::new_width(1),
+            height: ScreenChars::new_height(1),
+        },
+    );
     // FIXME: assert this is still in the screen space
     batch.fill_region(
-        fill_bounds,
+        fill_bounds.to_bracket_geometry_rect(),
         ColorPair::new(colorpair.bg, colorpair.bg),
         to_cp437('█'),
     );
-    batch.print_color(pos, text, colorpair);
+    batch.print_color(position.to_bracket_geometry_point(), text, colorpair);
 }
