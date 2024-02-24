@@ -8,16 +8,14 @@ authors.workspace = true
 
 [dependencies]
 units = { path = "../units"}
-units-proc-macros = { path = "../units-proc-macros" }
-bracket-lib = { version = "~0.8", features = ["specs", "serde"] }
+bracket-lib = { version = "~0.8", default-features = false, features = ["specs", "serde", "crossterm"] }
 bracket-algorithm-traits = { version = "~0.8" }
 bracket-color = { version = "~0.8" }
 bracket-geometry = { version = "~0.8" }
 bracket-pathfinding = { version = "~0.8" }
-bracket-terminal = { version = "~0.8" }
+bracket-terminal = { version = "~0.8", default-features = false, features = ["crossterm"] }
 specs = { version = "~0.18", features = ["serde"] }
 specs-derive = { version = "~0.4" }
 serde = { version = "~1.0", features = ["derive"] }
 serde_json = { version = "~1.0" }
-statig = { version = "0.3.0", features = ["macro", "serde"] }
 derive_more = "0.99.17"

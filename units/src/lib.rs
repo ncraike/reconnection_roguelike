@@ -1,9 +1,6 @@
-mod base;
-mod box2d;
-pub mod integer;
-mod point_and_size;
-mod traits;
-pub mod utils;
+pub mod base;
+pub mod size;
+pub mod tests;
 
-#[cfg(test)]
-mod tests;
+pub use base::UnitI32;
+pub use size::{WidthI32, HeightI32, Size2DI32};

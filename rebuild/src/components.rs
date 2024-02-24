@@ -20,7 +20,7 @@ pub struct Renderable {
 #[derive(Component, Debug)]
 pub struct Player {}
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug)] 
 pub struct Monster {}
 
 #[derive(Component, Debug)]

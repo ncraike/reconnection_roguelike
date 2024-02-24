@@ -1,5 +1,5 @@
 [workspace]
-members = ["rebuild", "units", "units-proc-macros"]
+members = ["rebuild", "units"]
 resolver = "2"
 
 [workspace.package]
