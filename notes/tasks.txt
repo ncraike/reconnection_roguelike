@@ -16,3 +16,10 @@
 
 - Actually get the game building?
   + Add UI unit(s) and world unit(s)
+  - Cleanup main.rs to use crate:: instead of reconnection_roguelike::
+  - Update units in ui::common
+  - Replace bracket_geometry Rect and Point in ui::camera
+
+- Add more unit helpers for:
+  - testing position in box2D?
+  - getting center of box2D
