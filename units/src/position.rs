@@ -83,3 +83,47 @@ impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<Position2DI32<T>> for Position2
         }
     }
 }
+
+impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<WidthI32<T>> for Position2DI32<T> {
+    type Output = Self;
+
+    fn add(self, rhs: WidthI32<T>) -> Self::Output {
+        Self {
+            x: self.x + rhs,
+            y: self.y,
+        }
+    }
+}
+
+impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<WidthI32<T>> for Position2DI32<T> {
+    type Output = Self;
+
+    fn sub(self, rhs: WidthI32<T>) -> Self::Output {
+        Self {
+            x: self.x - rhs,
+            y: self.y,
+        }
+    }
+}
+
+impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<HeightI32<T>> for Position2DI32<T> {
+    type Output = Self;
+
+    fn add(self, rhs: HeightI32<T>) -> Self::Output {
+        Self {
+            x: self.x,
+            y: self.y + rhs,
+        }
+    }
+}
+
+impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<HeightI32<T>> for Position2DI32<T> {
+    type Output = Self;
+
+    fn sub(self, rhs: HeightI32<T>) -> Self::Output {
+        Self {
+            x: self.x,
+            y: self.y - rhs,
+        }
+    }
+}
