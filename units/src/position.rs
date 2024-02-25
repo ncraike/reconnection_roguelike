@@ -106,7 +106,10 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
     }
 
     pub fn to_buffer_index(self, width: WidthI32<T>) -> usize {
-        (self.y.to_primitive() * width.to_primitive() + self.x.to_primitive()) as usize
+        let x: usize = self.x.to_primitive().try_into().ok().unwrap();
+        let y: usize = self.y.to_primitive().try_into().ok().unwrap();
+        let w: usize = width.to_primitive().try_into().ok().unwrap();
+        (y * w) + x
     }
 
     pub fn from_buffer_index(index: usize, width: WidthI32<T>) -> Self {

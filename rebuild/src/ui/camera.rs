@@ -1,24 +1,19 @@
-use bracket_color::prelude::ColorPair;
-use bracket_terminal::prelude::DrawBatch;
+use bracket_color::named;
+use bracket_color::prelude::{ColorPair, RGBA};
+use bracket_terminal::prelude::{to_cp437, DrawBatch};
 use specs::prelude::*;
 use units::{Box2DI32, Position2DI32};
 
 use crate::components::{Item, Player, Renderable, WorldPosition2D};
 use crate::map::{Map, TileGraphic};
+use crate::ui::common::Consoles;
 use crate::ui::units::ScreenChars;
 use crate::world::units::WorldUnits;
 
-use super::colors;
-use super::common::Consoles;
-
-const VISIBLE: ColorPair = ColorPair {
-    fg: colors::OPAQUE_WHITE,
-    bg: colors::OPAQUE_WHITE,
-};
-const SEEN: ColorPair = ColorPair {
-    fg: colors::OPAQUE_GRAY,
-    bg: colors::OPAQUE_GRAY,
-};
+const VISIBLE_FG: (u8, u8, u8) = named::WHITE;
+const VISIBLE_BG: (u8, u8, u8) = named::BLACK;
+const SEEN_FG: (u8, u8, u8) = named::DIM_GRAY;
+const SEEN_BG: (u8, u8, u8) = named::BLACK;
 
 pub fn get_camera_bounds_in_world(
     ecs: &World,
@@ -61,6 +56,15 @@ pub fn render_terrain_in_camera(
     let map = ecs.fetch::<Map>();
     let map_bounds = map.bounds();
 
+    let visible_color = ColorPair {
+        fg: RGBA::named(VISIBLE_FG),
+        bg: RGBA::named(VISIBLE_BG),
+    };
+    let seen_color = ColorPair {
+        fg: RGBA::named(SEEN_FG),
+        bg: RGBA::named(SEEN_BG),
+    };
+
     let mut batch = DrawBatch::new();
     batch.target(Consoles::WorldTerrain as usize);
     batch.cls();
@@ -74,16 +78,32 @@ pub fn render_terrain_in_camera(
             if map_bounds.contains(pos_in_world) {
                 let tile_idx = map.to_index(pos_in_world);
                 if map.visible_tiles[tile_idx] {
-                    batch.set(screen_pos_as_pt, VISIBLE, map.tiles[tile_idx] as u16);
+                    batch.set(
+                        screen_pos_as_pt,
+                        visible_color,
+                        tile_to_glyph(map.tiles[tile_idx]),
+                    );
                 } else if map.revealed_tiles[tile_idx] {
-                    batch.set(screen_pos_as_pt, SEEN, map.tiles[tile_idx] as u16);
+                    batch.set(
+                        screen_pos_as_pt,
+                        seen_color,
+                        tile_to_glyph(map.tiles[tile_idx]),
+                    );
                 } else {
-                    batch.set(screen_pos_as_pt, VISIBLE, TileGraphic::Void as u16);
+                    batch.set(
+                        screen_pos_as_pt,
+                        visible_color,
+                        tile_to_glyph(TileGraphic::Void),
+                    );
                 }
                 return;
             }
         }
-        batch.set(screen_pos_as_pt, SEEN, TileGraphic::Void as u16);
+        batch.set(
+            screen_pos_as_pt,
+            seen_color,
+            tile_to_glyph(TileGraphic::Void),
+        );
     });
 
     batch
@@ -91,11 +111,31 @@ pub fn render_terrain_in_camera(
         .expect("Couldn't render tiles");
 }
 
+pub fn tile_to_glyph(tile: TileGraphic) -> u16 {
+    match tile {
+        TileGraphic::Void => to_cp437(' '),
+        TileGraphic::Ground1
+        | TileGraphic::Ground2
+        | TileGraphic::Ground3
+        | TileGraphic::Ground4 => to_cp437('.'),
+        TileGraphic::Floor1 | TileGraphic::Floor2 => to_cp437(','),
+        TileGraphic::WallHExternal => to_cp437('-'),
+        TileGraphic::WallSECornerExternal => to_cp437('+'),
+        TileGraphic::WallV => to_cp437('|'),
+        TileGraphic::PlayerCharacter => to_cp437('@'),
+        _ => to_cp437('?'),
+    }
+}
+
 pub fn render_entities_in_camera(
     ecs: &World,
     camera_view: Box2DI32<ScreenChars>,
     camera_in_world: Box2DI32<WorldUnits>,
 ) {
+    let visible_color = ColorPair {
+        fg: RGBA::named(VISIBLE_FG),
+        bg: RGBA::named(VISIBLE_BG),
+    };
     let map = ecs.fetch::<Map>();
     let entities = ecs.entities();
     let positions = ecs.read_storage::<WorldPosition2D>();
@@ -124,14 +164,14 @@ pub fn render_entities_in_camera(
                     None => {
                         draw_characters.set(
                             screen_pos.to_bracket_geometry_point(),
-                            VISIBLE,
+                            visible_color,
                             render.graphic as u16,
                         );
                     }
                     Some(_item) => {
                         draw_items.set(
                             screen_pos.to_bracket_geometry_point(),
-                            VISIBLE,
+                            visible_color,
                             render.graphic as u16,
                         );
                     }

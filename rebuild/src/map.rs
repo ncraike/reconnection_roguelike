@@ -8,11 +8,6 @@ use crate::world::units::WorldUnits;
 pub const MAP_WIDTH: u32 = 80;
 pub const MAP_HEIGHT: u32 = 25;
 
-pub const TILE_1X_WIDTH: u32 = 16;
-pub const TILE_1X_HEIGHT: u32 = 24;
-pub const TILE_2X_WIDTH: u32 = 32;
-pub const TILE_2X_HEIGHT: u32 = 48;
-
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileGraphic {
     // Ground
