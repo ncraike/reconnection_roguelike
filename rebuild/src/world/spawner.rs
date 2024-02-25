@@ -1,12 +1,12 @@
-pub use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 
 use super::super::components::{
     BlocksTile, CombatStats, HealthRestore, Item, Monster, Name, Player, Renderable, Viewshed,
+    WorldPosition2D,
 };
 use super::super::map::TileGraphic;
 
-pub fn create_player(ecs: &mut World, at: Point) -> Entity {
+pub fn create_player(ecs: &mut World, at: WorldPosition2D) -> Entity {
     ecs.create_entity()
         .with(Player {})
         .with(Name {
@@ -30,7 +30,7 @@ pub fn create_player(ecs: &mut World, at: Point) -> Entity {
         .build()
 }
 
-pub fn create_enemy_hound(ecs: &mut World, at: Point) -> Entity {
+pub fn create_enemy_hound(ecs: &mut World, at: WorldPosition2D) -> Entity {
     ecs.create_entity()
         .with(Monster {})
         .with(Name {
@@ -55,7 +55,7 @@ pub fn create_enemy_hound(ecs: &mut World, at: Point) -> Entity {
         .build()
 }
 
-pub fn create_enemy_big_stalker(ecs: &mut World, at: Point) -> Entity {
+pub fn create_enemy_big_stalker(ecs: &mut World, at: WorldPosition2D) -> Entity {
     ecs.create_entity()
         .with(Monster {})
         .with(Name {
@@ -80,7 +80,7 @@ pub fn create_enemy_big_stalker(ecs: &mut World, at: Point) -> Entity {
         .build()
 }
 
-pub fn create_bandage(ecs: &mut World, at: Point) -> Entity {
+pub fn create_bandage(ecs: &mut World, at: WorldPosition2D) -> Entity {
     ecs.create_entity()
         .with(Item {})
         .with(Name {
@@ -94,7 +94,7 @@ pub fn create_bandage(ecs: &mut World, at: Point) -> Entity {
         .build()
 }
 
-pub fn create_first_aid_kit(ecs: &mut World, at: Point) -> Entity {
+pub fn create_first_aid_kit(ecs: &mut World, at: WorldPosition2D) -> Entity {
     ecs.create_entity()
         .with(Item {})
         .with(Name {

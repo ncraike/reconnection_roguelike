@@ -1,24 +1,24 @@
 use bracket_lib::prelude::main_loop;
 use bracket_terminal;
-use bracket_terminal::prelude::{BError, EMBED};
+use bracket_terminal::prelude::BError;
 
 use specs::prelude::*;
 
-use crate::components::{register_components, WorldPosition2D};
-use crate::map::{Map, MAP_HEIGHT, MAP_WIDTH};
-use crate::message_log::MessageLog;
-use crate::types::RunState;
-use crate::ui::common::UIState; // FIXME: move to UI setup
-use crate::ui::keyboard::{classic_laptop, Keybindings};
-use crate::ui::UI;
-use crate::world::engine::WorldEngineState;
-use crate::world::spawner::{
+use rebuild::components::{register_components, WorldPosition2D};
+use rebuild::map::{Map, MAP_HEIGHT, MAP_WIDTH};
+use rebuild::message_log::MessageLog;
+use rebuild::types::RunState;
+use rebuild::ui::common::UIState; // FIXME: move to UI setup
+use rebuild::ui::keyboard::{classic_laptop, Keybindings};
+use rebuild::ui::UI;
+use rebuild::world::engine::WorldEngineState;
+use rebuild::world::spawner::{
     create_bandage, create_enemy_big_stalker, create_enemy_hound, create_first_aid_kit,
     create_player,
 };
-use crate::world::WorldEngine; // FIXME: move to WorldEngine setup
+use rebuild::world::WorldEngine; // FIXME: move to WorldEngine setup
 
-use crate::State;
+use rebuild::State;
 
 fn main() -> BError {
     let mut gs = State { ecs: World::new() };
