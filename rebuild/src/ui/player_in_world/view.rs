@@ -60,10 +60,9 @@ pub fn render_player_in_world_view(ecs: &World, ctx: &mut BTerm) {
     render_tooltips(
         &mut batch,
         ecs,
-        main_view.camera_view_2x,
+        main_view.camera_view,
         camera_in_world,
-        main_view.mouse_pt_in_tiles,
-        main_view.mouse_pt_in_text_chars,
+        main_view.mouse_position,
     );
 
     render_draw_buffer(ctx).expect("Couldn't render camera");

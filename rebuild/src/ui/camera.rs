@@ -1,8 +1,7 @@
 use bracket_color::prelude::ColorPair;
-use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
-use units::{Box2DI32, Position2DI32, UnitI32};
+use units::{Box2DI32, Position2DI32};
 
 use crate::components::{Item, Player, Renderable, WorldPosition2D};
 use crate::map::{Map, TileGraphic};
@@ -67,30 +66,28 @@ pub fn render_terrain_in_camera(
     batch.cls();
 
     window_bounds.for_each(|screen_pos: Position2DI32<ScreenChars>| {
+        let screen_pos_as_pt = screen_pos.to_bracket_geometry_point();
         if camera_view.contains(screen_pos) {
-            let pos_in_world = camera_in_world.p1
-                + WorldUnits::new_size2d(screen_pos.x.to_primitive(), screen_pos.y.to_primitive());
-            let map_pt = Point {
-                x: camera_in_world.x1 + screen_pos.x,
-                y: camera_in_world.y1 + screen_pos.y,
-            };
-            if map_bounds.point_in_rect(map_pt) {
-                let tile_idx = map.to_index(map_pt);
+            let screen_pos_as_world_offset =
+                WorldUnits::new_size2d(screen_pos.x.to_primitive(), screen_pos.y.to_primitive());
+            let pos_in_world = camera_in_world.p1 + screen_pos_as_world_offset;
+            if map_bounds.contains(pos_in_world) {
+                let tile_idx = map.to_index(pos_in_world);
                 if map.visible_tiles[tile_idx] {
-                    batch.set(screen_pos, VISIBLE, map.tiles[tile_idx] as u16);
+                    batch.set(screen_pos_as_pt, VISIBLE, map.tiles[tile_idx] as u16);
                 } else if map.revealed_tiles[tile_idx] {
-                    batch.set(screen_pos, SEEN, map.tiles[tile_idx] as u16);
+                    batch.set(screen_pos_as_pt, SEEN, map.tiles[tile_idx] as u16);
                 } else {
-                    batch.set(screen_pos, VISIBLE, TileGraphic::Void as u16);
+                    batch.set(screen_pos_as_pt, VISIBLE, TileGraphic::Void as u16);
                 }
                 return;
             }
         }
-        batch.set(screen_pos, SEEN, TileGraphic::Void as u16);
+        batch.set(screen_pos_as_pt, SEEN, TileGraphic::Void as u16);
     });
 
     batch
-        .submit(Consoles::TilesTerrain as usize)
+        .submit(Consoles::WorldTerrain as usize)
         .expect("Couldn't render tiles");
 }
 
@@ -101,7 +98,7 @@ pub fn render_entities_in_camera(
 ) {
     let map = ecs.fetch::<Map>();
     let entities = ecs.entities();
-    let positions = ecs.read_storage::<Point>();
+    let positions = ecs.read_storage::<WorldPosition2D>();
     let renderables = ecs.read_storage::<Renderable>();
     let items = ecs.read_storage::<Item>();
 
@@ -113,20 +110,30 @@ pub fn render_entities_in_camera(
     draw_characters.target(Consoles::WorldActors as usize);
     draw_characters.cls();
 
-    for (entity, pos, render) in (&entities, &positions, &renderables).join() {
-        let tile_idx = map.to_index(*pos);
+    for (entity, pos_comp, render) in (&entities, &positions, &renderables).join() {
+        let pos = pos_comp.to_world_units();
+        let tile_idx = map.to_index(pos);
         if map.visible_tiles[tile_idx] {
-            let camera_pt = Point {
-                x: pos.x - camera_in_world.x1,
-                y: pos.y - camera_in_world.y1,
-            };
-            if camera_view.point_in_rect(camera_pt) {
+            let screen_pos_as_offset = pos - camera_in_world.p1;
+            let screen_pos = ScreenChars::new_position2d(
+                screen_pos_as_offset.width.to_primitive(),
+                screen_pos_as_offset.height.to_primitive(),
+            );
+            if camera_view.contains(screen_pos) {
                 match items.get(entity) {
                     None => {
-                        draw_characters.set(camera_pt, VISIBLE, render.graphic as u16);
+                        draw_characters.set(
+                            screen_pos.to_bracket_geometry_point(),
+                            VISIBLE,
+                            render.graphic as u16,
+                        );
                     }
                     Some(_item) => {
-                        draw_items.set(camera_pt, VISIBLE, render.graphic as u16);
+                        draw_items.set(
+                            screen_pos.to_bracket_geometry_point(),
+                            VISIBLE,
+                            render.graphic as u16,
+                        );
                     }
                 }
             }
@@ -134,9 +141,9 @@ pub fn render_entities_in_camera(
     }
 
     draw_items
-        .submit(Consoles::TilesEntitiesItems as usize)
+        .submit(Consoles::WorldItems as usize)
         .expect("Couldn't render items");
     draw_characters
-        .submit(Consoles::TilesEntitiesCharacters as usize)
+        .submit(Consoles::WorldActors as usize)
         .expect("Couldn't render entities");
 }
