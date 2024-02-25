@@ -1,7 +1,7 @@
 use std::ops::{Add as AddTrait, Div as DivTrait, Mul as MulTrait, Sub as SubTrait};
 extern crate derive_more;
 use super::UnitI32;
-use derive_more::{Add, Div, Mul, Sub};
+use derive_more::{Add, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub)]
 pub struct WidthI32<T: UnitI32>(pub T);
