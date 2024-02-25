@@ -31,6 +31,6 @@ pub fn convert_direction_to_delta(direction: WorldDirection) -> Size2DI32<WorldU
         WorldDirection::South => WorldUnits::new_size2d(0, 1),
         WorldDirection::SouthWest => WorldUnits::new_size2d(-1, 1),
         WorldDirection::West => WorldUnits::new_size2d(-1, 0),
-        WorldDirection::NorthWest => WorldUnits::new_size2d(-1, 1),
+        WorldDirection::NorthWest => WorldUnits::new_size2d(-1, -1),
     }
 }
