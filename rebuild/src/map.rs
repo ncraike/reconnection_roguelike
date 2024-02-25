@@ -104,12 +104,16 @@ impl Map {
                 self.tiles[inside] = TileGraphic::Floor1;
             }
         }
+        let nw_corner_index = self.to_index(room.p1);
+        let ne_corner_index = self.to_index(room.p1.with_x_of(room.p2));
+        let se_corner_index = self.to_index(room.p2);
+        let sw_corner_index = self.to_index(room.p2.with_x_of(room.p1));
 
         // Corners
-        self.tiles[self.to_index(room.p1)] = TileGraphic::WallNWCorner;
-        self.tiles[self.to_index(room.p1.with_x_of(room.p2))] = TileGraphic::WallNECorner;
-        self.tiles[self.to_index(room.p2)] = TileGraphic::WallSECornerExternal;
-        self.tiles[self.to_index(room.p2.with_x_of(room.p1))] = TileGraphic::WallSWCornerExternal;
+        self.tiles[nw_corner_index] = TileGraphic::WallNWCorner;
+        self.tiles[ne_corner_index] = TileGraphic::WallNECorner;
+        self.tiles[se_corner_index] = TileGraphic::WallSECornerExternal;
+        self.tiles[sw_corner_index] = TileGraphic::WallSWCornerExternal;
 
         for x in (room.x1().to_primitive() + 1)..room.x2().to_primitive() {
             // Top wall
