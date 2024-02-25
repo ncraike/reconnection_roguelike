@@ -1,5 +1,4 @@
 use bracket_color::prelude::{ColorPair, RGB};
-use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
 use units::Box2DI32;

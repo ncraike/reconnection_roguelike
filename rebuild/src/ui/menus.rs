@@ -1,12 +1,10 @@
 use bracket_color::prelude::RGB;
 
 use bracket_color::prelude::ColorPair;
-use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
 use std::cmp;
 use units::Box2DI32;
-use units::HeightI32;
 use units::PosYI32;
 use units::Position2DI32;
 

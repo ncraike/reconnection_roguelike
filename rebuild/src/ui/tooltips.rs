@@ -1,8 +1,7 @@
 use bracket_color::prelude::{ColorPair, RGB};
-use bracket_geometry::prelude::Point;
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
-use units::{Box2DI32, Position2DI32, Size2DI32};
+use units::{Box2DI32, Position2DI32};
 
 use crate::ui::units::ScreenChars;
 use crate::world::units::WorldUnits;
