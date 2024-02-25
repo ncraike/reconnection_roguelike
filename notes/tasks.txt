@@ -24,3 +24,14 @@
 - Add more unit helpers for:
   - testing position in box2D?
   + getting center of box2D
+
+-- 2024-02-25 Sun
+
+- Actually get the game building?
+  + Replace bracket_geometry Rect and Point in ui::camera
+  - Convert Rect to Box2DI32 and Point to Position2DI32
+  - Fix errors in files
+  - Audit every use of bracket_geometry Point
+
+- Add more unit helpers for:
+  + testing position in box2D

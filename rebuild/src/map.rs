@@ -1,6 +1,9 @@
 use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap, SmallVec};
-use bracket_geometry::prelude::{DistanceAlg, Point, Rect};
+use bracket_geometry::prelude::{DistanceAlg, Point};
 use specs::prelude::*;
+use units::{Box2DI32, PosXI32, PosYI32, Position2DI32, Size2DI32};
+
+use crate::world::units::WorldUnits;
 
 pub const MAP_WIDTH: u32 = 80;
 pub const MAP_HEIGHT: u32 = 25;
@@ -56,8 +59,7 @@ pub enum TileGraphic {
 }
 
 pub struct Map {
-    pub width: u32,
-    pub height: u32,
+    pub size: Size2DI32<WorldUnits>,
     pub tiles: Vec<TileGraphic>,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
@@ -68,8 +70,7 @@ pub struct Map {
 impl Map {
     pub fn new_map() -> Map {
         let mut map = Map {
-            width: MAP_WIDTH,
-            height: MAP_HEIGHT,
+            size: WorldUnits::new_size2d(MAP_WIDTH as i32, MAP_HEIGHT as i32),
             tiles: vec![TileGraphic::Ground1; (MAP_WIDTH * MAP_HEIGHT) as usize],
             revealed_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
             visible_tiles: vec![false; (MAP_WIDTH * MAP_HEIGHT) as usize],
@@ -77,78 +78,72 @@ impl Map {
             tile_content: vec![Vec::new(); (MAP_WIDTH * MAP_HEIGHT) as usize],
         };
 
-        let room = Rect::with_exact(16, 2, 22, 7);
+        let room = WorldUnits::new_box2d_from_x1_y1_x2_y2(16, 2, 22, 7);
         map.apply_room_to_map(&room);
 
         map
     }
 
-    pub fn to_index(&self, point: Point) -> usize {
-        point.to_index(self.width)
+    pub fn to_index(&self, position: Position2DI32<WorldUnits>) -> usize {
+        position.to_buffer_index(self.size.width)
     }
 
-    pub fn to_point(&self, index: usize) -> Point {
-        Point {
-            x: (index as i32) % (self.width as i32),
-            y: (index as i32) / (self.width as i32),
-        }
+    pub fn to_position(&self, index: usize) -> Position2DI32<WorldUnits> {
+        Position2DI32::<WorldUnits>::from_buffer_index(index, self.size.width)
     }
 
-    pub fn bounds(&self) -> Rect {
-        Rect::with_size(0, 0, self.width, self.height)
+    pub fn bounds(&self) -> Box2DI32<WorldUnits> {
+        WorldUnits::new_box2d_from_size(self.size)
     }
 
-    fn apply_room_to_map(&mut self, room: &Rect) {
+    fn apply_room_to_map(&mut self, room: &Box2DI32<WorldUnits>) {
         // Fill inside
-        for y in (room.y1 + 1)..room.y2 {
-            for x in (room.x1 + 1)..room.x2 {
-                let inside = self.to_index(Point { x, y });
+        for y in (room.y1().to_primitive() + 1)..room.y2().to_primitive() {
+            for x in (room.x1().to_primitive() + 1)..room.x2().to_primitive() {
+                let inside = self.to_index(WorldUnits::new_position2d(x, y));
                 self.tiles[inside] = TileGraphic::Floor1;
             }
         }
 
         // Corners
-        let nw_corner = self.to_index(Point {
-            x: room.x1,
-            y: room.y1,
-        });
-        self.tiles[nw_corner] = TileGraphic::WallNWCorner;
-        let ne_corner = self.to_index(Point {
-            x: room.x2,
-            y: room.y1,
-        });
-        self.tiles[ne_corner] = TileGraphic::WallNECorner;
-        let se_corner = self.to_index(Point {
-            x: room.x2,
-            y: room.y2,
-        });
-        self.tiles[se_corner] = TileGraphic::WallSECornerExternal;
-        let sw_corner = self.to_index(Point {
-            x: room.x1,
-            y: room.y2,
-        });
-        self.tiles[sw_corner] = TileGraphic::WallSWCornerExternal;
+        self.tiles[self.to_index(room.p1)] = TileGraphic::WallNWCorner;
+        self.tiles[self.to_index(room.p1.with_x_of(room.p2))] = TileGraphic::WallNECorner;
+        self.tiles[self.to_index(room.p2)] = TileGraphic::WallSECornerExternal;
+        self.tiles[self.to_index(room.p2.with_x_of(room.p1))] = TileGraphic::WallSWCornerExternal;
 
-        for x in (room.x1 + 1)..room.x2 {
+        for x in (room.x1().to_primitive() + 1)..room.x2().to_primitive() {
             // Top wall
-            let top = self.to_index(Point { x, y: room.y1 });
+            let top = self.to_index(Position2DI32 {
+                x: PosXI32(WorldUnits(x)),
+                y: room.y1(),
+            });
             self.tiles[top] = TileGraphic::WallHInternal;
             // Bottom wall
-            let bottom = self.to_index(Point { x, y: room.y2 });
+            let bottom = self.to_index(Position2DI32 {
+                x: PosXI32(WorldUnits(x)),
+                y: room.y2(),
+            });
             self.tiles[bottom] = TileGraphic::WallHExternal;
         }
-        for y in (room.y1 + 1)..room.y2 {
+        for y in (room.y1().to_primitive() + 1)..room.y2().to_primitive() {
             // Left wall
-            let left = self.to_index(Point { x: room.x1, y });
+            let left = self.to_index(Position2DI32 {
+                x: room.x1(),
+                y: PosYI32(WorldUnits(y)),
+            });
             self.tiles[left] = TileGraphic::WallV;
             // Right wall
-            let right = self.to_index(Point { x: room.x2, y });
+            let right = self.to_index(Position2DI32 {
+                x: room.x2(),
+                y: PosYI32(WorldUnits(y)),
+            });
             self.tiles[right] = TileGraphic::WallV;
         }
     }
 
-    pub fn can_move_to(&self, point: Point) -> bool {
-        self.in_bounds(point) && !self.blocked[self.to_index(point)]
+    pub fn can_move_to(&self, position: Position2DI32<WorldUnits>) -> bool {
+        self.in_bounds(position.to_bracket_geometry_point())
+            && !self.blocked[self.to_index(position)]
     }
 
     pub fn populate_blocked(&mut self) {
@@ -179,7 +174,10 @@ pub fn is_passable(tile: TileGraphic) -> bool {
 
 impl Algorithm2D for Map {
     fn dimensions(&self) -> Point {
-        Point::new(self.width, self.height)
+        Point::new(
+            self.size.width.to_primitive(),
+            self.size.height.to_primitive(),
+        )
     }
 }
 
@@ -190,7 +188,7 @@ impl BaseMap for Map {
 
     fn get_available_exits(&self, _idx: usize) -> SmallVec<[(usize, f32); 10]> {
         let mut exits = SmallVec::new();
-        let point = self.to_point(_idx);
+        let point = self.to_position(_idx);
 
         let directions = vec![
             (0, -1, 1.0),   // north
@@ -204,7 +202,7 @@ impl BaseMap for Map {
         ];
         for direction in directions {
             let (dir_x, dir_y, distance) = direction;
-            let candidate_exit = point + Point { x: dir_x, y: dir_y };
+            let candidate_exit = point + WorldUnits::new_size2d(dir_x, dir_y);
             if self.can_move_to(candidate_exit) {
                 exits.push((self.to_index(candidate_exit), distance))
             }
@@ -214,8 +212,11 @@ impl BaseMap for Map {
     }
 
     fn get_pathing_distance(&self, _idx1: usize, _idx2: usize) -> f32 {
-        let point1 = self.to_point(_idx1);
-        let point2 = self.to_point(_idx2);
-        DistanceAlg::Pythagoras.distance2d(point1, point2)
+        let pos1 = self.to_position(_idx1);
+        let pos2 = self.to_position(_idx2);
+        DistanceAlg::Pythagoras.distance2d(
+            pos1.to_bracket_geometry_point(),
+            pos2.to_bracket_geometry_point(),
+        )
     }
 }

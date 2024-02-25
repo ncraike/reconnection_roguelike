@@ -1,13 +1,12 @@
 pub use bracket_geometry::prelude::Point;
-use serde::{Deserialize, Serialize};
 use specs::prelude::*;
-use specs::saveload::{ConvertSaveload, Marker};
-use specs_derive::{Component, ConvertSaveload};
-use std::convert::Infallible as NoError;
+use specs_derive::Component;
+use units::Position2DI32;
 
-use super::map::TileGraphic;
+use crate::map::TileGraphic;
+use crate::world::units::WorldUnits;
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct Name {
     pub name: String,
 }
@@ -17,26 +16,26 @@ pub struct Renderable {
     pub graphic: TileGraphic,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct Player {}
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct Monster {}
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct Item {}
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct BlocksTile {}
 
-#[derive(Component)]
+#[derive(Component, Debug, Clone)]
 pub struct Viewshed {
     pub visible_tiles: Vec<Point>,
     pub range: i32,
     pub dirty: bool,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct CombatStats {
     pub max_hp: i32,
     pub hp: i32,
@@ -44,20 +43,21 @@ pub struct CombatStats {
     pub power: i32,
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
+#[derive(Component, Debug, Clone)]
 pub struct WantsToMelee {
     pub target: Entity,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct SufferDamage {
     pub amount: Vec<i32>,
 }
 
-#[derive(Component, Debug, ConvertSaveload, Clone)]
+// FIXME: restore ConvertSaveload
+#[derive(Component, Debug, Clone)]
 pub struct WantsToMove {
     // FIXME: add Map
-    pub destination: Point,
+    pub destination: WorldPosition2D,
 }
 
 impl SufferDamage {
@@ -84,15 +84,28 @@ pub struct WantsToPickupItem {
     pub item: Entity,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct HealthRestore {
     pub heal_amount: i32,
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct WorldPosition2D {
     pub x: i32,
     pub y: i32,
+}
+
+impl WorldPosition2D {
+    pub fn to_world_units(&self) -> Position2DI32<WorldUnits> {
+        WorldUnits::new_position2d(self.x, self.y)
+    }
+
+    pub fn from_world_units(position: Position2DI32<WorldUnits>) -> Self {
+        Self {
+            x: position.x.to_primitive(),
+            y: position.y.to_primitive(),
+        }
+    }
 }
 
 pub fn register_components(ecs: &mut World) {

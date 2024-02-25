@@ -1,12 +1,14 @@
 use bracket_geometry::prelude::Point;
 use specs::prelude::*;
+use units::Position2DI32;
 
-use super::super::components::{CombatStats, Item, Player};
-use super::super::map::Map;
-use super::types::{convert_direction_to_delta, WorldDirection};
+use crate::components::{CombatStats, Item, Player, WorldPosition2D};
+use crate::map::Map;
+use crate::world::types::{convert_direction_to_delta, WorldDirection};
+use crate::world::units::WorldUnits;
 
 pub enum MoveAttemptResult {
-    MoveToFreeSpace(Point),
+    MoveToFreeSpace(Position2DI32<WorldUnits>),
     AttackHostile(Entity),
     // FIXME: add AttackFriendly
     // FIXME: add other interactions, e.g. open door
@@ -23,24 +25,25 @@ pub fn check_player_move_attempt(world: &World, direction: WorldDirection) -> Mo
     // FIXME: take a map argument
     let map = world.fetch::<Map>();
     let players_store = world.read_storage::<Player>();
-    let position_store = world.read_storage::<Point>();
+    let position_store = world.read_storage::<WorldPosition2D>();
     let combat_stats = world.read_storage::<CombatStats>();
 
-    for (_player, player_pos) in (&players_store, &position_store).join() {
+    for (_player, player_pos_comp) in (&players_store, &position_store).join() {
+        let player_pos = player_pos_comp.to_world_units();
         let delta = convert_direction_to_delta(direction);
-        let dest = *player_pos + delta;
+        let destination = player_pos + delta;
 
-        if !map.bounds().point_in_rect(dest) {
+        if !map.bounds().contains(destination) {
             // Can't move out of bounds (yet)
             // FIXME: add zone transitions?
             return MoveAttemptResult::Blocked;
         }
 
-        let dest_idx = map.to_index(dest);
+        let dest_idx = map.to_index(destination);
 
         if !map.blocked[dest_idx] {
             // Destination is free space
-            return MoveAttemptResult::MoveToFreeSpace(dest);
+            return MoveAttemptResult::MoveToFreeSpace(destination);
         }
 
         for potential_target in map.tile_content[dest_idx].iter() {

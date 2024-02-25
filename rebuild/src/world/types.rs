@@ -1,4 +1,6 @@
-use bracket_geometry::prelude::Point;
+use units::Size2DI32;
+
+use crate::world::units::WorldUnits;
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum WorldDirection {
@@ -19,17 +21,16 @@ pub enum WorldAction {
     Wait,
 }
 
-// FIXME: consider not using Point for distance. Ressurect ultraviolet Vec2i?
-pub fn convert_direction_to_delta(direction: WorldDirection) -> Point {
+pub fn convert_direction_to_delta(direction: WorldDirection) -> Size2DI32<WorldUnits> {
     // Remember origin is top-left
     match direction {
-        WorldDirection::North => Point { x: 0, y: -1 },
-        WorldDirection::NorthEast => Point { x: 1, y: -1 },
-        WorldDirection::East => Point { x: 1, y: 0 },
-        WorldDirection::SouthEast => Point { x: 1, y: 1 },
-        WorldDirection::South => Point { x: 0, y: 1 },
-        WorldDirection::SouthWest => Point { x: -1, y: 1 },
-        WorldDirection::West => Point { x: -1, y: 0 },
-        WorldDirection::NorthWest => Point { x: -1, y: -1 },
+        WorldDirection::North => WorldUnits::new_size2d(0, -1),
+        WorldDirection::NorthEast => WorldUnits::new_size2d(1, -1),
+        WorldDirection::East => WorldUnits::new_size2d(1, 0),
+        WorldDirection::SouthEast => WorldUnits::new_size2d(1, 1),
+        WorldDirection::South => WorldUnits::new_size2d(0, 1),
+        WorldDirection::SouthWest => WorldUnits::new_size2d(-1, 1),
+        WorldDirection::West => WorldUnits::new_size2d(-1, 0),
+        WorldDirection::NorthWest => WorldUnits::new_size2d(-1, 1),
     }
 }

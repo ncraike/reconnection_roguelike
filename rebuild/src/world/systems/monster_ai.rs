@@ -90,7 +90,7 @@ impl<'a> System<'a> for MonsterAI {
                             let player_pos_idx = map.to_index(player_pos);
                             let path = a_star_search(monster_pos_idx, player_pos_idx, &mut *map);
                             if path.success && path.steps.len() > 1 {
-                                let destination = map.to_point(path.steps[1]);
+                                let destination = map.to_position(path.steps[1]);
                                 wants_to_move_store
                                     .insert(
                                         entity,

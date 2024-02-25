@@ -1,4 +1,4 @@
-use crate::components::{Player, WantsToMelee, WantsToMove, WantsToPickupItem};
+use crate::components::{Player, WantsToMelee, WantsToMove, WantsToPickupItem, WorldPosition2D};
 use crate::message_log::MessageLog;
 use crate::types::{RunState, UITask};
 use crate::ui::common::{NewStates, UIAction, UIState};
@@ -70,7 +70,7 @@ pub fn move_attempt(world: &mut World, direction: WorldDirection) -> NewStates {
                     .insert(
                         player_entity,
                         WantsToMove {
-                            destination: destination,
+                            destination: WorldPosition2D::from_world_units(destination),
                         },
                     )
                     .expect("Queueing player move failed");

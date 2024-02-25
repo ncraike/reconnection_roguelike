@@ -2,16 +2,18 @@ use bracket_color::prelude::{ColorPair, RGB};
 use bracket_geometry::prelude::{Point, Rect};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
+use units::Box2DI32;
 
 use super::super::components::{CombatStats, Player};
 use super::colors;
 use super::common::Consoles;
+use super::units::ScreenChars;
 
 const HEALTH_CRITICAL_COLOR: RGB = colors::BRIGHT_ORANGE;
 const HEALTH_OKAY_COLOR: RGB = colors::BRIGHT_YELLOW;
 const HEALTH_GOOD_COLOR: RGB = colors::GREEN_MID;
 
-pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Rect) {
+pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Box2DI32<ScreenChars>) {
     let stats_store = ecs.read_storage::<CombatStats>();
     let player_store = ecs.read_storage::<Player>();
 
@@ -31,22 +33,17 @@ pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Rect) {
             bg: colors::TRANSPARENT,
         };
         batch.print_color(
-            Point {
-                x: bounds.x1,
-                y: bounds.y1 + 1,
-            },
+            (bounds.p1 + ScreenChars::new_height(1)).to_bracket_geometry_point(),
             &health_text,
             health_color,
         );
-        let health_bar_offset = health_text.len() as i32 + 4;
-        let health_bar_width = bounds.width() - health_bar_offset - 4;
-        if health_bar_width > 0 {
+        let health_bar_offset = ScreenChars::new_width(health_text.len() as i32 + 4);
+        let health_bar_width = bounds.width() - health_bar_offset - ScreenChars::new_width(4);
+        if health_bar_width > ScreenChars::new_width(0) {
             batch.bar_horizontal(
-                Point {
-                    x: bounds.x1 + health_bar_offset,
-                    y: bounds.y1 + 1,
-                },
-                health_bar_width,
+                (bounds.p1 + health_bar_offset + ScreenChars::new_height(1))
+                    .to_bracket_geometry_point(),
+                health_bar_width.to_primitive(),
                 stats.hp,
                 stats.max_hp,
                 health_color,

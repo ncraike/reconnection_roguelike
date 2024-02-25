@@ -69,6 +69,13 @@ impl<
         self.size().height
     }
 
+    pub fn contains(&self, position: Position2DI32<T>) -> bool {
+        self.x1() <= position.x
+            && position.x <= self.x2()
+            && self.y1() <= position.y
+            && position.y <= self.y2()
+    }
+
     pub fn normalize(&self) -> Self {
         Self {
             p1: Position2DI32::<T> {
@@ -140,5 +147,20 @@ impl<
             self.x2().0.to_primitive(),
             self.y2().0.to_primitive(),
         )
+    }
+
+    /// Calls a function for each x/y position in the box
+    pub fn for_each<F>(&self, mut f: F)
+    where
+        F: FnMut(Position2DI32<T>),
+    {
+        for y in self.y1().to_primitive()..self.y2().to_primitive() {
+            for x in self.x1().to_primitive()..self.x2().to_primitive() {
+                f(Position2DI32 {
+                    x: PosXI32(T::new(x)),
+                    y: PosYI32(T::new(y)),
+                });
+            }
+        }
     }
 }

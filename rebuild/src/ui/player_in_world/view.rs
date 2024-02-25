@@ -48,12 +48,12 @@ pub fn render_player_in_world_view(ecs: &World, ctx: &mut BTerm) {
 
     render_camera(
         ecs,
-        main_view.camera_view_2x,
+        main_view.camera_view,
         camera_in_world,
-        main_view.window_in_tiles,
+        main_view.window,
     );
     let mut batch = DrawBatch::new();
-    batch.target(Consoles::Text as usize);
+    batch.target(Consoles::UIText as usize);
     batch.cls();
     render_messages(ecs, &mut batch, main_view.message_log_view);
     render_stats(ecs, &mut batch, main_view.stats_view);

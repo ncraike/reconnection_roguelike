@@ -6,7 +6,7 @@ use derive_more::{Add, Div, Mul, Sub};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub)]
 pub struct WidthI32<T: UnitI32>(pub T);
 
-impl<T: UnitI32 + AddTrait<T> + SubTrait<T> + MulTrait<i32> + DivTrait<i32>> WidthI32<T> {
+impl<T: UnitI32> WidthI32<T> {
     pub fn abs(&self) -> Self {
         Self(self.0.abs())
     }
@@ -35,7 +35,7 @@ impl<T: UnitI32 + DivTrait<i32, Output = T>> DivTrait<i32> for WidthI32<T> {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub)]
 pub struct HeightI32<T: UnitI32>(pub T);
 
-impl<T: UnitI32 + AddTrait<T> + SubTrait<T> + MulTrait<i32> + DivTrait<i32>> HeightI32<T> {
+impl<T: UnitI32> HeightI32<T> {
     pub fn abs(&self) -> Self {
         Self(self.0.abs())
     }

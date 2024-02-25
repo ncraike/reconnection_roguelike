@@ -1,6 +1,5 @@
 use bracket_geometry::prelude::Point;
-use std::ops::Add as AddTrait;
-use std::ops::Sub as SubTrait;
+use std::ops::{Add as AddTrait, Sub as SubTrait};
 extern crate derive_more;
 use super::{HeightI32, Size2DI32, UnitI32, WidthI32};
 
@@ -9,6 +8,12 @@ pub struct PosXI32<T: UnitI32>(pub T);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosYI32<T: UnitI32>(pub T);
+
+impl<T: UnitI32> PosXI32<T> {
+    pub fn to_primitive(&self) -> i32 {
+        self.0.to_primitive()
+    }
+}
 
 impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<WidthI32<T>> for PosXI32<T> {
     type Output = Self;
@@ -31,6 +36,12 @@ impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<WidthI32<T>> for PosXI32<T> {
 
     fn sub(self, rhs: WidthI32<T>) -> Self::Output {
         PosXI32::<T>(self.0 - rhs.0)
+    }
+}
+
+impl<T: UnitI32> PosYI32<T> {
+    pub fn to_primitive(&self) -> i32 {
+        self.0.to_primitive()
     }
 }
 
@@ -92,6 +103,17 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
 
     pub fn with_y_of(self, other_position: Self) -> Self {
         self.with_y(other_position.y)
+    }
+
+    pub fn to_buffer_index(self, width: WidthI32<T>) -> usize {
+        (self.y.to_primitive() * width.to_primitive() + self.x.to_primitive()) as usize
+    }
+
+    pub fn from_buffer_index(index: usize, width: WidthI32<T>) -> Self {
+        Self {
+            x: PosXI32(T::new(index as i32 % width.to_primitive())),
+            y: PosYI32(T::new(index as i32 / width.to_primitive())),
+        }
     }
 
     pub fn to_bracket_geometry_point(self) -> Point {
@@ -164,6 +186,17 @@ impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<HeightI32<T>> for Position2DI32
         Self {
             x: self.x,
             y: self.y - rhs,
+        }
+    }
+}
+
+impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<Size2DI32<T>> for Position2DI32<T> {
+    type Output = Position2DI32<T>;
+
+    fn sub(self, rhs: Size2DI32<T>) -> Position2DI32<T> {
+        Position2DI32::<T> {
+            x: self.x - rhs.width,
+            y: self.y - rhs.height,
         }
     }
 }
