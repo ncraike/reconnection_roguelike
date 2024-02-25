@@ -106,6 +106,20 @@ impl WorldPosition2D {
             y: position.y.to_primitive(),
         }
     }
+
+    pub fn to_point(&self) -> Point {
+        Point {
+            x: self.x,
+            y: self.y,
+        }
+    }
+
+    pub fn from_point(point: Point) -> Self {
+        Self {
+            x: point.x,
+            y: point.y,
+        }
+    }
 }
 
 pub fn register_components(ecs: &mut World) {
