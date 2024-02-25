@@ -2,7 +2,8 @@ mod base;
 mod box2d;
 mod position;
 mod size;
-mod tests;
+#[cfg(test)]
+mod test;
 
 pub use base::UnitI32;
 pub use box2d::Box2DI32;
