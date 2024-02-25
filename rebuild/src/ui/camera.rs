@@ -1,6 +1,6 @@
 use bracket_color::named;
 use bracket_color::prelude::{ColorPair, RGBA};
-use bracket_terminal::prelude::{to_cp437, DrawBatch};
+use bracket_terminal::prelude::{console, to_cp437, DrawBatch};
 use specs::prelude::*;
 use units::{Box2DI32, Position2DI32};
 
@@ -10,7 +10,7 @@ use crate::ui::common::Consoles;
 use crate::ui::units::ScreenChars;
 use crate::world::units::WorldUnits;
 
-const VISIBLE_FG: (u8, u8, u8) = named::WHITE;
+const VISIBLE_FG: (u8, u8, u8) = named::GRAY;
 const VISIBLE_BG: (u8, u8, u8) = named::BLACK;
 const SEEN_FG: (u8, u8, u8) = named::DIM_GRAY;
 const SEEN_BG: (u8, u8, u8) = named::BLACK;
@@ -119,10 +119,18 @@ pub fn tile_to_glyph(tile: TileGraphic) -> u16 {
         | TileGraphic::Ground3
         | TileGraphic::Ground4 => to_cp437('.'),
         TileGraphic::Floor1 | TileGraphic::Floor2 => to_cp437(','),
-        TileGraphic::WallHExternal => to_cp437('-'),
-        TileGraphic::WallSECornerExternal => to_cp437('+'),
+        TileGraphic::WallHExternal | TileGraphic::WallHInternal => to_cp437('-'),
+        TileGraphic::WallSECornerExternal
+        | TileGraphic::WallSWCornerExternal
+        | TileGraphic::WallNWCorner
+        | TileGraphic::WallNECorner => to_cp437('+'),
         TileGraphic::WallV => to_cp437('|'),
         TileGraphic::PlayerCharacter => to_cp437('@'),
+        TileGraphic::EnemyHound => to_cp437('h'),
+        TileGraphic::EnemySmallStalker => to_cp437('s'),
+        TileGraphic::EnemyBigStalker => to_cp437('S'),
+        TileGraphic::ItemBandage => to_cp437('&'),
+        TileGraphic::ItemFirstAidKit => to_cp437('='),
         _ => to_cp437('?'),
     }
 }
@@ -165,14 +173,14 @@ pub fn render_entities_in_camera(
                         draw_characters.set(
                             screen_pos.to_bracket_geometry_point(),
                             visible_color,
-                            render.graphic as u16,
+                            tile_to_glyph(render.graphic),
                         );
                     }
                     Some(_item) => {
                         draw_items.set(
                             screen_pos.to_bracket_geometry_point(),
                             visible_color,
-                            render.graphic as u16,
+                            tile_to_glyph(render.graphic),
                         );
                     }
                 }
