@@ -17,6 +17,7 @@ pub const DEFAULT_WINDOW_SIZE: Size2DI32<ScreenChars> = Size2DI32::<ScreenChars>
     width: WidthI32(ScreenChars(80)),
     height: HeightI32(ScreenChars(25)),
 };
+pub const TEXT_BOX_HEIGHT: HeightI32<ScreenChars> = HeightI32(ScreenChars(6));
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum Consoles {

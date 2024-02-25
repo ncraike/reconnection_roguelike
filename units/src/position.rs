@@ -122,6 +122,13 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
             y: self.y.0.to_primitive(),
         }
     }
+
+    pub fn from_bracket_geometry_point(point: Point) -> Self {
+        Self {
+            x: PosXI32(T::new(point.x)),
+            y: PosYI32(T::new(point.y)),
+        }
+    }
 }
 
 impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<Size2DI32<T>> for Position2DI32<T> {
