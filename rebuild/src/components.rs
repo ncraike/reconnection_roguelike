@@ -89,7 +89,7 @@ pub struct HealthRestore {
     pub heal_amount: i32,
 }
 
-#[derive(Component, Debug, Clone)]
+#[derive(Component, Debug, Clone, Copy)]
 pub struct WorldPosition2D {
     pub x: i32,
     pub y: i32,
