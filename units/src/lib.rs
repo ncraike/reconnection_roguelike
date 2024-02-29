@@ -5,7 +5,7 @@ mod size;
 #[cfg(test)]
 mod test;
 
-pub use base::UnitI32;
-pub use box2d::Box2DI32;
-pub use position::{PosXI32, PosYI32, Position2DI32};
-pub use size::{HeightI32, Size2DI32, WidthI32};
+pub use base::Unit;
+pub use box2d::Box2D;
+pub use position::{PosX, PosY, Position2D};
+pub use size::{Height, Size2D, Width};

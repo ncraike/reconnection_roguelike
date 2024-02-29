@@ -1,4 +1,4 @@
-use units::Size2DI32;
+use units::Size2D;
 
 use crate::world::units::WorldUnits;
 
@@ -21,7 +21,7 @@ pub enum WorldAction {
     Wait,
 }
 
-pub fn convert_direction_to_delta(direction: WorldDirection) -> Size2DI32<WorldUnits> {
+pub fn convert_direction_to_delta(direction: WorldDirection) -> Size2D<WorldUnits> {
     // Remember origin is top-left
     match direction {
         WorldDirection::North => WorldUnits::new_size2d(0, -1),

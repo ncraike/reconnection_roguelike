@@ -1,6 +1,6 @@
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
-use units::{Box2DI32, HeightI32, Position2DI32};
+use units::{Box2D, Height, Position2D};
 
 use crate::ui::camera::{get_camera_bounds_in_world, render_camera};
 use crate::ui::common::Consoles;
@@ -10,15 +10,15 @@ use crate::ui::tooltips::render_tooltips;
 use crate::ui::units::ScreenChars;
 use crate::ui::utils::{get_mouse_position, window_size};
 
-pub const MESSAGE_BOX_HEIGHT: HeightI32<ScreenChars> = HeightI32(ScreenChars(6));
+pub const MESSAGE_BOX_HEIGHT: Height<ScreenChars> = Height(ScreenChars(6));
 
 #[derive(Debug)]
 pub struct PlayerInWorldView {
-    pub camera_view: Box2DI32<ScreenChars>,
-    pub message_log_view: Box2DI32<ScreenChars>,
-    pub stats_view: Box2DI32<ScreenChars>,
-    pub window: Box2DI32<ScreenChars>,
-    pub mouse_position: Position2DI32<ScreenChars>,
+    pub camera_view: Box2D<ScreenChars>,
+    pub message_log_view: Box2D<ScreenChars>,
+    pub stats_view: Box2D<ScreenChars>,
+    pub window: Box2D<ScreenChars>,
+    pub mouse_position: Position2D<ScreenChars>,
 }
 
 impl PlayerInWorldView {

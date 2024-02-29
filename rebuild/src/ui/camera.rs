@@ -2,7 +2,7 @@ use bracket_color::named;
 use bracket_color::prelude::{ColorPair, RGBA};
 use bracket_terminal::prelude::{console, to_cp437, DrawBatch};
 use specs::prelude::*;
-use units::{Box2DI32, Position2DI32};
+use units::{Box2D, Position2D};
 
 use crate::components::{Item, Player, Renderable, WorldPosition2D};
 use crate::map::{Map, TileGraphic};
@@ -17,8 +17,8 @@ const SEEN_BG: (u8, u8, u8) = named::BLACK;
 
 pub fn get_camera_bounds_in_world(
     ecs: &World,
-    camera_view: Box2DI32<ScreenChars>,
-) -> Option<Box2DI32<WorldUnits>> {
+    camera_view: Box2D<ScreenChars>,
+) -> Option<Box2D<WorldUnits>> {
     let positions = ecs.read_storage::<WorldPosition2D>();
     let players = ecs.read_storage::<Player>();
 
@@ -39,9 +39,9 @@ pub fn get_camera_bounds_in_world(
 
 pub fn render_camera(
     ecs: &World,
-    camera_view: Box2DI32<ScreenChars>,
-    camera_in_world: Box2DI32<WorldUnits>,
-    window_bounds: Box2DI32<ScreenChars>,
+    camera_view: Box2D<ScreenChars>,
+    camera_in_world: Box2D<WorldUnits>,
+    window_bounds: Box2D<ScreenChars>,
 ) {
     render_terrain_in_camera(ecs, camera_view, camera_in_world, window_bounds);
     render_entities_in_camera(ecs, camera_view, camera_in_world);
@@ -49,9 +49,9 @@ pub fn render_camera(
 
 pub fn render_terrain_in_camera(
     ecs: &World,
-    camera_view: Box2DI32<ScreenChars>,
-    camera_in_world: Box2DI32<WorldUnits>,
-    window_bounds: Box2DI32<ScreenChars>,
+    camera_view: Box2D<ScreenChars>,
+    camera_in_world: Box2D<WorldUnits>,
+    window_bounds: Box2D<ScreenChars>,
 ) {
     let map = ecs.fetch::<Map>();
     let map_bounds = map.bounds();
@@ -69,7 +69,7 @@ pub fn render_terrain_in_camera(
     batch.target(Consoles::WorldTerrain as usize);
     batch.cls();
 
-    window_bounds.for_each(|screen_pos: Position2DI32<ScreenChars>| {
+    window_bounds.for_each(|screen_pos: Position2D<ScreenChars>| {
         let screen_pos_as_pt = screen_pos.to_bracket_geometry_point();
         if camera_view.contains(screen_pos) {
             let screen_pos_as_world_offset =
@@ -137,8 +137,8 @@ pub fn tile_to_glyph(tile: TileGraphic) -> u16 {
 
 pub fn render_entities_in_camera(
     ecs: &World,
-    camera_view: Box2DI32<ScreenChars>,
-    camera_in_world: Box2DI32<WorldUnits>,
+    camera_view: Box2D<ScreenChars>,
+    camera_in_world: Box2D<WorldUnits>,
 ) {
     let visible_color = ColorPair {
         fg: RGBA::named(VISIBLE_FG),

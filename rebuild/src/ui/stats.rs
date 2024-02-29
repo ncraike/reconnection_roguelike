@@ -1,7 +1,7 @@
 use bracket_color::prelude::{ColorPair, RGB};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
-use units::Box2DI32;
+use units::Box2D;
 
 use super::super::components::{CombatStats, Player};
 use super::colors;
@@ -12,7 +12,7 @@ const HEALTH_CRITICAL_COLOR: RGB = colors::BRIGHT_ORANGE;
 const HEALTH_OKAY_COLOR: RGB = colors::BRIGHT_YELLOW;
 const HEALTH_GOOD_COLOR: RGB = colors::GREEN_MID;
 
-pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Box2DI32<ScreenChars>) {
+pub fn render_stats(ecs: &World, batch: &mut DrawBatch, bounds: Box2D<ScreenChars>) {
     let stats_store = ecs.read_storage::<CombatStats>();
     let player_store = ecs.read_storage::<Player>();
 

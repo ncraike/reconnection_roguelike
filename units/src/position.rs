@@ -1,89 +1,89 @@
 use bracket_geometry::prelude::Point;
 use std::ops::{Add as AddTrait, Sub as SubTrait};
 extern crate derive_more;
-use super::{HeightI32, Size2DI32, UnitI32, WidthI32};
+use super::{Height, Size2D, Unit, Width};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PosXI32<T: UnitI32>(pub T);
+pub struct PosX<T: Unit>(pub T);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PosYI32<T: UnitI32>(pub T);
+pub struct PosY<T: Unit>(pub T);
 
-impl<T: UnitI32> PosXI32<T> {
+impl<T: Unit> PosX<T> {
     pub fn to_primitive(&self) -> i32 {
         self.0.to_primitive()
     }
 }
 
-impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<WidthI32<T>> for PosXI32<T> {
+impl<T: Unit + AddTrait<Output = T>> AddTrait<Width<T>> for PosX<T> {
     type Output = Self;
 
-    fn add(self, rhs: WidthI32<T>) -> Self::Output {
+    fn add(self, rhs: Width<T>) -> Self::Output {
         Self(self.0 + rhs.0)
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<PosXI32<T>> for PosXI32<T> {
-    type Output = WidthI32<T>;
+impl<T: Unit + SubTrait<Output = T>> SubTrait<PosX<T>> for PosX<T> {
+    type Output = Width<T>;
 
-    fn sub(self, rhs: PosXI32<T>) -> Self::Output {
-        WidthI32::<T>(self.0 - rhs.0)
+    fn sub(self, rhs: PosX<T>) -> Self::Output {
+        Width::<T>(self.0 - rhs.0)
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<WidthI32<T>> for PosXI32<T> {
-    type Output = PosXI32<T>;
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Width<T>> for PosX<T> {
+    type Output = PosX<T>;
 
-    fn sub(self, rhs: WidthI32<T>) -> Self::Output {
-        PosXI32::<T>(self.0 - rhs.0)
+    fn sub(self, rhs: Width<T>) -> Self::Output {
+        PosX::<T>(self.0 - rhs.0)
     }
 }
 
-impl<T: UnitI32> PosYI32<T> {
+impl<T: Unit> PosY<T> {
     pub fn to_primitive(&self) -> i32 {
         self.0.to_primitive()
     }
 }
 
-impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<HeightI32<T>> for PosYI32<T> {
+impl<T: Unit + AddTrait<Output = T>> AddTrait<Height<T>> for PosY<T> {
     type Output = Self;
 
-    fn add(self, rhs: HeightI32<T>) -> Self::Output {
+    fn add(self, rhs: Height<T>) -> Self::Output {
         Self(self.0 + rhs.0)
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<PosYI32<T>> for PosYI32<T> {
-    type Output = HeightI32<T>;
+impl<T: Unit + SubTrait<Output = T>> SubTrait<PosY<T>> for PosY<T> {
+    type Output = Height<T>;
 
-    fn sub(self, rhs: PosYI32<T>) -> Self::Output {
-        HeightI32::<T>(self.0 - rhs.0)
+    fn sub(self, rhs: PosY<T>) -> Self::Output {
+        Height::<T>(self.0 - rhs.0)
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<HeightI32<T>> for PosYI32<T> {
-    type Output = PosYI32<T>;
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Height<T>> for PosY<T> {
+    type Output = PosY<T>;
 
-    fn sub(self, rhs: HeightI32<T>) -> Self::Output {
-        PosYI32::<T>(self.0 - rhs.0)
+    fn sub(self, rhs: Height<T>) -> Self::Output {
+        PosY::<T>(self.0 - rhs.0)
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Position2DI32<T: UnitI32> {
-    pub x: PosXI32<T>,
-    pub y: PosYI32<T>,
+pub struct Position2D<T: Unit> {
+    pub x: PosX<T>,
+    pub y: PosY<T>,
 }
 
-impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Position2DI32<T> {
+impl<T: Unit + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Position2D<T> {
     pub fn origin() -> Self {
         Self {
-            x: PosXI32(T::zero()),
-            y: PosYI32(T::zero()),
+            x: PosX(T::zero()),
+            y: PosY(T::zero()),
         }
     }
 
-    pub fn with_x(self, new_x: PosXI32<T>) -> Self {
+    pub fn with_x(self, new_x: PosX<T>) -> Self {
         Self {
             x: new_x,
             y: self.y,
@@ -94,7 +94,7 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
         self.with_x(other_position.x)
     }
 
-    pub fn with_y(self, new_y: PosYI32<T>) -> Self {
+    pub fn with_y(self, new_y: PosY<T>) -> Self {
         Self {
             x: self.x,
             y: new_y,
@@ -105,17 +105,17 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
         self.with_y(other_position.y)
     }
 
-    pub fn to_buffer_index(self, width: WidthI32<T>) -> usize {
+    pub fn to_buffer_index(self, width: Width<T>) -> usize {
         let x: usize = self.x.to_primitive().try_into().ok().unwrap();
         let y: usize = self.y.to_primitive().try_into().ok().unwrap();
         let w: usize = width.to_primitive().try_into().ok().unwrap();
         (y * w) + x
     }
 
-    pub fn from_buffer_index(index: usize, width: WidthI32<T>) -> Self {
+    pub fn from_buffer_index(index: usize, width: Width<T>) -> Self {
         Self {
-            x: PosXI32(T::new(index as i32 % width.to_primitive())),
-            y: PosYI32(T::new(index as i32 / width.to_primitive())),
+            x: PosX(T::new(index as i32 % width.to_primitive())),
+            y: PosY(T::new(index as i32 / width.to_primitive())),
         }
     }
 
@@ -128,16 +128,16 @@ impl<T: UnitI32 + Copy + AddTrait<Output = T> + SubTrait<Output = T> + Ord> Posi
 
     pub fn from_bracket_geometry_point(point: Point) -> Self {
         Self {
-            x: PosXI32(T::new(point.x)),
-            y: PosYI32(T::new(point.y)),
+            x: PosX(T::new(point.x)),
+            y: PosY(T::new(point.y)),
         }
     }
 }
 
-impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<Size2DI32<T>> for Position2DI32<T> {
+impl<T: Unit + AddTrait<Output = T>> AddTrait<Size2D<T>> for Position2D<T> {
     type Output = Self;
 
-    fn add(self, rhs: Size2DI32<T>) -> Self::Output {
+    fn add(self, rhs: Size2D<T>) -> Self::Output {
         Self {
             x: self.x + rhs.width,
             y: self.y + rhs.height,
@@ -145,21 +145,21 @@ impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<Size2DI32<T>> for Position2DI32
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<Position2DI32<T>> for Position2DI32<T> {
-    type Output = Size2DI32<T>;
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Position2D<T>> for Position2D<T> {
+    type Output = Size2D<T>;
 
-    fn sub(self, rhs: Position2DI32<T>) -> Size2DI32<T> {
-        Size2DI32::<T> {
+    fn sub(self, rhs: Position2D<T>) -> Size2D<T> {
+        Size2D::<T> {
             width: self.x - rhs.x,
             height: self.y - rhs.y,
         }
     }
 }
 
-impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<WidthI32<T>> for Position2DI32<T> {
+impl<T: Unit + AddTrait<Output = T>> AddTrait<Width<T>> for Position2D<T> {
     type Output = Self;
 
-    fn add(self, rhs: WidthI32<T>) -> Self::Output {
+    fn add(self, rhs: Width<T>) -> Self::Output {
         Self {
             x: self.x + rhs,
             y: self.y,
@@ -167,10 +167,10 @@ impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<WidthI32<T>> for Position2DI32<
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<WidthI32<T>> for Position2DI32<T> {
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Width<T>> for Position2D<T> {
     type Output = Self;
 
-    fn sub(self, rhs: WidthI32<T>) -> Self::Output {
+    fn sub(self, rhs: Width<T>) -> Self::Output {
         Self {
             x: self.x - rhs,
             y: self.y,
@@ -178,10 +178,10 @@ impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<WidthI32<T>> for Position2DI32<
     }
 }
 
-impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<HeightI32<T>> for Position2DI32<T> {
+impl<T: Unit + AddTrait<Output = T>> AddTrait<Height<T>> for Position2D<T> {
     type Output = Self;
 
-    fn add(self, rhs: HeightI32<T>) -> Self::Output {
+    fn add(self, rhs: Height<T>) -> Self::Output {
         Self {
             x: self.x,
             y: self.y + rhs,
@@ -189,10 +189,10 @@ impl<T: UnitI32 + AddTrait<Output = T>> AddTrait<HeightI32<T>> for Position2DI32
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<HeightI32<T>> for Position2DI32<T> {
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Height<T>> for Position2D<T> {
     type Output = Self;
 
-    fn sub(self, rhs: HeightI32<T>) -> Self::Output {
+    fn sub(self, rhs: Height<T>) -> Self::Output {
         Self {
             x: self.x,
             y: self.y - rhs,
@@ -200,11 +200,11 @@ impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<HeightI32<T>> for Position2DI32
     }
 }
 
-impl<T: UnitI32 + SubTrait<Output = T>> SubTrait<Size2DI32<T>> for Position2DI32<T> {
-    type Output = Position2DI32<T>;
+impl<T: Unit + SubTrait<Output = T>> SubTrait<Size2D<T>> for Position2D<T> {
+    type Output = Position2D<T>;
 
-    fn sub(self, rhs: Size2DI32<T>) -> Position2DI32<T> {
-        Position2DI32::<T> {
+    fn sub(self, rhs: Size2D<T>) -> Position2D<T> {
+        Position2D::<T> {
             x: self.x - rhs.width,
             y: self.y - rhs.height,
         }

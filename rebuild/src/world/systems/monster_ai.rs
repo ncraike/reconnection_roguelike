@@ -1,7 +1,7 @@
 use bracket_geometry::prelude::DistanceAlg;
 use bracket_pathfinding::prelude::a_star_search;
 use specs::prelude::*;
-use units::Position2DI32;
+use units::Position2D;
 
 use crate::world::units::WorldUnits;
 
@@ -19,7 +19,7 @@ impl<'a> MonsterAI {
         player_store: &ReadStorage<'a, Player>,
         monster_store: &ReadStorage<'a, Monster>,
         position_store: &ReadStorage<'a, WorldPosition2D>,
-    ) -> Option<Position2DI32<WorldUnits>> {
+    ) -> Option<Position2D<WorldUnits>> {
         match (player_store, !monster_store, position_store).join().next() {
             None => None,
             Some(player_and_pos) => {

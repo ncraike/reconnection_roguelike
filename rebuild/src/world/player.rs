@@ -1,6 +1,6 @@
 use bracket_geometry::prelude::Point;
 use specs::prelude::*;
-use units::Position2DI32;
+use units::Position2D;
 
 use crate::components::{CombatStats, Item, Player, WorldPosition2D};
 use crate::map::Map;
@@ -8,7 +8,7 @@ use crate::world::types::{convert_direction_to_delta, WorldDirection};
 use crate::world::units::WorldUnits;
 
 pub enum MoveAttemptResult {
-    MoveToFreeSpace(Position2DI32<WorldUnits>),
+    MoveToFreeSpace(Position2D<WorldUnits>),
     AttackHostile(Entity),
     // FIXME: add AttackFriendly
     // FIXME: add other interactions, e.g. open door

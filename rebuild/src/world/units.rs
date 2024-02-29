@@ -1,12 +1,12 @@
 use crate::components::WorldPosition2D;
 use bracket_geometry::prelude::Point;
 use derive_more::{Add, Div, Mul, Sub};
-use units::{Box2DI32, HeightI32, PosXI32, PosYI32, Position2DI32, Size2DI32, UnitI32, WidthI32};
+use units::{Box2D, Height, PosX, PosY, Position2D, Size2D, Unit, Width};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub, Mul, Div)]
 pub struct WorldUnits(pub i32);
 
-impl UnitI32 for WorldUnits {
+impl Unit for WorldUnits {
     fn new(value: i32) -> Self {
         Self(value)
     }
@@ -25,56 +25,56 @@ impl UnitI32 for WorldUnits {
 }
 
 impl WorldUnits {
-    pub fn new_width(value: i32) -> WidthI32<Self> {
-        WidthI32(Self(value))
+    pub fn new_width(value: i32) -> Width<Self> {
+        Width(Self(value))
     }
 
-    pub fn new_height(value: i32) -> HeightI32<Self> {
-        HeightI32(Self(value))
+    pub fn new_height(value: i32) -> Height<Self> {
+        Height(Self(value))
     }
 
-    pub fn new_size2d(width: i32, height: i32) -> Size2DI32<Self> {
-        Size2DI32 {
+    pub fn new_size2d(width: i32, height: i32) -> Size2D<Self> {
+        Size2D {
             width: Self::new_width(width),
             height: Self::new_height(height),
         }
     }
 
-    pub fn new_position2d(x: i32, y: i32) -> Position2DI32<Self> {
-        Position2DI32 {
-            x: PosXI32(Self(x)),
-            y: PosYI32(Self(y)),
+    pub fn new_position2d(x: i32, y: i32) -> Position2D<Self> {
+        Position2D {
+            x: PosX(Self(x)),
+            y: PosY(Self(y)),
         }
     }
 
-    pub fn new_position2d_from_component(component: WorldPosition2D) -> Position2DI32<Self> {
+    pub fn new_position2d_from_component(component: WorldPosition2D) -> Position2D<Self> {
         Self::new_position2d(component.x, component.y)
     }
 
-    pub fn new_position2d_from_point(point: Point) -> Position2DI32<Self> {
+    pub fn new_position2d_from_point(point: Point) -> Position2D<Self> {
         Self::new_position2d(point.x, point.y)
     }
 
-    pub fn new_box2d(p1: Position2DI32<Self>, p2: Position2DI32<Self>) -> Box2DI32<Self> {
-        Box2DI32 { p1: p1, p2: p2 }
+    pub fn new_box2d(p1: Position2D<Self>, p2: Position2D<Self>) -> Box2D<Self> {
+        Box2D { p1: p1, p2: p2 }
     }
 
-    pub fn new_box2d_from_x1_y1_x2_y2(x1: i32, y1: i32, x2: i32, y2: i32) -> Box2DI32<Self> {
+    pub fn new_box2d_from_x1_y1_x2_y2(x1: i32, y1: i32, x2: i32, y2: i32) -> Box2D<Self> {
         Self::new_box2d(Self::new_position2d(x1, y1), Self::new_position2d(x2, y2))
     }
 
     pub fn new_box2d_from_position_and_size(
-        position: Position2DI32<Self>,
-        size: Size2DI32<Self>,
-    ) -> Box2DI32<Self> {
-        Box2DI32::new_from_position_and_size(position, size)
+        position: Position2D<Self>,
+        size: Size2D<Self>,
+    ) -> Box2D<Self> {
+        Box2D::new_from_position_and_size(position, size)
     }
 
-    pub fn new_box2d_from_size(size: Size2DI32<Self>) -> Box2DI32<Self> {
-        Box2DI32::new_from_size(size)
+    pub fn new_box2d_from_size(size: Size2D<Self>) -> Box2D<Self> {
+        Box2D::new_from_size(size)
     }
 
-    pub fn new_box2d_from_width_height(width: i32, height: i32) -> Box2DI32<Self> {
+    pub fn new_box2d_from_width_height(width: i32, height: i32) -> Box2D<Self> {
         Self::new_box2d_from_size(Self::new_size2d(width, height))
     }
 }

@@ -1,7 +1,7 @@
 use bracket_color::prelude::{ColorPair, RGB};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
-use units::{Box2DI32, Position2DI32};
+use units::{Box2D, Position2D};
 
 use crate::ui::units::ScreenChars;
 use crate::world::units::WorldUnits;
@@ -17,9 +17,9 @@ const TEXT_COLOR: RGB = colors::BLUE_LIGHT;
 pub fn render_tooltips(
     batch: &mut DrawBatch,
     ecs: &World,
-    camera_view: Box2DI32<ScreenChars>,
-    camera_in_world: Box2DI32<WorldUnits>,
-    mouse_position: Position2DI32<ScreenChars>,
+    camera_view: Box2D<ScreenChars>,
+    camera_in_world: Box2D<WorldUnits>,
+    mouse_position: Position2D<ScreenChars>,
 ) {
     let names = ecs.read_storage::<Name>();
     let map = ecs.fetch::<Map>();

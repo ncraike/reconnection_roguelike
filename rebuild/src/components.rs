@@ -1,7 +1,7 @@
 pub use bracket_geometry::prelude::Point;
 use specs::prelude::*;
 use specs_derive::Component;
-use units::Position2DI32;
+use units::Position2D;
 
 use crate::map::TileGraphic;
 use crate::world::units::WorldUnits;
@@ -96,11 +96,11 @@ pub struct WorldPosition2D {
 }
 
 impl WorldPosition2D {
-    pub fn to_world_units(&self) -> Position2DI32<WorldUnits> {
+    pub fn to_world_units(&self) -> Position2D<WorldUnits> {
         WorldUnits::new_position2d(self.x, self.y)
     }
 
-    pub fn from_world_units(position: Position2DI32<WorldUnits>) -> Self {
+    pub fn from_world_units(position: Position2D<WorldUnits>) -> Self {
         Self {
             x: position.x.to_primitive(),
             y: position.y.to_primitive(),

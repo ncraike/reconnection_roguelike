@@ -1,7 +1,7 @@
 use bracket_algorithm_traits::prelude::{Algorithm2D, BaseMap, SmallVec};
 use bracket_geometry::prelude::{DistanceAlg, Point};
 use specs::prelude::*;
-use units::{Box2DI32, PosXI32, PosYI32, Position2DI32, Size2DI32};
+use units::{Box2D, PosX, PosY, Position2D, Size2D};
 
 use crate::world::units::WorldUnits;
 
@@ -54,7 +54,7 @@ pub enum TileGraphic {
 }
 
 pub struct Map {
-    pub size: Size2DI32<WorldUnits>,
+    pub size: Size2D<WorldUnits>,
     pub tiles: Vec<TileGraphic>,
     pub revealed_tiles: Vec<bool>,
     pub visible_tiles: Vec<bool>,
@@ -79,19 +79,19 @@ impl Map {
         map
     }
 
-    pub fn to_index(&self, position: Position2DI32<WorldUnits>) -> usize {
+    pub fn to_index(&self, position: Position2D<WorldUnits>) -> usize {
         position.to_buffer_index(self.size.width)
     }
 
-    pub fn to_position(&self, index: usize) -> Position2DI32<WorldUnits> {
-        Position2DI32::<WorldUnits>::from_buffer_index(index, self.size.width)
+    pub fn to_position(&self, index: usize) -> Position2D<WorldUnits> {
+        Position2D::<WorldUnits>::from_buffer_index(index, self.size.width)
     }
 
-    pub fn bounds(&self) -> Box2DI32<WorldUnits> {
+    pub fn bounds(&self) -> Box2D<WorldUnits> {
         WorldUnits::new_box2d_from_size(self.size)
     }
 
-    fn apply_room_to_map(&mut self, room: &Box2DI32<WorldUnits>) {
+    fn apply_room_to_map(&mut self, room: &Box2D<WorldUnits>) {
         // Fill inside
         for y in (room.y1().to_primitive() + 1)..room.y2().to_primitive() {
             for x in (room.x1().to_primitive() + 1)..room.x2().to_primitive() {
@@ -112,35 +112,35 @@ impl Map {
 
         for x in (room.x1().to_primitive() + 1)..room.x2().to_primitive() {
             // Top wall
-            let top = self.to_index(Position2DI32 {
-                x: PosXI32(WorldUnits(x)),
+            let top = self.to_index(Position2D {
+                x: PosX(WorldUnits(x)),
                 y: room.y1(),
             });
             self.tiles[top] = TileGraphic::WallHInternal;
             // Bottom wall
-            let bottom = self.to_index(Position2DI32 {
-                x: PosXI32(WorldUnits(x)),
+            let bottom = self.to_index(Position2D {
+                x: PosX(WorldUnits(x)),
                 y: room.y2(),
             });
             self.tiles[bottom] = TileGraphic::WallHExternal;
         }
         for y in (room.y1().to_primitive() + 1)..room.y2().to_primitive() {
             // Left wall
-            let left = self.to_index(Position2DI32 {
+            let left = self.to_index(Position2D {
                 x: room.x1(),
-                y: PosYI32(WorldUnits(y)),
+                y: PosY(WorldUnits(y)),
             });
             self.tiles[left] = TileGraphic::WallV;
             // Right wall
-            let right = self.to_index(Position2DI32 {
+            let right = self.to_index(Position2D {
                 x: room.x2(),
-                y: PosYI32(WorldUnits(y)),
+                y: PosY(WorldUnits(y)),
             });
             self.tiles[right] = TileGraphic::WallV;
         }
     }
 
-    pub fn can_move_to(&self, position: Position2DI32<WorldUnits>) -> bool {
+    pub fn can_move_to(&self, position: Position2D<WorldUnits>) -> bool {
         self.in_bounds(position.to_bracket_geometry_point())
             && !self.blocked[self.to_index(position)]
     }

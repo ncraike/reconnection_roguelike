@@ -1,7 +1,7 @@
 use bracket_terminal::prelude::{BResult, BTerm, BTermBuilder};
 use specs::prelude::*;
 
-use units::{HeightI32, Size2DI32, WidthI32};
+use units::{Height, Size2D, Width};
 
 use super::keyboard::{match_key, Keybindings, Keybound};
 use super::menus::render_inventory_menu;
@@ -13,11 +13,11 @@ use crate::GAME_TITLE;
 pub const TEXT_FONT: &str = "vga8x16.png";
 pub const TEXT_FONT_WIDTH: usize = 8;
 pub const TEXT_FONT_HEIGHT: usize = 16;
-pub const DEFAULT_WINDOW_SIZE: Size2DI32<ScreenChars> = Size2DI32::<ScreenChars> {
-    width: WidthI32(ScreenChars(80)),
-    height: HeightI32(ScreenChars(25)),
+pub const DEFAULT_WINDOW_SIZE: Size2D<ScreenChars> = Size2D::<ScreenChars> {
+    width: Width(ScreenChars(80)),
+    height: Height(ScreenChars(25)),
 };
-pub const TEXT_BOX_HEIGHT: HeightI32<ScreenChars> = HeightI32(ScreenChars(6));
+pub const TEXT_BOX_HEIGHT: Height<ScreenChars> = Height(ScreenChars(6));
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]
 pub enum Consoles {

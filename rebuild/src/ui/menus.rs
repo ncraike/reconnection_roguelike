@@ -4,9 +4,9 @@ use bracket_color::prelude::ColorPair;
 use bracket_terminal::prelude::{render_draw_buffer, BTerm, DrawBatch};
 use specs::prelude::*;
 use std::cmp;
-use units::Box2DI32;
-use units::PosYI32;
-use units::Position2DI32;
+use units::Box2D;
+use units::PosY;
+use units::Position2D;
 
 use crate::components::{InInventory, Name};
 
@@ -22,10 +22,10 @@ const MENU_BG_COLOR: RGB = colors::BROWN_DARK;
 
 #[derive(Debug, Clone)]
 pub struct MenuInventoryView {
-    pub camera_view: Box2DI32<ScreenChars>,
-    pub menu_view: Box2DI32<ScreenChars>,
-    pub window: Box2DI32<ScreenChars>,
-    pub mouse_position: Position2DI32<ScreenChars>,
+    pub camera_view: Box2D<ScreenChars>,
+    pub menu_view: Box2D<ScreenChars>,
+    pub window: Box2D<ScreenChars>,
+    pub mouse_position: Position2D<ScreenChars>,
 }
 
 impl MenuInventoryView {
@@ -104,7 +104,7 @@ pub fn render_inventory_menu(ecs: &World, ctx: &mut BTerm) {
             batch.print_color(
                 listing_bounds
                     .p1
-                    .with_y(PosYI32(ScreenChars(y)))
+                    .with_y(PosY(ScreenChars(y)))
                     .to_bracket_geometry_point(),
                 &item_name.name.to_string(),
                 text_colorpair,

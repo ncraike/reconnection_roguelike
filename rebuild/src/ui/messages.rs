@@ -1,7 +1,7 @@
 use bracket_color::prelude::{ColorPair, RgbLerp, RGB};
 use bracket_terminal::prelude::DrawBatch;
 use specs::prelude::*;
-use units::Box2DI32;
+use units::Box2D;
 
 use super::super::message_log::MessageLog;
 
@@ -12,7 +12,7 @@ use super::units::ScreenChars;
 const FIRST_MESSAGE_COLOR: RGB = colors::BLUE_LIGHT;
 const LAST_MESSAGE_COLOR: RGB = colors::BLUE_MID_DARK;
 
-pub fn render_messages(ecs: &World, batch: &mut DrawBatch, bounds: Box2DI32<ScreenChars>) {
+pub fn render_messages(ecs: &World, batch: &mut DrawBatch, bounds: Box2D<ScreenChars>) {
     let message_log = ecs.fetch::<MessageLog>();
     let tail = message_log
         .entries
