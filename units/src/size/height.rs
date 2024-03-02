@@ -4,9 +4,9 @@ use crate::Unit;
 use derive_more::{Add, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub)]
-pub struct Width<T: Unit>(pub T);
+pub struct Height<T: Unit>(pub T);
 
-impl<T: Unit> Width<T> {
+impl<T: Unit> Height<T> {
     pub fn abs(&self) -> Self {
         Self(self.0.abs())
     }
@@ -16,7 +16,7 @@ impl<T: Unit> Width<T> {
     }
 }
 
-impl<T: Unit + MulTrait<i32, Output = T>> MulTrait<i32> for Width<T> {
+impl<T: Unit + MulTrait<i32, Output = T>> MulTrait<i32> for Height<T> {
     type Output = Self;
 
     fn mul(self, rhs: i32) -> Self::Output {
@@ -24,7 +24,7 @@ impl<T: Unit + MulTrait<i32, Output = T>> MulTrait<i32> for Width<T> {
     }
 }
 
-impl<T: Unit + DivTrait<i32, Output = T>> DivTrait<i32> for Width<T> {
+impl<T: Unit + DivTrait<i32, Output = T>> DivTrait<i32> for Height<T> {
     type Output = Self;
 
     fn div(self, rhs: i32) -> Self::Output {
@@ -34,24 +34,24 @@ impl<T: Unit + DivTrait<i32, Output = T>> DivTrait<i32> for Width<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::Width;
+    use super::Height;
     use crate::example::MyUnit;
 
     #[test]
-    fn add_width_gives_width() {
+    fn add_height_gives_height() {
         assert_eq!(
-            Width(MyUnit(1)) + Width(MyUnit(2)),
-            Width::<MyUnit>(MyUnit(3))
+            Height(MyUnit(2)) + Height(MyUnit(3)),
+            Height::<MyUnit>(MyUnit(5))
         );
     }
 
     #[test]
-    fn mul_by_i32_gives_width() {
-        assert_eq!(Width(MyUnit(4)) * 3, Width(MyUnit(12)))
+    fn mul_by_i32_gives_height() {
+        assert_eq!(Height(MyUnit(3)) * 2, Height(MyUnit(6)));
     }
 
     #[test]
-    fn div_by_i32_gives_width() {
-        assert_eq!(Width(MyUnit(8)) / 2, Width(MyUnit(4)))
+    fn div_by_i32_gives_height() {
+        assert_eq!(Height(MyUnit(12)) / 3, Height(MyUnit(4)));
     }
 }
