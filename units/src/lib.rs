@@ -5,6 +5,7 @@ mod size;
 #[cfg(test)]
 mod test;
 
+pub mod example;
 pub use base::Unit;
 pub use box2d::Box2D;
 pub use position::{PosX, PosY, Position2D};

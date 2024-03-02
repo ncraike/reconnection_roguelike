@@ -35,3 +35,13 @@
 
 - Add more unit helpers for:
   + testing position in box2D
+
+
+-- 2024-03-02 Sat
+
+- Restructure units and tests, with each type in its own file, with tests as "module" within the same file
+  * size.rs: Width, Height, Size2D
+  - position.rs: PosX, PosY, Position2D
+  - box2d.rs: Box2D
+
+- Add tests to Box2D to verify foreach behaviour

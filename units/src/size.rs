@@ -3,34 +3,9 @@ extern crate derive_more;
 use super::Unit;
 use derive_more::{Add, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub)]
-pub struct Width<T: Unit>(pub T);
+mod width;
 
-impl<T: Unit> Width<T> {
-    pub fn abs(&self) -> Self {
-        Self(self.0.abs())
-    }
-
-    pub fn to_primitive(&self) -> i32 {
-        self.0.to_primitive()
-    }
-}
-
-impl<T: Unit + MulTrait<i32, Output = T>> MulTrait<i32> for Width<T> {
-    type Output = Self;
-
-    fn mul(self, rhs: i32) -> Self::Output {
-        Self(self.0 * rhs)
-    }
-}
-
-impl<T: Unit + DivTrait<i32, Output = T>> DivTrait<i32> for Width<T> {
-    type Output = Self;
-
-    fn div(self, rhs: i32) -> Self::Output {
-        Self(self.0 / rhs)
-    }
-}
+pub use width::Width;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Add, Sub)]
 pub struct Height<T: Unit>(pub T);
