@@ -45,4 +45,6 @@
   - box2d.rs: Box2D
   - example.rs: add tests for MyUnit from test/base.rs
 
+* Add tests for Size2D
+* Implement Add Width/Height/Self for Size2D
 - Add tests to Box2D to verify foreach behaviour
