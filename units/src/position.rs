@@ -1,43 +1,13 @@
-use bracket_geometry::prelude::Point;
-use std::ops::{Add as AddTrait, Sub as SubTrait};
 extern crate derive_more;
 use super::{Height, Size2D, Unit, Width};
+use bracket_geometry::prelude::Point;
+use std::ops::{Add as AddTrait, Sub as SubTrait};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PosX<T: Unit>(pub T);
+mod pos_x;
+pub use pos_x::PosX;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PosY<T: Unit>(pub T);
-
-impl<T: Unit> PosX<T> {
-    pub fn to_primitive(&self) -> i32 {
-        self.0.to_primitive()
-    }
-}
-
-impl<T: Unit + AddTrait<Output = T>> AddTrait<Width<T>> for PosX<T> {
-    type Output = Self;
-
-    fn add(self, rhs: Width<T>) -> Self::Output {
-        Self(self.0 + rhs.0)
-    }
-}
-
-impl<T: Unit + SubTrait<Output = T>> SubTrait<PosX<T>> for PosX<T> {
-    type Output = Width<T>;
-
-    fn sub(self, rhs: PosX<T>) -> Self::Output {
-        Width::<T>(self.0 - rhs.0)
-    }
-}
-
-impl<T: Unit + SubTrait<Output = T>> SubTrait<Width<T>> for PosX<T> {
-    type Output = PosX<T>;
-
-    fn sub(self, rhs: Width<T>) -> Self::Output {
-        PosX::<T>(self.0 - rhs.0)
-    }
-}
 
 impl<T: Unit> PosY<T> {
     pub fn to_primitive(&self) -> i32 {
