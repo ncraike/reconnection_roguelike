@@ -40,9 +40,8 @@ impl<T: Unit + SubTrait<Output = T>> SubTrait<PosX<T>> for PosX<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::PosX;
+    use super::{PosX, Width};
     use crate::example::MyUnit;
-    use crate::Width;
 
     #[test]
     fn add_width_gives_pos_x() {

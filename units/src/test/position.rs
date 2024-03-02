@@ -2,20 +2,6 @@ use super::base::MyUnitI32;
 use crate::{Height, PosX, PosY, Position2D, Size2D, Width};
 
 #[test]
-fn pos_y_i32_add_height_gives_pos_y() {
-    let y = PosY(MyUnitI32(2));
-    let h = Height(MyUnitI32(3));
-    assert_eq!(y + h, PosY::<MyUnitI32>(MyUnitI32(5)));
-}
-
-#[test]
-fn pos_y_i32_sub_pos_y_gives_height() {
-    let y1 = PosY(MyUnitI32(2));
-    let y2 = PosY(MyUnitI32(5));
-    assert_eq!(y2 - y1, Height::<MyUnitI32>(MyUnitI32(3)));
-}
-
-#[test]
 fn position_2d_i32_add_size2d_gives_position2d() {
     let pos2d = Position2D::<MyUnitI32> {
         x: PosX(MyUnitI32(2)),

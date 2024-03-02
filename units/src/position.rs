@@ -4,40 +4,10 @@ use bracket_geometry::prelude::Point;
 use std::ops::{Add as AddTrait, Sub as SubTrait};
 
 mod pos_x;
+mod pos_y;
+
 pub use pos_x::PosX;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct PosY<T: Unit>(pub T);
-
-impl<T: Unit> PosY<T> {
-    pub fn to_primitive(&self) -> i32 {
-        self.0.to_primitive()
-    }
-}
-
-impl<T: Unit + AddTrait<Output = T>> AddTrait<Height<T>> for PosY<T> {
-    type Output = Self;
-
-    fn add(self, rhs: Height<T>) -> Self::Output {
-        Self(self.0 + rhs.0)
-    }
-}
-
-impl<T: Unit + SubTrait<Output = T>> SubTrait<PosY<T>> for PosY<T> {
-    type Output = Height<T>;
-
-    fn sub(self, rhs: PosY<T>) -> Self::Output {
-        Height::<T>(self.0 - rhs.0)
-    }
-}
-
-impl<T: Unit + SubTrait<Output = T>> SubTrait<Height<T>> for PosY<T> {
-    type Output = PosY<T>;
-
-    fn sub(self, rhs: Height<T>) -> Self::Output {
-        PosY::<T>(self.0 - rhs.0)
-    }
-}
+pub use pos_y::PosY;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Position2D<T: Unit> {
