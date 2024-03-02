@@ -1,4 +1,3 @@
-extern crate derive_more;
 use crate::{Unit, Width};
 use std::ops::{Add as AddTrait, Sub as SubTrait};
 
