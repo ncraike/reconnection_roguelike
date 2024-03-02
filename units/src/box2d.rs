@@ -1,4 +1,4 @@
-use super::{Height, PosX, PosY, Position2D, Size2D, Unit, Width};
+use crate::{Height, PosX, PosY, Position2D, Size2D, Unit, Width};
 use bracket_geometry::prelude::Rect;
 use std::cmp::{max, min};
 use std::ops::{Add, Div, Mul, Sub};
@@ -159,5 +159,307 @@ impl<
                 });
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Box2D, Height, PosX, PosY, Position2D, Size2D, Width};
+    use crate::example::MyUnit;
+
+    #[test]
+    fn x1_y1_x2_y2() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(5)),
+            },
+        };
+        assert_eq!(box2d.x1(), PosX(MyUnit(2)));
+        assert_eq!(box2d.y1(), PosY(MyUnit(3)));
+        assert_eq!(box2d.x2(), PosX(MyUnit(4)));
+        assert_eq!(box2d.y2(), PosY(MyUnit(5)));
+    }
+
+    #[test]
+    fn size_width_height() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert_eq!(
+            box2d.size(),
+            Size2D {
+                width: Width(MyUnit(2)),
+                height: Height(MyUnit(3)),
+            }
+        );
+        assert_eq!(box2d.width(), Width(MyUnit(2)));
+        assert_eq!(box2d.height(), Height(MyUnit(3)));
+    }
+
+    #[test]
+    fn normalize_leaves_normal_unchanged() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(5)),
+            },
+        };
+        assert_eq!(box2d.normalize(), box2d);
+    }
+
+    #[test]
+    fn normalize_swaps_p1_p2() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(5)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+        };
+        let normal_box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(5)),
+            },
+        };
+        assert_eq!(box2d.normalize(), normal_box2d);
+    }
+
+    #[test]
+    fn normalize_picks_top_left_bottom_right_corners() {
+        let box2d = Box2D::<MyUnit> {
+            // Bottom-left corner (assuming top-left origin)
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(5)),
+            },
+            // Top-right corner (assuming top-left origin)
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(3)),
+            },
+        };
+        let normal_box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(5)),
+            },
+        };
+        assert_eq!(box2d.normalize(), normal_box2d);
+    }
+
+    #[test]
+    fn split_from_left() {
+        let orig_box = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(7)),
+                y: PosY(MyUnit(8)),
+            },
+        };
+        let (left_box, right_box) = orig_box.split_from_left(Width(MyUnit(2)));
+        assert_eq!(left_box.p1, orig_box.p1);
+        assert_eq!(right_box.p2, orig_box.p2);
+        assert_eq!(left_box.width(), Width(MyUnit(2)));
+        assert_eq!(left_box.width() + right_box.width(), orig_box.width());
+        assert_eq!(left_box.height(), orig_box.height());
+        assert_eq!(right_box.height(), orig_box.height());
+        assert_eq!(
+            left_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(2)),
+                    y: PosY(MyUnit(3)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(4)),
+                    y: PosY(MyUnit(8)),
+                },
+            }
+        );
+        assert_eq!(
+            right_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(4)),
+                    y: PosY(MyUnit(3)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(7)),
+                    y: PosY(MyUnit(8)),
+                },
+            }
+        );
+    }
+
+    #[test]
+    fn split_from_right() {
+        let orig_box = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(7)),
+                y: PosY(MyUnit(8)),
+            },
+        };
+        let (left_box, right_box) = orig_box.split_from_right(Width(MyUnit(2)));
+        assert_eq!(left_box.p1, orig_box.p1);
+        assert_eq!(right_box.p2, orig_box.p2);
+        assert_eq!(right_box.width(), Width(MyUnit(2)));
+        assert_eq!(left_box.width() + right_box.width(), orig_box.width());
+        assert_eq!(left_box.height(), orig_box.height());
+        assert_eq!(right_box.height(), orig_box.height());
+        assert_eq!(
+            left_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(2)),
+                    y: PosY(MyUnit(3)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(5)),
+                    y: PosY(MyUnit(8)),
+                },
+            }
+        );
+        assert_eq!(
+            right_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(5)),
+                    y: PosY(MyUnit(3)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(7)),
+                    y: PosY(MyUnit(8)),
+                },
+            }
+        );
+    }
+
+    #[test]
+    fn split_from_top() {
+        let orig_box = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(7)),
+                y: PosY(MyUnit(9)),
+            },
+        };
+        let (top_box, bottom_box) = orig_box.split_from_top(Height(MyUnit(2)));
+        assert_eq!(top_box.p1, orig_box.p1);
+        assert_eq!(bottom_box.p2, orig_box.p2);
+        assert_eq!(top_box.height(), Height(MyUnit(2)));
+        assert_eq!(top_box.height() + bottom_box.height(), orig_box.height());
+        assert_eq!(top_box.width(), orig_box.width());
+        assert_eq!(bottom_box.width(), orig_box.width());
+        assert_eq!(
+            top_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(2)),
+                    y: PosY(MyUnit(3)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(7)),
+                    y: PosY(MyUnit(5)),
+                },
+            }
+        );
+        assert_eq!(
+            bottom_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(2)),
+                    y: PosY(MyUnit(5)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(7)),
+                    y: PosY(MyUnit(9)),
+                },
+            }
+        );
+    }
+
+    #[test]
+    fn split_from_bottom() {
+        let orig_box = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(7)),
+                y: PosY(MyUnit(9)),
+            },
+        };
+        let (top_box, bottom_box) = orig_box.split_from_bottom(Height(MyUnit(2)));
+        assert_eq!(top_box.p1, orig_box.p1);
+        assert_eq!(bottom_box.p2, orig_box.p2);
+        assert_eq!(bottom_box.height(), Height(MyUnit(2)));
+        assert_eq!(top_box.height() + bottom_box.height(), orig_box.height());
+        assert_eq!(top_box.width(), orig_box.width());
+        assert_eq!(bottom_box.width(), orig_box.width());
+        assert_eq!(
+            top_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(2)),
+                    y: PosY(MyUnit(3)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(7)),
+                    y: PosY(MyUnit(7)),
+                },
+            }
+        );
+        assert_eq!(
+            bottom_box,
+            Box2D {
+                p1: Position2D {
+                    x: PosX(MyUnit(2)),
+                    y: PosY(MyUnit(7)),
+                },
+                p2: Position2D {
+                    x: PosX(MyUnit(7)),
+                    y: PosY(MyUnit(9)),
+                },
+            }
+        );
     }
 }
