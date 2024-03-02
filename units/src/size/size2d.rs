@@ -2,7 +2,7 @@ extern crate derive_more;
 use super::{Height, Width};
 use crate::Unit;
 use derive_more::{Add, Div, Mul, Sub};
-use std::ops::{Add as AddTrait, Div as DivTrait, Mul as MulTrait, Sub as SubTrait};
+use std::ops::{Add as AddTrait, Sub as SubTrait};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Add, Sub, Mul, Div)]
 pub struct Size2D<T: Unit> {
@@ -10,7 +10,7 @@ pub struct Size2D<T: Unit> {
     pub height: Height<T>,
 }
 
-impl<T: Unit + AddTrait<T> + SubTrait<T> + MulTrait<i32> + DivTrait<i32>> Size2D<T> {
+impl<T: Unit> Size2D<T> {
     pub fn nothing() -> Self {
         Self {
             width: Width(Unit::zero()),
