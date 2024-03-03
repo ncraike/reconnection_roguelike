@@ -13,10 +13,11 @@
 
 -- 2024-03-03 Sun
 
-* Restructure units and tests, with each type in its own file, with tests as "module" within the same file
++ Restructure units and tests, with each type in its own file, with tests as "module" within the same file
   + box2d.rs: Box2D
   + example.rs: add tests for MyUnit from test/base.rs
 + Restructure box2d.rs, splitting implementation (and associated tests) across multiple files
++ Restructure Position2D: split impl across multiple files
 
 - Add tests for Position2D to_buffer_index, from_buffer_index
 - Add tests to Box2D to verify contains() and for_each() behaviour
