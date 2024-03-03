@@ -19,5 +19,7 @@
 + Restructure box2d.rs, splitting implementation (and associated tests) across multiple files
 + Restructure Position2D: split impl across multiple files
 
-- Add tests for Position2D to_buffer_index, from_buffer_index
++ Add tests for Position2D to_buffer_index, from_buffer_index
+  > Tests added, no bugs found. Also, to_buffer_index() now panic!s if x > width.
+
 - Add tests to Box2D to verify contains() and for_each() behaviour
