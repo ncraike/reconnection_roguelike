@@ -22,3 +22,34 @@ impl Unit for MyUnit {
         Self(self.0.abs())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{MyUnit, Unit};
+
+    #[test]
+    fn new() {
+        assert_eq!(MyUnit::new(3), MyUnit(3));
+    }
+
+    #[test]
+    fn zero() {
+        assert_eq!(MyUnit::zero(), MyUnit(0));
+        assert_eq!(MyUnit::zero().to_primitive(), 0);
+    }
+
+    #[test]
+    fn to_primitive() {
+        assert_eq!(MyUnit(7).to_primitive(), 7);
+    }
+
+    #[test]
+    fn mul() {
+        assert_eq!(MyUnit(3) * 4, MyUnit(12));
+    }
+
+    #[test]
+    fn div() {
+        assert_eq!(MyUnit(6) / 2, MyUnit(3));
+    }
+}

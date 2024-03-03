@@ -2,8 +2,6 @@ mod base;
 mod box2d;
 mod position;
 mod size;
-#[cfg(test)]
-mod test;
 
 pub mod example;
 pub use base::Unit;
