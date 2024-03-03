@@ -18,5 +18,5 @@
   + example.rs: add tests for MyUnit from test/base.rs
 + Restructure box2d.rs, splitting implementation (and associated tests) across multiple files
 
-- Add tests for Size2D to_buffer_index, from_buffer_index
+- Add tests for Position2D to_buffer_index, from_buffer_index
 - Add tests to Box2D to verify contains() and for_each() behaviour
