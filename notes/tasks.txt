@@ -23,3 +23,13 @@
   > Tests added, no bugs found. Also, to_buffer_index() now panic!s if x > width.
 
 - Add tests to Box2D to verify contains() and for_each() behaviour
+
+
+-- 2024-03-04 Mon
+
++ Add tests to Box2D to verify contains() behaviour
+- Add tests to Box2D to verify for_each() behaviour
+
+- Remove Box2D x1(), y1(), x2(), y2()?
+- Remove Box2D width(), height()?
+- Keep Box2D size()?

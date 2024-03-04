@@ -39,9 +39,9 @@ impl<T: Unit + Copy + Add<Output = T> + Sub<Output = T> + Ord> Box2D<T> {
 
     pub fn contains(&self, position: Position2D<T>) -> bool {
         self.x1() <= position.x
-            && position.x <= self.x2()
+            && position.x < self.x2()
             && self.y1() <= position.y
-            && position.y <= self.y2()
+            && position.y < self.y2()
     }
 
     pub fn normalize(&self) -> Self {
@@ -123,6 +123,102 @@ mod tests {
         );
         assert_eq!(box2d.width(), Width(MyUnit(2)));
         assert_eq!(box2d.height(), Height(MyUnit(3)));
+    }
+
+    #[test]
+    fn contains_position_inside() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert!(box2d.contains(Position2D {
+            x: PosX(MyUnit(3)),
+            y: PosY(MyUnit(4)),
+        }));
+    }
+
+    #[test]
+    fn contains_p1() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert!(box2d.contains(box2d.p1));
+    }
+
+    #[test]
+    fn contains_does_not_contain_position_outside() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert!(!box2d.contains(Position2D {
+            x: PosX(MyUnit(7)),
+            y: PosY(MyUnit(8)),
+        }));
+    }
+
+    #[test]
+    fn contains_does_not_contain_p2() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert!(!box2d.contains(box2d.p2));
+    }
+
+    #[test]
+    fn contains_does_not_contain_p2_x() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert!(!box2d.contains(box2d.p1.with_x_of(box2d.p2)));
+    }
+
+    #[test]
+    fn contains_does_not_contain_p2_y() {
+        let box2d = Box2D::<MyUnit> {
+            p1: Position2D {
+                x: PosX(MyUnit(2)),
+                y: PosY(MyUnit(3)),
+            },
+            p2: Position2D {
+                x: PosX(MyUnit(4)),
+                y: PosY(MyUnit(6)),
+            },
+        };
+        assert!(!box2d.contains(box2d.p1.with_y_of(box2d.p2)));
     }
 
     #[test]
